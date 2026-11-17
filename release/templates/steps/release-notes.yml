@@ -1,0 +1,34 @@
+# Optional: release notes for every releasing unit, as <notesDirectory>/<unit>.md and .txt. Leave this
+# step out and packages are built without notes and GitHub releases get a minimal body.
+# Needs only READ access to the repository (public repositories work without a token).
+
+parameters:
+  - name: planFile
+    type: string
+    default: $(Build.ArtifactStagingDirectory)/release/release-plan.json
+  - name: notesDirectory
+    type: string
+    default: $(Build.ArtifactStagingDirectory)/release/notes
+  - name: githubToken              # e.g. $(GitHubReadToken); an undefined variable means anonymous access
+    type: string
+    default: $(GitHubReadToken)
+  - name: toolkitPath
+    type: string
+    default: $(Pipeline.Workspace)/toolkit
+
+steps:
+  - pwsh: |
+      & "$env:TOOLKIT_PATH/release/scripts/New-ReleaseNotes.ps1" `
+        -PlanFile $env:PLAN_FILE `
+        -OutDirectory $env:NOTES_DIRECTORY `
+        -Repository $env:BUILD_REPOSITORY_NAME
+    displayName: Generate release notes
+    workingDirectory: $(Build.SourcesDirectory)
+    target:
+      commands: restricted
+      settableVariables: []
+    env:
+      TOOLKIT_PATH: ${{ parameters.toolkitPath }}
+      PLAN_FILE: ${{ parameters.planFile }}
+      NOTES_DIRECTORY: ${{ parameters.notesDirectory }}
+      GITHUB_TOKEN: ${{ parameters.githubToken }}

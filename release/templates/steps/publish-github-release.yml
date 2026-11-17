@@ -1,0 +1,35 @@
+# One phase of the GitHub release of every releasing unit: Prepare (draft + assets, before the feed push)
+# or Publish (after it; creates the tag). Needs a token with Contents: write.
+
+parameters:
+  - name: action
+    type: string
+    values: [ Prepare, Publish ]
+  - name: releaseDirectory         # the downloaded 'release' artifact
+    type: string
+    default: $(Pipeline.Workspace)/release
+  - name: githubToken
+    type: string
+    default: $(GitHubToken)
+  - name: toolkitPath
+    type: string
+    default: $(Pipeline.Workspace)/toolkit
+
+steps:
+  - pwsh: |
+      & "$env:TOOLKIT_PATH/release/scripts/Publish-GitHubRelease.ps1" `
+        -Action $env:RELEASE_ACTION `
+        -PlanFile (Join-Path $env:RELEASE_DIRECTORY 'release-plan.json') `
+        -PackagesPath (Join-Path $env:RELEASE_DIRECTORY 'packages') `
+        -NotesDirectory (Join-Path $env:RELEASE_DIRECTORY 'notes') `
+        -Repository $env:BUILD_REPOSITORY_NAME
+    displayName: ${{ parameters.action }} GitHub release
+    workingDirectory: $(Build.SourcesDirectory)
+    target:
+      commands: restricted
+      settableVariables: []
+    env:
+      TOOLKIT_PATH: ${{ parameters.toolkitPath }}
+      RELEASE_ACTION: ${{ parameters.action }}
+      RELEASE_DIRECTORY: ${{ parameters.releaseDirectory }}
+      GITHUB_TOKEN: ${{ parameters.githubToken }}

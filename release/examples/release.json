@@ -1,0 +1,7 @@
+{
+  "units": [
+    { "name": "Gmf.DDD.Common", "type": "nuget", "projects": ["Packages/Gmf.DDD.Common/Gmf.DDD.Common.csproj"] },
+    { "name": "Gmf.Mail.Common", "type": "nuget", "projects": ["Packages/Gmf.Mail.Common/Gmf.Mail.Common.csproj"] },
+    { "name": "web-components", "type": "npm", "package": "Site/Components/package.json" }
+  ]
+}

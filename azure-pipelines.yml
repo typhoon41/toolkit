@@ -1,0 +1,49 @@
+# CI for the toolkit itself: tests and static analysis on every push and PR.
+
+trigger:
+  branches:
+    include: [ main ]
+
+pr:
+  branches:
+    include: [ main ]
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+  - checkout: self
+    fetchDepth: 1
+
+  - task: UseDotNet@2
+    displayName: Install .NET SDK
+    inputs:
+      version: 10.x
+
+  - pwsh: |
+      Install-Module Pester -MinimumVersion 5.6.0 -Scope CurrentUser -Force -SkipPublisherCheck
+      Install-Module PSScriptAnalyzer -Scope CurrentUser -Force
+    displayName: Install Pester and PSScriptAnalyzer
+
+  - pwsh: |
+      $issues = @('./module', './scripts' | ForEach-Object { Invoke-ScriptAnalyzer -Path $_ -Recurse -Settings ./PSScriptAnalyzerSettings.psd1 })
+      $issues | Format-Table ScriptName, Line, RuleName, Message -Wrap | Out-String -Width 200 | Write-Host
+      if ($issues.Count -gt 0) { exit 1 }
+    displayName: Analyze release tooling
+    workingDirectory: release
+
+  - pwsh: |
+      $configuration = New-PesterConfiguration
+      $configuration.Run.Path = './tests'
+      $configuration.Run.Exit = $true
+      $configuration.TestResult.Enabled = $true
+      $configuration.TestResult.OutputPath = "$env:AGENT_TEMPDIRECTORY/release-tests.xml"
+      Invoke-Pester -Configuration $configuration
+    displayName: Test release tooling
+    workingDirectory: release
+
+  - task: PublishTestResults@2
+    condition: always()
+    inputs:
+      testResultsFormat: NUnit
+      testResultsFiles: $(Agent.TempDirectory)/release-tests.xml

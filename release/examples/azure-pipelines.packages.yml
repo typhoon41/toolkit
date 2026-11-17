@@ -1,0 +1,41 @@
+# Package repository (NuGet and/or npm). Builds every push and PR; releases a unit when a merge to main
+# bumps its version, after approval in the 'package-release' environment.
+
+trigger:
+  branches:
+    include: [ main ]
+
+pr:
+  branches:
+    include: [ main ]
+
+lockBehavior: sequential           # with the environment's exclusive lock: releases never overlap
+
+resources:
+  repositories:
+    - repository: toolkit
+      type: github
+      name: typhoon41/toolkit
+      endpoint: github-connection  # your GitHub service connection
+      ref: refs/tags/v1.0.0
+
+stages:
+  - template: release/templates/stages/package-release.yml@toolkit
+    parameters:
+      releaseNotes: true
+      environment: package-release
+      releaseVariableGroup: release-secrets
+      buildVariableGroup: build-read     # holds GitHubReadToken; remove for public repositories
+      buildSteps:
+        - task: UseDotNet@2
+          displayName: Install .NET SDK
+          inputs:
+            version: 10.x
+        - task: NodeTool@0
+          displayName: Install Node
+          inputs:
+            versionSpec: 22.x
+        - pwsh: dotnet build -c Release
+          displayName: Build
+        - pwsh: dotnet test -c Release --no-build
+          displayName: Test

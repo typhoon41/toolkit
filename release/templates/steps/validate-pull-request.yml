@@ -1,0 +1,29 @@
+# Checks the PR title and commits against the commit convention. Warn-only unless enforce: true.
+# Runs PR-controlled code: give it a READ-ONLY token at most, never publishing credentials.
+
+parameters:
+  - name: enforce
+    type: boolean
+    default: false
+  - name: githubToken
+    type: string
+    default: $(GitHubReadToken)
+  - name: toolkitPath
+    type: string
+    default: $(Pipeline.Workspace)/toolkit
+
+steps:
+  - pwsh: |
+      & "$env:TOOLKIT_PATH/release/scripts/Test-PullRequest.ps1" `
+        -PullRequestNumber $env:SYSTEM_PULLREQUEST_PULLREQUESTNUMBER `
+        -Repository $env:BUILD_REPOSITORY_NAME `
+        -Enforce:([bool]::Parse($env:ENFORCE))
+    displayName: Check commit convention
+    condition: and(succeeded(), eq(variables['Build.Reason'], 'PullRequest'))
+    target:
+      commands: restricted
+      settableVariables: []
+    env:
+      TOOLKIT_PATH: ${{ parameters.toolkitPath }}
+      ENFORCE: ${{ parameters.enforce }}
+      GITHUB_TOKEN: ${{ parameters.githubToken }}

@@ -1,0 +1,74 @@
+# Pushes the packages of every releasing NuGet and npm unit. Idempotent; safe with "Rerun failed jobs".
+#   nuget.org:       variable NuGetApiKey (secret)
+#   Azure Artifacts: nugetAuthenticate: true (the API key is then irrelevant)
+#   npmjs.org:       variable NpmToken (secret, an automation token)
+#   Azure Artifacts: npmAuthenticate: true with npmrcFile pointing at an .npmrc that names the feed
+
+parameters:
+  - name: releaseDirectory
+    type: string
+    default: $(Pipeline.Workspace)/release
+  - name: nugetApiKey
+    type: string
+    default: $(NuGetApiKey)
+  - name: nugetAuthenticate
+    type: boolean
+    default: false
+  - name: npmToken
+    type: string
+    default: $(NpmToken)
+  - name: npmAuthenticate
+    type: boolean
+    default: false
+  - name: npmrcFile
+    type: string
+    default: $(Build.SourcesDirectory)/.npmrc
+  - name: npmAccess                # '', public or restricted (scoped packages on npmjs.org default to restricted)
+    type: string
+    default: ''
+  - name: toolkitPath
+    type: string
+    default: $(Pipeline.Workspace)/toolkit
+
+steps:
+  - ${{ if parameters.nugetAuthenticate }}:
+    - task: NuGetAuthenticate@1
+      displayName: Authenticate to NuGet feeds
+
+  - pwsh: |
+      & "$env:TOOLKIT_PATH/release/scripts/Publish-NuGetPackage.ps1" `
+        -PlanFile (Join-Path $env:RELEASE_DIRECTORY 'release-plan.json') `
+        -PackagesPath (Join-Path $env:RELEASE_DIRECTORY 'packages')
+    displayName: Push NuGet packages
+    target:
+      commands: restricted
+      settableVariables: []
+    env:
+      TOOLKIT_PATH: ${{ parameters.toolkitPath }}
+      RELEASE_DIRECTORY: ${{ parameters.releaseDirectory }}
+      NUGET_API_KEY: ${{ parameters.nugetApiKey }}
+      NUGET_FEED_READ_TOKEN: $(System.AccessToken)
+
+  - ${{ if parameters.npmAuthenticate }}:
+    - task: npmAuthenticate@0
+      displayName: Authenticate to npm feeds
+      inputs:
+        workingFile: ${{ parameters.npmrcFile }}
+
+  - pwsh: |
+      & "$env:TOOLKIT_PATH/release/scripts/Publish-NpmPackage.ps1" `
+        -PlanFile (Join-Path $env:RELEASE_DIRECTORY 'release-plan.json') `
+        -PackagesPath (Join-Path $env:RELEASE_DIRECTORY 'packages') `
+        -Access $env:NPM_ACCESS
+    displayName: Publish npm packages
+    target:
+      commands: restricted
+      settableVariables: []
+    env:
+      TOOLKIT_PATH: ${{ parameters.toolkitPath }}
+      RELEASE_DIRECTORY: ${{ parameters.releaseDirectory }}
+      NPM_ACCESS: ${{ parameters.npmAccess }}
+      ${{ if parameters.npmAuthenticate }}:
+        NPM_CONFIG_USERCONFIG: ${{ parameters.npmrcFile }}
+      ${{ else }}:
+        NPM_TOKEN: ${{ parameters.npmToken }}

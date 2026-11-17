@@ -1,0 +1,50 @@
+# Full-stack application: the version comes from the pipeline. Only the release-tooling parts are shown;
+# keep your own build and deployment steps where the comments say. release.json:
+#   { "units": [ { "name": "marush", "type": "pipeline" } ] }
+
+trigger:
+  - main
+
+variables:
+  applicationVersion: 0.9
+
+name: $(applicationVersion).$(Rev:r)      # 0.9.42 on main; feature branches become 0.9.42-<branch words>
+
+resources:
+  repositories:
+    - repository: toolkit
+      type: github
+      name: typhoon41/toolkit
+      endpoint: github-connection
+      ref: refs/tags/v1.0.0
+
+stages:
+  - stage: Build
+    jobs:
+      - job: Build
+        steps:
+          - template: release/templates/steps/checkout.yml@toolkit
+
+          - template: release/templates/steps/resolve-release-plan.yml@toolkit
+            parameters:
+              pipelineVersion: $(Build.BuildNumber)
+              publishPlan: true
+
+          # ... your build steps (they run in $(Build.SourcesDirectory) as before)
+
+  # ... your test deployment stage
+
+  - stage: DeployToProduction
+    dependsOn: Build
+    jobs:
+      # ... your approval and production deployment jobs
+
+      - job: Release
+        displayName: GitHub release
+        dependsOn: [ ]                    # list your production deployment jobs here
+        variables:
+          - group: release-secrets        # GitHubToken (Contents: write)
+        steps:
+          - template: release/templates/steps/release-application.yml@toolkit
+            parameters:
+              releaseNotes: true

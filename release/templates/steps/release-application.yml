@@ -1,0 +1,45 @@
+# For applications (a 'pipeline' unit whose version comes from the pipeline): put these steps after the
+# production deployment. They generate the release notes (optional) and publish the GitHub release and
+# tag at the built commit. Builds that are not on the release branch do nothing here.
+# The Build stage must have run resolve-release-plan.yml with pipelineVersion and publishPlan: true.
+
+parameters:
+  - name: releaseNotes
+    type: boolean
+    default: true
+  - name: checkout                 # false when the job already ran steps/checkout.yml
+    type: boolean
+    default: true
+  - name: githubToken              # Contents: write
+    type: string
+    default: $(GitHubToken)
+  - name: toolkitRepository
+    type: string
+    default: toolkit
+  - name: toolkitPath
+    type: string
+    default: $(Pipeline.Workspace)/toolkit
+
+steps:
+  - ${{ if parameters.checkout }}:
+    - template: checkout.yml
+      parameters:
+        toolkitRepository: ${{ parameters.toolkitRepository }}
+
+  - download: current
+    artifact: release
+    displayName: Download release plan
+
+  - ${{ if parameters.releaseNotes }}:
+    - template: release-notes.yml
+      parameters:
+        planFile: $(Pipeline.Workspace)/release/release-plan.json
+        notesDirectory: $(Pipeline.Workspace)/release/notes
+        githubToken: ${{ parameters.githubToken }}
+        toolkitPath: ${{ parameters.toolkitPath }}
+
+  - template: publish-github-release.yml
+    parameters:
+      action: Publish
+      githubToken: ${{ parameters.githubToken }}
+      toolkitPath: ${{ parameters.toolkitPath }}

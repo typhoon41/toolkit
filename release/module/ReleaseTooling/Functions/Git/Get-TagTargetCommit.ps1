@@ -1,0 +1,9 @@
+function Get-TagTargetCommit {
+    # SHA of the commit a local tag points to (annotated tags are peeled), or $null when it doesn't exist.
+    param([Parameter(Mandatory)] [string] $Tag)
+    $commit = & git rev-parse --verify --quiet "refs/tags/$Tag^{commit}" 2>$null
+    if ($LASTEXITCODE -ne 0 -or -not $commit) {
+        return $null
+    }
+    [string]$commit
+}
