@@ -1,8 +1,9 @@
 function Invoke-NpmPack {
     <#
         Packs an npm unit with the plan's package version into -OutDirectory. With -NotesFile the notes ship
-        in the tarball as RELEASE-NOTES.md (added to "files" when the package lists its files). The package
-        directory is restored afterwards, so nothing of this ends up in a commit.
+        in the tarball as RELEASE-NOTES.md (added to "files" when the package lists its files); packing fails
+        when they are left out anyway (.npmignore). The package directory, including the lock and shrinkwrap
+        files `npm version` updates, is restored afterwards, so nothing of this ends up in a commit.
     #>
     param(
         [Parameter(Mandatory)] $UnitPlan,
@@ -12,7 +13,7 @@ function Invoke-NpmPack {
     $packageDirectory = Split-Path -Parent ([IO.Path]::GetFullPath($UnitPlan.package, (Get-Location).Path))
     $notesTarget = Join-Path $packageDirectory 'RELEASE-NOTES.md'
     $backups = @{}
-    foreach ($name in 'package.json', 'package-lock.json', 'RELEASE-NOTES.md') {
+    foreach ($name in 'package.json', 'package-lock.json', 'npm-shrinkwrap.json', 'RELEASE-NOTES.md') {
         $path = Join-Path $packageDirectory $name
         $backups[$path] = if (Test-Path -LiteralPath $path) { [IO.File]::ReadAllBytes($path) } else { $null }
     }
@@ -36,6 +37,10 @@ function Invoke-NpmPack {
         $tarball = Join-Path $destination ("$(($UnitPlan.packageNames[0] -replace '^@', '') -replace '/', '-')-$($UnitPlan.packageVersion).tgz")
         if (-not (Test-Path -LiteralPath $tarball)) {
             throw "npm pack did not produce $tarball."
+        }
+        if ($NotesFile -and -not (Test-NpmTarballEntry -Path $tarball -Name 'RELEASE-NOTES.md')) {
+            throw ("$($UnitPlan.package) excludes RELEASE-NOTES.md from its package, so the release notes would be missing. " +
+                   'Add RELEASE-NOTES.md to "files" in package.json, or un-ignore it in .npmignore.')
         }
         $tarball
     }
