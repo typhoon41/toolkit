@@ -1,5 +1,6 @@
 # Pushes the packages of every releasing NuGet and npm unit. Idempotent; safe with "Rerun failed jobs".
-# Run authenticate-feeds.yml earlier in the job for Azure Artifacts feeds.
+# It doesn't authenticate by itself: run authenticate-feeds.yml earlier in the job for Azure Artifacts
+# feeds (step order: release/README.md, "Using the step templates on their own").
 #   nuget.org:       variable NuGetApiKey (secret)
 #   Azure Artifacts: authenticate-feeds.yml with nugetAuthenticate: true (the API key is then irrelevant)
 #   npmjs.org:       variable NpmToken (secret, an automation token)

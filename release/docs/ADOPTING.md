@@ -52,7 +52,8 @@ resources:
 ```
 
 - Packages: copy [../examples/azure-pipelines.packages.yml](../examples/azure-pipelines.packages.yml).
-  It uses `templates/stages/package-release.yml` and needs `lockBehavior: sequential` at the root.
+  It uses `templates/stages/package-release.yml` and needs `lockBehavior: sequential` at the root
+  (assembling the steps yourself: [README](../README.md#using-the-step-templates-on-their-own)).
 - Applications: copy the relevant parts of
   [../examples/azure-pipelines.application.yml](../examples/azure-pipelines.application.yml): add
   `steps/checkout.yml` + `steps/resolve-release-plan.yml` (with `pipelineVersion: $(Build.BuildNumber)`

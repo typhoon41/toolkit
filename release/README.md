@@ -30,6 +30,31 @@ Preview the notes of an upcoming release locally from the project root:
 pwsh ../toolkit/release/scripts/New-ReleaseNotes.ps1 -Unit <unit> -Version 1.4.0 -Preview
 ```
 
+## Using the step templates on their own
+
+`stages/package-release.yml` already runs every step in the right order. When you assemble a release job
+yourself, keep this order. `publish-packages.yml` doesn't authenticate by itself, so for Azure Artifacts
+run `authenticate-feeds.yml` before the first step that touches a feed (Prepare already reads them):
+
+```yaml
+steps:   # inside a deployment job, after the Build stage published the 'release' artifact
+  - template: release/templates/steps/checkout.yml@toolkit
+  - download: current
+    artifact: release
+  - template: release/templates/steps/authenticate-feeds.yml@toolkit     # Azure Artifacts only
+    parameters: { nugetAuthenticate: true, npmAuthenticate: true, npmrcFile: $(Build.SourcesDirectory)/.npmrc }
+  - template: release/templates/steps/publish-github-release.yml@toolkit
+    parameters: { action: Prepare, npmAuthenticate: true, npmrcFile: $(Build.SourcesDirectory)/.npmrc }
+  - template: release/templates/steps/publish-packages.yml@toolkit
+    parameters: { npmAuthenticate: true, npmrcFile: $(Build.SourcesDirectory)/.npmrc }
+  - template: release/templates/steps/publish-github-release.yml@toolkit
+    parameters: { action: Publish, npmAuthenticate: true, npmrcFile: $(Build.SourcesDirectory)/.npmrc }
+```
+
+Pass `nugetAuthenticate` only to `authenticate-feeds.yml`. Give `npmAuthenticate`/`npmrcFile` to every
+step that reads or writes the npm feed. With nuget.org and npmjs.org, leave out `authenticate-feeds.yml`
+and those parameters; the `NuGetApiKey` / `NpmToken` variables are used instead.
+
 ## Layout
 
 | Path | Contents |
