@@ -1,5 +1,6 @@
-# Release job of package-release.yml, behind the approval environment: Prepare the GitHub drafts ->
-# push NuGet/npm -> publish the GitHub releases and tags once the feeds list the packages.
+# Release job of package-release.yml, behind the approval environment: authenticate to the feeds ->
+# Prepare the GitHub drafts -> push NuGet/npm -> publish the GitHub releases and tags once the feeds list
+# the packages.
 # Every step is safe to re-run with "Rerun failed jobs" on the same run.
 
 parameters:
@@ -41,13 +42,20 @@ jobs:
               artifact: release
               displayName: Download release artifact
 
+            - template: ../steps/authenticate-feeds.yml      # before the first feed check (Prepare)
+              parameters:
+                nugetAuthenticate: ${{ parameters.nugetAuthenticate }}
+                npmAuthenticate: ${{ parameters.npmAuthenticate }}
+                npmrcFile: ${{ parameters.npmrcFile }}
+
             - template: ../steps/publish-github-release.yml
               parameters:
                 action: Prepare
+                npmAuthenticate: ${{ parameters.npmAuthenticate }}
+                npmrcFile: ${{ parameters.npmrcFile }}
 
             - template: ../steps/publish-packages.yml
               parameters:
-                nugetAuthenticate: ${{ parameters.nugetAuthenticate }}
                 npmAuthenticate: ${{ parameters.npmAuthenticate }}
                 npmrcFile: ${{ parameters.npmrcFile }}
                 npmAccess: ${{ parameters.npmAccess }}
@@ -56,3 +64,5 @@ jobs:
               parameters:
                 action: Publish
                 feedWaitMinutes: ${{ parameters.feedWaitMinutes }}
+                npmAuthenticate: ${{ parameters.npmAuthenticate }}
+                npmrcFile: ${{ parameters.npmrcFile }}

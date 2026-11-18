@@ -17,6 +17,12 @@ parameters:
   - name: npmToken                 # reads private npm registries; npmjs.org needs nothing
     type: string
     default: $(NpmToken)
+  - name: npmAuthenticate          # read npm feeds with the .npmrc authenticate-feeds.yml prepared instead
+    type: boolean
+    default: false
+  - name: npmrcFile
+    type: string
+    default: $(Build.SourcesDirectory)/.npmrc
   - name: toolkitPath
     type: string
     default: $(Pipeline.Workspace)/toolkit
@@ -42,4 +48,7 @@ steps:
       GITHUB_TOKEN: ${{ parameters.githubToken }}
       FEED_WAIT_MINUTES: ${{ parameters.feedWaitMinutes }}
       NUGET_FEED_READ_TOKEN: $(System.AccessToken)     # private NuGet feeds (Azure Artifacts) are read with it
-      NPM_TOKEN: ${{ parameters.npmToken }}
+      ${{ if parameters.npmAuthenticate }}:
+        NPM_CONFIG_USERCONFIG: ${{ parameters.npmrcFile }}
+      ${{ else }}:
+        NPM_TOKEN: ${{ parameters.npmToken }}

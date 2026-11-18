@@ -70,7 +70,7 @@ The templates check the project out at `$(Build.SourcesDirectory)` and this tool
 | `environment` | `package-release` | Approval environment of the Release stage |
 | `releaseVariableGroup` | `release-secrets` | `NuGetApiKey`, `NpmToken`, `GitHubToken` |
 | `buildVariableGroup` | `''` | Optional group with `GitHubReadToken` for the PR check and the notes |
-| `nugetAuthenticate` / `npmAuthenticate` | `false` | Azure Artifacts feeds instead of API keys |
+| `nugetAuthenticate` / `npmAuthenticate` | `false` | Azure Artifacts feeds instead of API keys; the release job authenticates first, before any feed check (`steps/authenticate-feeds.yml`) |
 | `npmAccess` | `''` | `public` for scoped packages on npmjs.org |
 | `enforceCommitConvention` | `false` | Fail PRs whose title/commits don't follow the convention |
 
