@@ -35,6 +35,22 @@ Describe 'Invoke-ReleasePublish' {
         Should -Invoke -ModuleName ReleaseTooling Start-Sleep -Times 0 -Exactly
     }
 
+    It 'refuses when a higher version is released while it waits for the feed' {
+        $script:releaseReads = 0
+        Mock -ModuleName ReleaseTooling Get-GitHubRelease {
+            $script:releaseReads++
+            if ($script:releaseReads -lt 2) { , @() } else { , @([pscustomobject]@{ tag_name = 'v1.2.0'; draft = $false }) }
+        }
+        $script:checks = 0
+        Mock -ModuleName ReleaseTooling Get-UnitFeedState {
+            $script:checks++
+            $state = if ($script:checks -lt 2) { 'Absent' } else { 'Published' }
+            , @([pscustomobject]@{ Label = 'Lib 1.1.0'; State = $state; Detail = '' })
+        }
+        { Invoke-ReleasePublish -Context (New-TestContext -Files @($package)) -Release (New-TestDraft) -FeedWaitMinutes 10 } | Should -Throw '*v1.2.0 is already released*'
+        Should -Invoke -ModuleName ReleaseTooling Invoke-GitHubApi -Times 0 -Exactly -ParameterFilter { $Method -eq 'Patch' }
+    }
+
     It 'waits for indexing, then publishes' {
         $script:checks = 0
         Mock -ModuleName ReleaseTooling Get-UnitFeedState {

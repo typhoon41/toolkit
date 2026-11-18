@@ -14,12 +14,10 @@ function Invoke-ReleasePublish {
     if (-not (Get-ReleaseAsset -Context $Context -Release $Release -Name (Get-ReleaseStateName).Marker)) {
         throw "Prepare did not complete for $($Context.Tag); run Prepare, then the feed push, then Publish."
     }
-    $releases = Get-GitHubRelease -Client $Context.Client
-    Assert-ReleaseOrder -Context $Context -Releases $releases          # immediately before publication
-    Assert-NoUnfinishedRelease -Context $Context -Releases $releases
-    [void](Assert-TagTarget -Context $Context)
+    Assert-ReleasePublishable -Context $Context                        # fail fast, before any waiting
     Sync-ReleaseAsset -Context $Context -Release $Release -VerifyOnly -FrozenReason (Get-FrozenReason $Context)
     Wait-UnitFeedPublication -Context $Context -TimeoutMinutes $FeedWaitMinutes
+    Assert-ReleasePublishable -Context $Context                        # again: the wait can take minutes
 
     $published = Invoke-GitHubApi -Client $Context.Client -Method Patch -Path "releases/$($Release.id)" -Body @{
         draft       = $false
