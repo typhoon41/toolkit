@@ -10,6 +10,8 @@ variables:
 
 name: $(applicationVersion).$(Rev:r)      # 0.9.42 on main; feature branches become 0.9.42-<branch words>
 
+lockBehavior: sequential                  # with the environment's Exclusive lock: releases never overlap
+
 resources:
   repositories:
     - repository: toolkit
@@ -39,12 +41,16 @@ stages:
     jobs:
       # ... your approval and production deployment jobs
 
-      - job: Release
+      - deployment: Release
         displayName: GitHub release
         dependsOn: [ ]                    # list your production deployment jobs here
+        environment: application-release  # give it an Exclusive lock (Approvals and checks) so releases run one at a time
         variables:
           - group: release-secrets        # GitHubToken (Contents: write)
-        steps:
-          - template: release/templates/steps/release-application.yml@toolkit
-            parameters:
-              releaseNotes: true
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - template: release/templates/steps/release-application.yml@toolkit
+                  parameters:
+                    releaseNotes: true

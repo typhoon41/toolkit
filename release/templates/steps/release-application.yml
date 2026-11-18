@@ -2,6 +2,8 @@
 # production deployment. They generate the release notes (optional) and publish the GitHub release and
 # tag at the built commit. Builds that are not on the release branch do nothing here.
 # The Build stage must have run resolve-release-plan.yml with pipelineVersion and publishPlan: true.
+# Run these steps in a deployment job whose environment has an Exclusive lock (and lockBehavior: sequential
+# in the pipeline), so two production runs never release at the same time and out of order.
 
 parameters:
   - name: releaseNotes

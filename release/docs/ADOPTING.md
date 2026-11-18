@@ -96,7 +96,8 @@ an npm **automation token**, both in `release-secrets`.
 - Approvals and checks → **Branch control**: `refs/heads/main`; tick *Verify branch protection*;
   untick *Allow resources from unknown/unverifiable branches*.
 
-**Pipelines → Environments → `package-release`** (or your name), Approvals and checks:
+**Pipelines → Environments → `package-release`** and, for applications, **`application-release`** (or your names; the
+application one needs only Branch control and the Exclusive lock, production was approved already), Approvals and checks:
 - **Approvals**: the reviewer; untick *Allow approvers to approve their own runs*.
 - **Branch control**: `refs/heads/main`.
 - **Exclusive lock** (the YAML's `lockBehavior: sequential` goes with it).

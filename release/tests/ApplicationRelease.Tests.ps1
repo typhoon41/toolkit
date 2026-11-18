@@ -18,6 +18,12 @@ Describe 'Publish-ApplicationRelease' {
         }
     }
 
+    It 'refuses when a higher version was released before it got the lock' {
+        Mock -ModuleName ReleaseTooling Get-GitHubRelease { , @([pscustomobject]@{ tag_name = 'v0.9.13'; draft = $false; html_url = 'x' }) }
+        { Publish-ApplicationRelease -Context (New-TestContext -Version '0.9.12' -Type 'pipeline') } | Should -Throw '*v0.9.13 is already released*'
+        Should -Invoke -ModuleName ReleaseTooling Invoke-GitHubApi -Times 0 -Exactly -ParameterFilter { $Method -in 'Post', 'Patch' }
+    }
+
     It 'only verifies an already published release' {
         Mock -ModuleName ReleaseTooling Get-GitHubRelease { , @([pscustomobject]@{ tag_name = 'v0.9.12'; draft = $false; html_url = 'x' }) }
         Publish-ApplicationRelease -Context (New-TestContext -Version '0.9.12' -Type 'pipeline')
