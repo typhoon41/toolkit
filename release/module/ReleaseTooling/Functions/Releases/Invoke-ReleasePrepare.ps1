@@ -18,7 +18,7 @@ function Invoke-ReleasePrepare {
         $state = Get-UnitFeedState -UnitPlan $Context.Unit -Files $Context.Files -Commit $Context.Commit
         $summary = ($state | ForEach-Object { "$($_.Label): $($_.State)" }) -join '; '
         $advice = if (@($state | Where-Object State -eq 'Foreign').Count -gt 0) { 'A FOREIGN package occupies the version: bump the version.' }
-                  else { "This build's package(s) reached the feed without a draft: a maintainer runs -Action Restore with the COMPLETE original artifacts, then Prepare -> publish to the feed -> Publish (docs/RELEASING.md, 'Missing draft')." }
+                  else { "This build's package(s) reached the feed without a draft: a maintainer runs -Action Restore with the COMPLETE original artifacts, then Prepare -> publish to the feed -> Publish (docs/RECOVERY.md, 'Missing draft')." }
         throw "The feed already holds version $($Context.Candidate.Text) but GitHub has no draft release $($Context.Tag). Found on the feed: $summary. $advice"
     }
     if ($PublicationStarted) {

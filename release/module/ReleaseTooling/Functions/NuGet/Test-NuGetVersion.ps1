@@ -9,11 +9,11 @@ function Test-NuGetVersion {
         [Parameter(Mandatory)] [string] $Version,
         [hashtable] $Headers = @{}
     )
-    $uri = "$FlatContainer$($Id.ToLowerInvariant())/index.json"
-    $versions = Invoke-RestMethod -Uri $uri -Headers $Headers -SkipHttpErrorCheck -StatusCodeVariable status
+    $indexUrl = "$FlatContainer$($Id.ToLowerInvariant())/index.json"
+    $versions = Invoke-RestMethod -Uri $indexUrl -Headers $Headers -SkipHttpErrorCheck -StatusCodeVariable status
     switch ($status) {
         200 { return (@($versions.versions) -contains $Version.ToLowerInvariant()) }
         404 { return $false }
-        default { throw "NuGet feed returned HTTP $status for $uri; cannot tell whether $Id $Version is published." }
+        default { throw "NuGet feed returned HTTP $status for $indexUrl; cannot tell whether $Id $Version is published." }
     }
 }

@@ -23,6 +23,6 @@ function Assert-ReleaseCommit {
         throw ("The feed already holds version $($Context.Candidate.Text), but the only draft for $($Context.Tag) is unfinished (no " +
                "marker) and targets $($Release.target_commitish), not $($Context.Commit). A maintainer resolves this: identify the " +
                'commit whose package is on the feed, delete the unmarked draft on GitHub, and run -Action Restore with that ' +
-               "commit's complete original artifacts (docs/RELEASING.md, 'Missing draft').")
+               "commit's complete original artifacts (docs/RECOVERY.md, 'Missing draft').")
     }
 }

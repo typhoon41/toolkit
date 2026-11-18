@@ -1,0 +1,53 @@
+# Build job of package-release.yml: checkout -> PR convention check -> release plan -> your build/test
+# steps -> release notes (optional) -> pack -> the 'release' artifact (plan, notes, packages).
+# Holds no publishing secrets. The job is named BuildJob: the Release stage reads
+# dependencies.Build.outputs['BuildJob.ReleasePlan.HasRelease'].
+
+parameters:
+  - name: buildSteps
+    type: stepList
+    default: []
+  - name: releaseNotes
+    type: boolean
+    default: true
+  - name: releaseBranch
+    type: string
+    default: refs/heads/main
+  - name: enforceCommitConvention
+    type: boolean
+    default: false
+  - name: configuration
+    type: string
+    default: Release
+  - name: toolkitRepository
+    type: string
+    default: toolkit
+
+jobs:
+  - job: BuildJob
+    steps:
+      - template: ../steps/checkout.yml
+        parameters:
+          toolkitRepository: ${{ parameters.toolkitRepository }}
+
+      - template: ../steps/validate-pull-request.yml
+        parameters:
+          enforce: ${{ parameters.enforceCommitConvention }}
+
+      - template: ../steps/resolve-release-plan.yml
+        parameters:
+          releaseBranch: ${{ parameters.releaseBranch }}
+
+      - ${{ each step in parameters.buildSteps }}:
+        - ${{ step }}
+
+      - ${{ if parameters.releaseNotes }}:
+        - template: ../steps/release-notes.yml
+
+      - template: ../steps/pack.yml
+        parameters:
+          configuration: ${{ parameters.configuration }}
+
+      - publish: $(Build.ArtifactStagingDirectory)/release
+        artifact: release
+        displayName: Publish release artifact

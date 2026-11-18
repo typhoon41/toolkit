@@ -16,21 +16,21 @@ function Get-PullRequestNoteEntry {
         [AllowEmptyCollection()] [string[]] $Scope = @(),
         [Parameter(Mandatory)] [hashtable] $FileCache
     )
-    $titleEntry = {
-        New-ReleaseNoteEntry -Commit $MergeCommit.Hash -Subject $PullRequest.title -ConventionalCommit (Get-ConventionalCommit -Subject $PullRequest.title) `
-            -Author $MergeCommit.Author -PullRequestNumber $PullRequest.number -RepositoryUrl $Client.RepositoryUrl
+    $titleEntry = @{
+        Commit = $MergeCommit.Hash; Subject = $PullRequest.title; ConventionalCommit = Get-ConventionalCommit -Subject $PullRequest.title
+        Author = $MergeCommit.Author; PullRequestNumber = $PullRequest.number; RepositoryUrl = $Client.RepositoryUrl
     }
     try {
         $commits = Get-PullRequestCommit -Client $Client -PullRequest $PullRequest
     }
     catch {
         Write-PipelineIssue -Type warning -Message "$($_.Exception.Message) Using the title of PR #$($PullRequest.number) instead."
-        return & $titleEntry
+        return New-ReleaseNoteEntry @titleEntry
     }
     [array]::Reverse($commits)
     $inner = @($commits | ForEach-Object { ConvertTo-InnerCommit $_ } | Where-Object { -not $_.IsIgnored })
     if ($inner.Count -eq 0) {
-        return & $titleEntry
+        return New-ReleaseNoteEntry @titleEntry
     }
     $inScope = @($inner | Where-Object {
         @($Scope).Count -eq 0 -or (Test-PathInScope -FilePaths (Get-GitHubCommitFile -Client $Client -Commit $_.Sha -Cache $FileCache) -Scope $Scope)
@@ -39,7 +39,7 @@ function Get-PullRequestNoteEntry {
         return
     }
     if (-not @($inner | Where-Object { $_.Conventional })) {
-        return & $titleEntry
+        return New-ReleaseNoteEntry @titleEntry
     }
     foreach ($commit in $inScope) {
         New-ReleaseNoteEntry -Commit $commit.Sha -Subject $commit.Subject -ConventionalCommit $commit.Conventional `

@@ -5,8 +5,8 @@ function New-NpmUserConfiguration {
         Returns the file path; point NPM_CONFIG_USERCONFIG at it and delete it afterwards.
     #>
     param([Parameter(Mandatory)] [string] $Registry)
-    $uri = [Uri]$Registry
-    $hostAndPath = "//$($uri.Authority)$($uri.AbsolutePath.TrimEnd('/'))/"
+    $registryAddress = [Uri]$Registry
+    $hostAndPath = "//$($registryAddress.Authority)$($registryAddress.AbsolutePath.TrimEnd('/'))/"
     $file = Join-Path ([IO.Path]::GetTempPath()) "npmrc-$([Guid]::NewGuid().ToString('n'))"
     $content = "registry=$Registry`n$($hostAndPath):_authToken=`${NPM_TOKEN}`nalways-auth=true`n"
     [IO.File]::WriteAllText($file, $content, [Text.UTF8Encoding]::new($false))

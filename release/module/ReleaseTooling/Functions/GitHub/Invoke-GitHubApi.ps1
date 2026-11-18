@@ -8,9 +8,9 @@ function Invoke-GitHubApi {
         [string] $InFile,
         [switch] $AllowNotFound
     )
-    $uri = if ($Path -match '^https?://') { $Path } else { "$($Client.ApiUrl)/repos/$($Client.Repository)/$Path" }
+    $requestUrl = if ($Path -match '^https?://') { $Path } else { "$($Client.ApiUrl)/repos/$($Client.Repository)/$Path" }
     $parameters = @{
-        Uri                = $uri
+        Uri                = $requestUrl
         Method             = $Method
         Headers            = $Client.Headers
         SkipHttpErrorCheck = $true
@@ -31,7 +31,7 @@ function Invoke-GitHubApi {
     }
     if ($httpStatus -ge 400) {
         $hint = if (($httpStatus -in @(401, 403, 404)) -and -not $Client.HasToken) { ' (no token was supplied)' } else { '' }
-        throw "GitHub API $Method $($uri -replace '\?.*$', '') returned HTTP $httpStatus$hint"
+        throw "GitHub API $Method $($requestUrl -replace '\?.*$', '') returned HTTP $httpStatus$hint"
     }
     $result
 }

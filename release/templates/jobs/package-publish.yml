@@ -1,0 +1,58 @@
+# Release job of package-release.yml, behind the approval environment: Prepare the GitHub drafts ->
+# push NuGet/npm -> publish the GitHub releases and tags once the feeds list the packages.
+# Every step is safe to re-run with "Rerun failed jobs" on the same run.
+
+parameters:
+  - name: environment
+    type: string
+    default: package-release
+  - name: feedWaitMinutes
+    type: number
+    default: 15
+  - name: nugetAuthenticate
+    type: boolean
+    default: false
+  - name: npmAuthenticate
+    type: boolean
+    default: false
+  - name: npmrcFile
+    type: string
+    default: $(Build.SourcesDirectory)/.npmrc
+  - name: npmAccess
+    type: string
+    default: ''
+  - name: toolkitRepository
+    type: string
+    default: toolkit
+
+jobs:
+  - deployment: Publish
+    displayName: Publish packages and GitHub releases
+    environment: ${{ parameters.environment }}
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - template: ../steps/checkout.yml       # same commit; tags are fetched after the approval
+              parameters:
+                toolkitRepository: ${{ parameters.toolkitRepository }}
+
+            - download: current
+              artifact: release
+              displayName: Download release artifact
+
+            - template: ../steps/publish-github-release.yml
+              parameters:
+                action: Prepare
+
+            - template: ../steps/publish-packages.yml
+              parameters:
+                nugetAuthenticate: ${{ parameters.nugetAuthenticate }}
+                npmAuthenticate: ${{ parameters.npmAuthenticate }}
+                npmrcFile: ${{ parameters.npmrcFile }}
+                npmAccess: ${{ parameters.npmAccess }}
+
+            - template: ../steps/publish-github-release.yml
+              parameters:
+                action: Publish
+                feedWaitMinutes: ${{ parameters.feedWaitMinutes }}

@@ -7,8 +7,8 @@ function Test-PublicationStarted {
     if (Get-ReleaseAsset -Context $Context -Release $Release -Name (Get-ReleaseStateName).Marker) {
         return $true
     }
-    foreach ($id in $Context.PackageIds) {
-        if (Test-FeedVersion -UnitPlan $Context.Unit -Id $id -Version $VersionText) {
+    foreach ($packageId in $Context.PackageIds) {
+        if (Test-FeedVersion -UnitPlan $Context.Unit -Id $packageId -Version $VersionText) {
             return $true
         }
     }

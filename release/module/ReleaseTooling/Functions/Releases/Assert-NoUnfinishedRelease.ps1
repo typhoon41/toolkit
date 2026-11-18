@@ -13,7 +13,7 @@ function Assert-NoUnfinishedRelease {
         if (Test-PublicationStarted -Context $Context -VersionText $tag.Version.Text -Release $draft) {
             throw ("Release $($draft.tag_name) is unfinished: its feed push was started but its GitHub release is still a " +
                    "draft. Re-run that release's job (Rerun failed jobs) to complete it before releasing $($Context.Tag), or " +
-                   'follow docs/RELEASING.md (Reconciliation). Do not delete that draft.')
+                   'follow docs/RECOVERY.md (Reconciliation). Do not delete that draft.')
         }
         Write-PipelineIssue -Type warning -Message "Abandoned draft release $($draft.tag_name) exists (its feed push never started). You can delete it on GitHub."
     }

@@ -1,9 +1,6 @@
-# Complete pipeline for NuGet/npm packages: Build (every branch and PR) and Release (only when a unit's
-# version was bumped on the release branch, behind the approval environment).
-#
-#   Build    checkout -> PR convention check -> release plan -> your build/test steps -> release notes
-#            (optional) -> pack -> publish the 'release' artifact (plan, notes, packages)
-#   Release  approval -> Prepare GitHub drafts -> push NuGet/npm -> publish GitHub releases and tags
+# Complete pipeline for NuGet/npm packages: Build (every branch and PR, jobs/package-build.yml) and
+# Release (only when a unit's version was bumped on the release branch, behind the approval environment,
+# jobs/package-publish.yml).
 #
 # The Build stage holds no publishing secrets. Only the Release stage references releaseVariableGroup
 # (NuGetApiKey / NpmToken / GitHubToken); protect it and the environment as described in docs/ADOPTING.md.
@@ -21,7 +18,7 @@ parameters:
   - name: releaseVariableGroup
     type: string
     default: release-secrets
-  - name: buildVariableGroup       # optional; e.g. a group holding GitHubReadToken
+  - name: buildVariableGroup       # optional; only a read-only GitHubReadToken (the Build stage runs PR code)
     type: string
     default: ''
   - name: releaseBranch
@@ -37,6 +34,9 @@ parameters:
   - name: configuration
     type: string
     default: Release
+  - name: feedWaitMinutes
+    type: number
+    default: 15
   - name: nugetAuthenticate
     type: boolean
     default: false
@@ -60,33 +60,14 @@ stages:
       variables:
         - group: ${{ parameters.buildVariableGroup }}
     jobs:
-      - job: BuildJob
-        steps:
-          - template: ../steps/checkout.yml
-            parameters:
-              toolkitRepository: ${{ parameters.toolkitRepository }}
-
-          - template: ../steps/validate-pull-request.yml
-            parameters:
-              enforce: ${{ parameters.enforceCommitConvention }}
-
-          - template: ../steps/resolve-release-plan.yml
-            parameters:
-              releaseBranch: ${{ parameters.releaseBranch }}
-
-          - ${{ each step in parameters.buildSteps }}:
-            - ${{ step }}
-
-          - ${{ if parameters.releaseNotes }}:
-            - template: ../steps/release-notes.yml
-
-          - template: ../steps/pack.yml
-            parameters:
-              configuration: ${{ parameters.configuration }}
-
-          - publish: $(Build.ArtifactStagingDirectory)/release
-            artifact: release
-            displayName: Publish release artifact
+      - template: ../jobs/package-build.yml
+        parameters:
+          buildSteps: ${{ parameters.buildSteps }}
+          releaseNotes: ${{ parameters.releaseNotes }}
+          releaseBranch: ${{ parameters.releaseBranch }}
+          enforceCommitConvention: ${{ parameters.enforceCommitConvention }}
+          configuration: ${{ parameters.configuration }}
+          toolkitRepository: ${{ parameters.toolkitRepository }}
 
   - stage: Release
     dependsOn: Build
@@ -95,33 +76,12 @@ stages:
     variables:
       - group: ${{ parameters.releaseVariableGroup }}
     jobs:
-      - deployment: Publish
-        displayName: Publish packages and GitHub releases
-        environment: ${{ parameters.environment }}
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - template: ../steps/checkout.yml       # same commit; tags are fetched after the approval
-                  parameters:
-                    toolkitRepository: ${{ parameters.toolkitRepository }}
-
-                - download: current
-                  artifact: release
-                  displayName: Download release artifact
-
-                # Every step below is safe to re-run with "Rerun failed jobs" on THIS run.
-                - template: ../steps/publish-github-release.yml
-                  parameters:
-                    action: Prepare
-
-                - template: ../steps/publish-packages.yml
-                  parameters:
-                    nugetAuthenticate: ${{ parameters.nugetAuthenticate }}
-                    npmAuthenticate: ${{ parameters.npmAuthenticate }}
-                    npmrcFile: ${{ parameters.npmrcFile }}
-                    npmAccess: ${{ parameters.npmAccess }}
-
-                - template: ../steps/publish-github-release.yml
-                  parameters:
-                    action: Publish
+      - template: ../jobs/package-publish.yml
+        parameters:
+          environment: ${{ parameters.environment }}
+          feedWaitMinutes: ${{ parameters.feedWaitMinutes }}
+          nugetAuthenticate: ${{ parameters.nugetAuthenticate }}
+          npmAuthenticate: ${{ parameters.npmAuthenticate }}
+          npmrcFile: ${{ parameters.npmrcFile }}
+          npmAccess: ${{ parameters.npmAccess }}
+          toolkitRepository: ${{ parameters.toolkitRepository }}

@@ -37,9 +37,9 @@ pwsh ../toolkit/release/scripts/New-ReleaseNotes.ps1 -Unit <unit> -Version 1.4.0
 | `scripts/` | Entry points the templates call (one per pipeline step) |
 | `module/ReleaseTooling/` | The functions behind them, one per file |
 | `templates/steps/` | Step templates, usable one by one |
-| `templates/stages/package-release.yml` | Complete Build + Release stages for package repositories |
+| `templates/jobs/`, `templates/stages/package-release.yml` | Complete Build + Release stages for package repositories |
 | `tests/` | Pester 5 tests: `Invoke-Pester ./tests` |
-| `docs/` | [Commit convention](docs/CONTRIBUTING.md), [adoption](docs/ADOPTING.md), [re-runs and recovery](docs/RELEASING.md) |
+| `docs/` | [Commit convention](docs/CONTRIBUTING.md), [adoption](docs/ADOPTING.md), [re-runs and errors](docs/RELEASING.md), [recovery](docs/RECOVERY.md) |
 
 | Script | Step |
 |---|---|
