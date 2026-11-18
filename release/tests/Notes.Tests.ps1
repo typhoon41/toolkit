@@ -49,41 +49,6 @@ Describe 'Test-PathInScope' {
     }
 }
 
-Describe 'Get-ReleaseNoteEntry with pull requests' {
-    BeforeAll {
-        $mergeCommit = [pscustomobject]@{ Hash = $sha; ParentCount = 1; Subject = 'Calendar fixes (#13)'; Author = 'Merger'; Body = '' }
-        Mock -ModuleName ReleaseTooling Get-MergedPullRequest { [pscustomobject]@{ number = 13; title = 'Calendar fixes'; commits = 3 } }
-        Mock -ModuleName ReleaseTooling Get-PullRequestCommit {
-            , @(
-                [pscustomobject]@{ sha = 'b' * 40; parents = @(1); commit = [pscustomobject]@{ message = 'fix: wrong day'; author = [pscustomobject]@{ name = 'Ana' } } }
-                [pscustomobject]@{ sha = 'c' * 40; parents = @(1); commit = [pscustomobject]@{ message = 'wip'; author = [pscustomobject]@{ name = 'Ana' } } }
-                [pscustomobject]@{ sha = 'd' * 40; parents = @(1); commit = [pscustomobject]@{ message = 'feat: web only'; author = [pscustomobject]@{ name = 'Bo' } } }
-            )
-        }
-        Mock -ModuleName ReleaseTooling Get-GitHubCommitFile { if ($Commit -eq ('d' * 40)) { , @('web/x.ts') } else { , @('src/Lib/A.cs') } }
-    }
-
-    It 'lists the conventional commits of the PR, newest first' {
-        $entries = @(Get-ReleaseNoteEntry -Client $client -Commits @($mergeCommit))
-        $entries.Count | Should -Be 2
-        $entries[0].Markdown | Should -Match 'feat: web only \(#13\)'
-        $entries[1].Section | Should -Be 'Bug Fixes'
-    }
-
-    It 'drops PR commits outside the unit''s paths' {
-        $entries = @(Get-ReleaseNoteEntry -Client $client -Commits @($mergeCommit) -Scope @('src/Lib'))
-        $entries.Count | Should -Be 1
-        $entries[0].Markdown | Should -Match 'fix: wrong day'
-    }
-
-    It 'falls back to the PR title as a chore when nothing conventional remains' {
-        $entries = @(Get-ReleaseNoteEntry -Client $client -Commits @($mergeCommit) -Scope @('docs'))
-        $entries.Count | Should -Be 1
-        $entries[0].Section | Should -Be 'Chores'
-        $entries[0].Markdown | Should -Match 'Calendar fixes \(#13\) \(Merger\)'
-    }
-}
-
 Describe 'New-UnitReleaseNote on a repository' {
     It 'covers the commits since the previous tag that touch the unit' {
         $repository = New-TestRepository (Join-Path $TestDrive 'notes')

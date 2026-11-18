@@ -61,9 +61,11 @@ Mark the **commit** itself: release notes are built from the individual commits 
 
 For each PR merged since the previous release of the package:
 
-- every commit in the PR that follows the convention, one line each, in its section;
-- if none does, the PR's title (as it is on GitHub now, so a merged PR's title can still be fixed);
-- in a repository with several packages, only commits that touched that package's folder.
+- if at least one commit in the PR follows the convention: every commit of the PR, one line each, in
+  its section (commits that don't follow it under Chores);
+- if none does: the PR's title (as it is on GitHub now, so a merged PR's title can still be fixed);
+- in a repository with several packages, only commits that touched that package's folder; a PR that
+  touched only other packages doesn't appear.
 
 Merge commits and `fixup!` / `squash!` / `amend!` commits never appear. Commits pushed directly to
 the release branch appear as themselves.
