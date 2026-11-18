@@ -25,9 +25,17 @@ git fetch --tags origin && git checkout <sha> &&
 pwsh <toolkit>/release/scripts/Resolve-ReleasePlan.ps1 -SourceBranch refs/heads/main -BuildId 0 -OutFile ./recover/release-plan.json -KeepRunName
 ```
 
-Set `$env:GITHUB_TOKEN` (release token) and `$env:NUGET_API_KEY` / `$env:NPM_TOKEN` first. Run one
-command at a time, stop at the first failure, and never publish while a push has failed. Disable the
-release pipeline and wait for running instances before Restore or Abandon.
+Set the credentials first:
+
+| Variable | For |
+|---|---|
+| `$env:GITHUB_TOKEN` | the release token (Contents: write) |
+| `$env:NUGET_API_KEY` | pushing to nuget.org (any value for Azure Artifacts, with its credential provider) |
+| `$env:NUGET_FEED_READ_TOKEN` | reading a **private** NuGet feed: an Azure DevOps PAT with *Packaging: Read* |
+| `$env:NPM_TOKEN`, or `$env:NPM_CONFIG_USERCONFIG` | npm: a token, or the path of an authenticated `.npmrc`, for publishing and for reading a private registry |
+
+Run one command at a time, stop at the first failure, and never publish while a push has failed.
+Disable the release pipeline and wait for running instances before Restore or Abandon.
 
 ## Reconciliation: the original run is gone
 
@@ -47,8 +55,9 @@ the GitHub UI: that skips completing the feed side.
 Use the **complete** original artifacts (Restore cannot know about a package you leave out):
 
 ```powershell
+$s = '<toolkit>/release/scripts'
 pwsh $s/New-ReleaseNotes.ps1 -PlanFile ./recover/release-plan.json -OutDirectory ./recover/notes -Unit <unit> &&
-pwsh $s/Publish-GitHubRelease.ps1 -Action Restore -PlanFile ./recover/release-plan.json -PackagesPath ./recover/packages -NotesDirectory ./recover/notes -Unit <unit> &&
+pwsh $s/Publish-GitHubRelease.ps1 -Action Restore -PlanFile ./recover/release-plan.json -PackagesPath ./recover/packages -NotesDirectory ./recover/notes -Unit <unit>
 ```
 
 then continue with the three Reconciliation commands. If Restore says *a frozen draft already exists*,
@@ -61,6 +70,7 @@ Only for a **version collision**: the feed holds a package under this version th
 `recover/packages/<unit>/` must contain exactly the draft's own assets.
 
 ```powershell
+$s = '<toolkit>/release/scripts'
 pwsh $s/Publish-GitHubRelease.ps1 -Action Abandon -PlanFile ./recover/release-plan.json -PackagesPath ./recover/packages -Unit <unit>
 ```
 
