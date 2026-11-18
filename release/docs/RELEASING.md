@@ -34,6 +34,8 @@ Application units have no assets: their release and tag are created in one idemp
 | *... assets are frozen* | A new run of a commit whose package is already published. Re-run the original run. |
 | *... has version '...' but this release of '...' is ...* | Something overrides the version at pack time. Remove it. |
 | Warning: *Abandoned draft release Y exists* | Its approval was rejected before publishing started. Delete the draft. |
+| Publish: *Prepare did not complete for X* | The draft has no marker: Prepare failed or was skipped. **Rerun failed jobs**; Prepare and the push run first. |
+| Publish: *... not on the feed yet, so X stays a draft* | The push succeeded but the feed hasn't indexed it within `feedWaitMinutes`. **Rerun failed jobs** in a few minutes. |
 | Anything else | **Rerun failed jobs**. If a feed reported a conflict, wait a few minutes first. |
 
 ## Drafts: which may be deleted

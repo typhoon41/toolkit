@@ -1,20 +1,25 @@
 function Invoke-ReleasePublish {
     <#
-        Re-checks the release order (no higher version may have been released while this run waited),
-        verifies the assets, then publishes the draft. GitHub creates the tag at the commit at that moment.
+        Publishes the draft, which makes GitHub create the tag at the commit. Only after Prepare completed
+        (the marker is on the draft) and every package is on its feed as this build's exact package; the
+        release order is re-checked (no higher version may have been released while this run waited).
     #>
-    param([Parameter(Mandatory)] $Context, [AllowNull()] $Release)
+    param([Parameter(Mandatory)] $Context, [AllowNull()] $Release, [int] $FeedWaitMinutes = 15)
     if (-not $Release) {
         throw "No draft release for $($Context.Tag); run the Prepare phase first."
     }
     if ($Release.target_commitish -ne $Context.Commit) {
         throw "Draft $($Context.Tag) targets $($Release.target_commitish), not $($Context.Commit)."
     }
+    if (-not (Get-ReleaseAsset -Context $Context -Release $Release -Name (Get-ReleaseStateName).Marker)) {
+        throw "Prepare did not complete for $($Context.Tag); run Prepare, then the feed push, then Publish."
+    }
     $releases = Get-GitHubRelease -Client $Context.Client
     Assert-ReleaseOrder -Context $Context -Releases $releases          # immediately before publication
     Assert-NoUnfinishedRelease -Context $Context -Releases $releases
     [void](Assert-TagTarget -Context $Context)
     Sync-ReleaseAsset -Context $Context -Release $Release -VerifyOnly -FrozenReason (Get-FrozenReason $Context)
+    Wait-UnitFeedPublication -Context $Context -TimeoutMinutes $FeedWaitMinutes
 
     $published = Invoke-GitHubApi -Client $Context.Client -Method Patch -Path "releases/$($Release.id)" -Body @{
         draft       = $false

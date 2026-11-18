@@ -8,7 +8,8 @@
       -Action Prepare   create or resume a DRAFT release for the unit's tag at the plan's commit, set its notes
                         (<NotesDirectory>/<unit>.md, or a minimal body without notes) and make its assets match
                         the unit's packages exactly; then mark it as publishing (frozen). Run before the push.
-      -Action Publish   re-check release ordering, verify the assets, publish the draft (GitHub creates the tag).
+      -Action Publish   once the marker is on the draft and every package is on its feed (waiting up to
+                        -FeedWaitMinutes for indexing), re-check ordering and publish the draft (creates the tag).
       -Action Abandon   maintainer-only: mark a started-but-unfinishable draft as superseded (-Unit required).
       -Action Restore   maintainer-only: recreate a missing draft when the feed already holds this build's
                         packages (-Unit required; needs the complete original artifacts).
@@ -26,6 +27,7 @@ param(
     [string] $Unit,
     [string] $Repository,
     [int] $MinimumAgeMinutes = 60,
+    [int] $FeedWaitMinutes = 15,
     [string] $ApiUrl = 'https://api.github.com',
     [string] $WebUrl = 'https://github.com'
 )
@@ -65,8 +67,14 @@ try {
             }
             continue
         }
-        Invoke-UnitGitHubRelease -Action $Action -Client $client -UnitPlan $unitPlan -Commit $plan.commit `
-            -PackagesPath $PackagesPath -NotesFile $notesFile -MinimumAgeMinutes $MinimumAgeMinutes
+        $npmConfiguration = if ($unitPlan.type -eq 'npm') { Enable-NpmTokenAuthentication -Registry $unitPlan.npmRegistry } else { $null }
+        try {
+            Invoke-UnitGitHubRelease -Action $Action -Client $client -UnitPlan $unitPlan -Commit $plan.commit `
+                -PackagesPath $PackagesPath -NotesFile $notesFile -MinimumAgeMinutes $MinimumAgeMinutes -FeedWaitMinutes $FeedWaitMinutes
+        }
+        finally {
+            Disable-NpmTokenAuthentication $npmConfiguration
+        }
     }
 }
 catch {

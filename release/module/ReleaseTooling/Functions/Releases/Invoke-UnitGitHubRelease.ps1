@@ -7,7 +7,8 @@ function Invoke-UnitGitHubRelease {
         [Parameter(Mandatory)] [string] $Commit,
         [Parameter(Mandatory)] [string] $PackagesPath,
         [string] $NotesFile,
-        [int] $MinimumAgeMinutes = 60
+        [int] $MinimumAgeMinutes = 60,
+        [int] $FeedWaitMinutes = 15
     )
     if (-not $PackagesPath) {
         throw "-PackagesPath is required for unit '$($UnitPlan.name)'."
@@ -39,7 +40,7 @@ function Invoke-UnitGitHubRelease {
     }
     switch ($Action) {
         'Prepare' { Invoke-ReleasePrepare -Context $context -Release $release -Releases $releases -PublicationStarted $publicationStarted -NotesFile $NotesFile }
-        'Publish' { Invoke-ReleasePublish -Context $context -Release $release }
+        'Publish' { Invoke-ReleasePublish -Context $context -Release $release -FeedWaitMinutes $FeedWaitMinutes }
         'Abandon' { Invoke-ReleaseAbandon -Context $context -Release $release -MinimumAgeMinutes $MinimumAgeMinutes }
         'Restore' { Invoke-ReleaseRestore -Context $context -Release $release -Releases $releases -NotesFile $NotesFile }
     }

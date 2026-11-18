@@ -11,6 +11,12 @@ parameters:
   - name: githubToken
     type: string
     default: $(GitHubToken)
+  - name: feedWaitMinutes          # Publish: how long to wait for the feed to index the pushed packages
+    type: number
+    default: 15
+  - name: npmToken                 # reads private npm registries; npmjs.org needs nothing
+    type: string
+    default: $(NpmToken)
   - name: toolkitPath
     type: string
     default: $(Pipeline.Workspace)/toolkit
@@ -22,7 +28,8 @@ steps:
         -PlanFile (Join-Path $env:RELEASE_DIRECTORY 'release-plan.json') `
         -PackagesPath (Join-Path $env:RELEASE_DIRECTORY 'packages') `
         -NotesDirectory (Join-Path $env:RELEASE_DIRECTORY 'notes') `
-        -Repository $env:BUILD_REPOSITORY_NAME
+        -Repository $env:BUILD_REPOSITORY_NAME `
+        -FeedWaitMinutes ([int]$env:FEED_WAIT_MINUTES)
     displayName: ${{ parameters.action }} GitHub release
     workingDirectory: $(Build.SourcesDirectory)
     target:
@@ -33,3 +40,6 @@ steps:
       RELEASE_ACTION: ${{ parameters.action }}
       RELEASE_DIRECTORY: ${{ parameters.releaseDirectory }}
       GITHUB_TOKEN: ${{ parameters.githubToken }}
+      FEED_WAIT_MINUTES: ${{ parameters.feedWaitMinutes }}
+      NUGET_FEED_READ_TOKEN: $(System.AccessToken)     # private NuGet feeds (Azure Artifacts) are read with it
+      NPM_TOKEN: ${{ parameters.npmToken }}

@@ -39,10 +39,7 @@ try {
         if ($Registry) {
             $unitPlan.npmRegistry = $Registry
         }
-        if ($env:NPM_TOKEN -and $env:NPM_TOKEN -notmatch '^\$\(') {
-            $userConfiguration = New-NpmUserConfiguration -Registry $unitPlan.npmRegistry
-            $env:NPM_CONFIG_USERCONFIG = $userConfiguration
-        }
+        $userConfiguration = Enable-NpmTokenAuthentication -Registry $unitPlan.npmRegistry
 
         $files = Get-UnitPackageFile -UnitPlan $unitPlan -PackagesPath $PackagesPath -Require
         foreach ($file in $files) {
@@ -63,10 +60,8 @@ try {
             Invoke-NpmCommand @arguments | ForEach-Object { Write-ReleaseLog $_ }
         }
 
-        if ($userConfiguration) {
-            Remove-Item -LiteralPath $userConfiguration -ErrorAction SilentlyContinue
-            $userConfiguration = $null
-        }
+        Disable-NpmTokenAuthentication $userConfiguration
+        $userConfiguration = $null
     }
 }
 catch {
@@ -74,7 +69,5 @@ catch {
     exit 1
 }
 finally {
-    if ($userConfiguration) {
-        Remove-Item -LiteralPath $userConfiguration -ErrorAction SilentlyContinue
-    }
+    Disable-NpmTokenAuthentication $userConfiguration
 }
