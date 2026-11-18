@@ -52,6 +52,14 @@ Describe 'Get-PullRequestNoteEntry' {
         (Get-TestEntry).Markdown | Should -Match 'feat: calendar'
     }
 
+    It 'uses the PR title for a unit-scoped release when only merge and fixup commits remain' {
+        Mock -ModuleName ReleaseTooling Get-PullRequestCommit { , @((New-ApiCommit 'b' 'squash! fix: x'), (New-ApiCommit 'c' 'Merge main' -ParentCount 2)) }
+        $entries = Get-TestEntry -Scope @('src/Lib')
+        $entries.Count | Should -Be 1
+        $entries[0].Markdown | Should -Match 'feat: calendar'
+        Should -Invoke -ModuleName ReleaseTooling Get-GitHubCommitFile -Times 0 -Exactly    # the merge commit already matched the unit's paths
+    }
+
     It 'uses the PR title, with a warning, when GitHub cannot list the commits' {
         Mock -ModuleName ReleaseTooling Get-PullRequestCommit { throw 'PR #13 has 300 commits but GitHub returned only 250.' }
         Mock -ModuleName ReleaseTooling Write-PipelineIssue { }

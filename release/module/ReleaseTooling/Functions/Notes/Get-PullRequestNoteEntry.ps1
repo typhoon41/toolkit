@@ -8,6 +8,8 @@ function Get-PullRequestNoteEntry {
                                                        commit is in scope; a non-conventional title is a chore
           inner commits exist but none is in scope   -> nothing (the PR belongs to another unit)
           GitHub can't list the commits (over 250)   -> the PR's title, with a warning
+        The title needs no path check of its own when there are no inner commits to check: -MergeCommit comes from
+        `git log --first-parent -- <unit paths>` (Get-ReleaseNoteEntry), so the PR's merge commit touched the unit.
     #>
     param(
         [Parameter(Mandatory)] $Client,
