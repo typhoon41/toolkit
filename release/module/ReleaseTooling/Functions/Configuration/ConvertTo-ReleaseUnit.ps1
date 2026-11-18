@@ -41,7 +41,7 @@ function ConvertTo-ReleaseUnit {
         TagPrefix   = $tagPrefix
         Paths       = $paths
         IsOnlyUnit  = [bool]$IsOnlyUnit
-        NuGetSource = if ($Definition['nugetSource']) { [string]$Definition['nugetSource'] } else { 'https://api.nuget.org/v3/index.json' }
-        NpmRegistry = if ($Definition['npmRegistry']) { [string]$Definition['npmRegistry'] } else { 'https://registry.npmjs.org/' }
+        NuGetSource = ConvertTo-FeedUrl -Value $Definition['nugetSource'] -Default 'https://api.nuget.org/v3/index.json' -Field "$name.nugetSource"
+        NpmRegistry = ConvertTo-FeedUrl -Value $Definition['npmRegistry'] -Default 'https://registry.npmjs.org/' -Field "$name.npmRegistry"
     }
 }

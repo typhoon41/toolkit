@@ -23,6 +23,9 @@ parameters:
   - name: npmrcFile
     type: string
     default: $(Build.SourcesDirectory)/.npmrc
+  - name: trustedFeedHosts         # comma-separated npm hosts besides npmjs.org/Azure Artifacts that may get NpmToken
+    type: string
+    default: ''
   - name: toolkitPath
     type: string
     default: $(Pipeline.Workspace)/toolkit
@@ -35,7 +38,8 @@ steps:
         -PackagesPath (Join-Path $env:RELEASE_DIRECTORY 'packages') `
         -NotesDirectory (Join-Path $env:RELEASE_DIRECTORY 'notes') `
         -Repository $env:BUILD_REPOSITORY_NAME `
-        -FeedWaitMinutes ([int]$env:FEED_WAIT_MINUTES)
+        -FeedWaitMinutes ([int]$env:FEED_WAIT_MINUTES) `
+        -TrustedFeedHost $env:TRUSTED_FEED_HOSTS
     displayName: ${{ parameters.action }} GitHub release
     workingDirectory: $(Build.SourcesDirectory)
     target:
@@ -47,7 +51,8 @@ steps:
       RELEASE_DIRECTORY: ${{ parameters.releaseDirectory }}
       GITHUB_TOKEN: ${{ parameters.githubToken }}
       FEED_WAIT_MINUTES: ${{ parameters.feedWaitMinutes }}
-      NUGET_FEED_READ_TOKEN: $(System.AccessToken)     # private NuGet feeds (Azure Artifacts) are read with it
+      TRUSTED_FEED_HOSTS: ${{ parameters.trustedFeedHosts }}
+      NUGET_FEED_READ_TOKEN: $(System.AccessToken)     # sent only to Azure Artifacts hosts
       ${{ if parameters.npmAuthenticate }}:
         NPM_CONFIG_USERCONFIG: ${{ parameters.npmrcFile }}
       ${{ else }}:

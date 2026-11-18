@@ -22,6 +22,9 @@ parameters:
   - name: npmAccess
     type: string
     default: ''
+  - name: trustedFeedHosts
+    type: string
+    default: ''
   - name: toolkitRepository
     type: string
     default: toolkit
@@ -51,6 +54,7 @@ jobs:
             - template: ../steps/publish-github-release.yml
               parameters:
                 action: Prepare
+                trustedFeedHosts: ${{ parameters.trustedFeedHosts }}
                 npmAuthenticate: ${{ parameters.npmAuthenticate }}
                 npmrcFile: ${{ parameters.npmrcFile }}
 
@@ -59,10 +63,12 @@ jobs:
                 npmAuthenticate: ${{ parameters.npmAuthenticate }}
                 npmrcFile: ${{ parameters.npmrcFile }}
                 npmAccess: ${{ parameters.npmAccess }}
+                trustedFeedHosts: ${{ parameters.trustedFeedHosts }}
 
             - template: ../steps/publish-github-release.yml
               parameters:
                 action: Publish
+                trustedFeedHosts: ${{ parameters.trustedFeedHosts }}
                 feedWaitMinutes: ${{ parameters.feedWaitMinutes }}
                 npmAuthenticate: ${{ parameters.npmAuthenticate }}
                 npmrcFile: ${{ parameters.npmrcFile }}

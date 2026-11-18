@@ -25,6 +25,7 @@ param(
     [string] $PackagesPath = '',
     [string] $NotesDirectory = '',
     [string] $Unit,
+    [AllowEmptyString()] [string] $TrustedFeedHost = '',     # extra npm hosts that may receive NPM_TOKEN
     [string] $Repository,
     [int] $MinimumAgeMinutes = 60,
     [int] $FeedWaitMinutes = 15,
@@ -67,7 +68,7 @@ try {
             }
             continue
         }
-        $npmConfiguration = if ($unitPlan.type -eq 'npm') { Enable-NpmTokenAuthentication -Registry $unitPlan.npmRegistry } else { $null }
+        $npmConfiguration = if ($unitPlan.type -eq 'npm') { Enable-NpmTokenAuthentication -Registry $unitPlan.npmRegistry -TrustedHost (ConvertTo-TrustedFeedHost $TrustedFeedHost) } else { $null }
         try {
             Invoke-UnitGitHubRelease -Action $Action -Client $client -UnitPlan $unitPlan -Commit $plan.commit `
                 -PackagesPath $PackagesPath -NotesFile $notesFile -MinimumAgeMinutes $MinimumAgeMinutes -FeedWaitMinutes $FeedWaitMinutes

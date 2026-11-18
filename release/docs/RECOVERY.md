@@ -30,7 +30,7 @@ Set the credentials first:
 | Variable | For |
 |---|---|
 | `$env:GITHUB_TOKEN` | the release token (Contents: write) |
-| `$env:NUGET_API_KEY` | pushing to nuget.org (any value for Azure Artifacts, with its credential provider) |
+| `$env:NUGET_API_KEY` | pushing to nuget.org, or to another feed you pass with `-TrustedFeedHost <host>` (Azure Artifacts uses its credential provider) |
 | `$env:NUGET_FEED_READ_TOKEN` | reading a **private** NuGet feed: an Azure DevOps PAT with *Packaging: Read* |
 | `$env:NPM_TOKEN`, or `$env:NPM_CONFIG_USERCONFIG` | npm: a token, or the path of an authenticated `.npmrc`, for publishing and for reading a private registry |
 

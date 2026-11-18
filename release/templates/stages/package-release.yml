@@ -49,6 +49,9 @@ parameters:
   - name: npmAccess
     type: string
     default: ''
+  - name: trustedFeedHosts         # comma-separated extra feed hosts that may get NuGetApiKey / NpmToken
+    type: string
+    default: ''
   - name: toolkitRepository
     type: string
     default: toolkit
@@ -84,4 +87,5 @@ stages:
           npmAuthenticate: ${{ parameters.npmAuthenticate }}
           npmrcFile: ${{ parameters.npmrcFile }}
           npmAccess: ${{ parameters.npmAccess }}
+          trustedFeedHosts: ${{ parameters.trustedFeedHosts }}
           toolkitRepository: ${{ parameters.toolkitRepository }}

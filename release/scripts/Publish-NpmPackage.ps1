@@ -11,7 +11,8 @@
       - otherwise it is published with dist-tag 'latest', or 'next' for a prerelease.
 
     Authentication: NPM_TOKEN environment variable (a temporary user config references it; the token is
-    never written to disk), or an .npmrc prepared earlier, e.g. by npmAuthenticate@0 for Azure Artifacts.
+    never written to disk; sent only to npmjs.org, Azure Artifacts or -TrustedFeedHost), or an .npmrc prepared
+    earlier, e.g. by npmAuthenticate@0 for Azure Artifacts.
     The registry is the unit's npmRegistry unless -Registry is given.
 #>
 [CmdletBinding()]
@@ -20,7 +21,8 @@ param(
     [Parameter(Mandatory)] [string] $PackagesPath,
     [string] $Registry,
     [ValidateSet('', 'public', 'restricted')] [string] $Access = '',
-    [string] $Unit
+    [string] $Unit,
+    [AllowEmptyString()] [string] $TrustedFeedHost = ''      # extra npm hosts that may receive NPM_TOKEN
 )
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
@@ -39,7 +41,7 @@ try {
         if ($Registry) {
             $unitPlan.npmRegistry = $Registry
         }
-        $userConfiguration = Enable-NpmTokenAuthentication -Registry $unitPlan.npmRegistry
+        $userConfiguration = Enable-NpmTokenAuthentication -Registry $unitPlan.npmRegistry -TrustedHost (ConvertTo-TrustedFeedHost $TrustedFeedHost)
 
         $files = Get-UnitPackageFile -UnitPlan $unitPlan -PackagesPath $PackagesPath -Require
         foreach ($file in $files) {

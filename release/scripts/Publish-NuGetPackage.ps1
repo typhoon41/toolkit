@@ -13,15 +13,17 @@
       - otherwise it is pushed with --no-symbols.
     Then every .snupkg is pushed with --skip-duplicate, so a failed symbol upload is always retried.
 
-    API key: NUGET_API_KEY environment variable. For Azure Artifacts (after NuGetAuthenticate@1) any value
-    works and 'az' is used when it is not set. The feed is the unit's nugetSource unless -Source is given.
+    API key: NUGET_API_KEY environment variable, sent only to nuget.org or a host in -TrustedFeedHost
+    (comma-separated). Azure Artifacts (after NuGetAuthenticate@1) gets 'az'; any other host is refused. The
+    feed is the unit's nugetSource unless -Source is given.
 #>
 [CmdletBinding()]
 param(
     [Parameter(Mandatory)] [string] $PlanFile,
     [Parameter(Mandatory)] [string] $PackagesPath,
     [string] $Source,
-    [string] $Unit
+    [string] $Unit,
+    [AllowEmptyString()] [string] $TrustedFeedHost = ''
 )
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
@@ -47,9 +49,7 @@ try {
         if ($Source) {
             $unitPlan.nugetSource = $Source
         }
-        $apiKey = if ($env:NUGET_API_KEY -and $env:NUGET_API_KEY -notmatch '^\$\(') { $env:NUGET_API_KEY }
-                  elseif ($unitPlan.nugetSource -notmatch '^https://api\.nuget\.org/') { 'az' }
-                  else { throw 'NUGET_API_KEY is not set.' }
+        $apiKey = Get-NuGetPushApiKey -Source $unitPlan.nugetSource -TrustedHost (ConvertTo-TrustedFeedHost $TrustedFeedHost)
 
         $files = Get-UnitPackageFile -UnitPlan $unitPlan -PackagesPath $PackagesPath -Require
         foreach ($file in $files) {
