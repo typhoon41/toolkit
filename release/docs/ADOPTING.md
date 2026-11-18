@@ -31,8 +31,8 @@ are what keep publishing credentials away from untrusted code.
 
 Versions: NuGet units read `<Version>` from the `.csproj`, else from the nearest
 `Directory.Build.props` above it (a props file that imports its parent through
-`GetPathOfFileAbove('Directory.Build.props', ...)` is followed). Use `<Version>`, not
-`VersionPrefix`/`VersionSuffix`.
+`GetPathOfFileAbove('Directory.Build.props', ...)` is followed). Use one unconditional `<Version>`, not
+`VersionPrefix`/`VersionSuffix`; a `<Version>` under a `Condition` or in a `Choose` block is refused.
 
 Existing tags keep working when their form matches: a single-unit repository uses `v1.2.3`.
 

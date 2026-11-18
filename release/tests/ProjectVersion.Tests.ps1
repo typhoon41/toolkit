@@ -47,6 +47,25 @@ Describe 'Read-MSBuildVersion' {
         { Read-MSBuildVersion -Snapshot $snapshot -ProjectPath 'src/Lib/Lib.csproj' } | Should -Throw '*no <Version>*'
     }
 
+    It 'refuses a conditional <Case>' -ForEach @(
+        @{ Case = 'Version'; Project = '<Project><PropertyGroup><Version Condition="''$(Configuration)'' == ''Release''">2.0.0</Version></PropertyGroup></Project>' }
+        @{ Case = 'PropertyGroup'; Project = '<Project><PropertyGroup Condition="''$(Configuration)'' == ''Debug''"><Version>2.0.0-dev</Version></PropertyGroup></Project>' }
+        @{ Case = 'Choose block'; Project = '<Project><Choose><When Condition="true"><PropertyGroup><Version>2.0.0</Version></PropertyGroup></When></Choose></Project>' }
+    ) {
+        Set-TestFile $root 'src/Lib/Lib.csproj' $Project
+        { Read-MSBuildVersion -Snapshot $snapshot -ProjectPath 'src/Lib/Lib.csproj' } | Should -Throw '*conditional <Version> is not supported*'
+    }
+
+    It 'ignores <Version> elements that are not properties' {
+        Set-TestFile $root 'src/Lib/Lib.csproj' '<Project><PropertyGroup><Version>1.4.0</Version></PropertyGroup><Choose><When Condition="true"><ItemGroup><PackageReference Include="X"><Version>9.0.0</Version></PackageReference></ItemGroup></When></Choose></Project>'
+        (Read-MSBuildVersion -Snapshot $snapshot -ProjectPath 'src/Lib/Lib.csproj').Text | Should -Be '1.4.0'
+    }
+
+    It 'lets the last unconditional <Version> win' {
+        Set-TestFile $root 'src/Lib/Lib.csproj' '<Project><PropertyGroup><Version>1.0.0</Version></PropertyGroup><PropertyGroup><Version>1.1.0</Version></PropertyGroup></Project>'
+        (Read-MSBuildVersion -Snapshot $snapshot -ProjectPath 'src/Lib/Lib.csproj').Text | Should -Be '1.1.0'
+    }
+
     It 'returns nothing for a project that does not exist' {
         Read-MSBuildVersion -Snapshot $snapshot -ProjectPath 'missing/Missing.csproj' | Should -BeNullOrEmpty
     }
