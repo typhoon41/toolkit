@@ -85,6 +85,7 @@ Describe 'Find-BannedPattern' {
     It 'reports inline-style when the file only mentions an HTML document: <Name>' -ForEach @(
         @{ Name = 'marker in a comment'; Content = "<!-- unlike <html> documents, no inline styles -->`n<div style=`"margin: 0;`"></div>" }
         @{ Name = 'doctype after markup'; Content = "<div>sample</div>`n<!DOCTYPE html>`n<div style=`"margin: 0;`"></div>" }
+        @{ Name = 'non-html doctype'; Content = "<!DOCTYPE html-fragment>`n<div style=`"margin: 0;`"></div>" }
     ) {
         $hits = @(Find-BannedPattern -Path 'src/app/card.html' -Text @('<div style="margin: 0;">') -Rule $script:Rules -FileContent $Content)
         $hits.RuleId | Should -Contain 'inline-style'
@@ -93,9 +94,20 @@ Describe 'Find-BannedPattern' {
     It 'exempts a file that starts as an HTML document: <Name>' -ForEach @(
         @{ Name = 'byte order mark'; Content = "$([char]0xFEFF)<!DOCTYPE html>`n<html><body style=`"margin: 0;`"></body></html>" }
         @{ Name = 'leading comment'; Content = "<!-- License`n header -->`n<html lang=`"en`"><body style=`"margin: 0;`"></body></html>" }
+        @{ Name = 'many leading comments'; Content = ('<!-- x -->' * 50) + "<!DOCTYPE html>`n<html><body style=`"margin: 0;`"></body></html>" }
     ) {
         Find-BannedPattern -Path 'src/mail/confirmation.html' -Text @('<body style="margin: 0;">') -Rule $script:Rules -FileContent $Content |
             Should -BeNullOrEmpty
+    }
+
+    It 'reports quickly when thousands of leading comments precede no document marker' {
+        $content = ('<!-- x -->' * 5000) + '<div style="margin: 0;"></div>'
+        $hits = $null
+        $elapsed = Measure-Command {
+            $hits = @(Find-BannedPattern -Path 'src/app/card.html' -Text @('<div style="margin: 0;">') -Rule $script:Rules -FileContent $content)
+        }
+        $hits.RuleId | Should -Contain 'inline-style'
+        $elapsed.TotalSeconds | Should -BeLessThan 2
     }
 
     It 'reports inline-style in a component template under an email-named folder' {

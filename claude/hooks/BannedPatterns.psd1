@@ -66,7 +66,7 @@
         @{
             Id = 'inline-style'; Extensions = @('.html'); Skill = 'html-scss'
             Pattern = '\sstyle\s*=\s*["'']|\[style[.\]]'
-            ExcludeWhenFileMatches = '(?is)\A\uFEFF?\s*(?:<!--.*?-->\s*)*(?:<!doctype\s+html\b|<html[\s>])'
+            ExcludeWhenFileMatches = '(?is)\A\uFEFF?\s*(?><!--(?:(?!-->).)*-->\s*)*(?:<!doctype\s+html(?=[\s>])|<html[\s>])'
             Message = 'no style attribute or [style] binding: use a class (an @for-generated one for runtime values)'
         }
         @{
