@@ -44,9 +44,34 @@
             Message = 'public is the default: omit it (template-only members are protected readonly)'
         }
         @{
-            Id = 'input-decorator'; Extensions = @('.ts'); Skill = 'angular'
-            Pattern = '@Input\s*\('
-            Message = 'use input() / input.required(), never @Input()'
+            Id = 'decorator-api'; Extensions = @('.ts'); Skill = 'angular'
+            Pattern = '@(?:Input|Output|ViewChild|ViewChildren|ContentChild|ContentChildren)\s*\('
+            Message = 'use the signal APIs input() / output() / viewChild() / contentChild(), never the decorators'
+        }
+        @{
+            Id = 'standalone-flag'; Extensions = @('.ts'); Skill = 'angular'
+            Pattern = '\bstandalone\s*:\s*true\b'
+            Message = 'standalone is the default: remove standalone: true'
+        }
+        @{
+            Id = 'any-type'; Extensions = @('.ts'); Skill = 'angular'
+            Pattern = '(?::\s*|\bas\s+|<\s*)any\b(?=\s*(?:[\[\]>,;)=|&{]|$))'
+            Message = 'no any: use unknown and narrow it'
+        }
+        @{
+            Id = 'non-null-assertion'; Extensions = @('.ts'); Skill = 'angular'
+            Pattern = '^(?!\s*(?:/[/*]|\*)).*?(?<=[\w)\]])!(?=[.;,)\[])'
+            Message = 'no non-null assertion (!): handle the absent case'
+        }
+        @{
+            Id = 'null-forgiving'; Extensions = @('.cs'); Skill = 'csharp'
+            Pattern = '^(?!\s*(?:/[/*]|\*)).*?(?<=[\w)\]])!(?=[.;,)\[])'
+            Message = 'no null-forgiving operator (!): fix the cause of the nullability warning'
+        }
+        @{
+            Id = 'blanket-suppression'; Extensions = @('.ts'); Skill = 'code-design'
+            Pattern = '@ts-(?:ignore|nocheck)\b'
+            Message = 'never silence the compiler: fix the error, or use @ts-expect-error with the reason'
         }
         @{
             Id = 'change-detector'; Extensions = @('.ts'); Skill = 'angular'
@@ -65,7 +90,7 @@
         }
         @{
             Id = 'inline-style'; Extensions = @('.html'); Skill = 'html-scss'
-            Pattern = '\sstyle\s*=\s*["'']|\[style[.\]]'
+            Pattern = '\sstyle\s*=\s*["'']|\[style[.\]]|\[ngStyle\]'
             ExcludeWhenFileMatches = '(?is)\A\uFEFF?\s*(?><!--(?:(?!-->).)*-->\s*)*(?:<!doctype\s+html(?=[\s>])|<html[\s>])'
             Message = 'no style attribute or [style] binding: use a class (an @for-generated one for runtime values)'
         }
@@ -87,7 +112,22 @@
         @{
             Id = 'bare-media-query'; Extensions = @('.scss'); Skill = 'html-scss'
             Pattern = '@media[^{]*\b(?:min|max)-width\b'
-            Message = 'use the project breakpoint mixins, not a bare width @media'
+            Message = 'mobile-first: use the project min-width breakpoint mixins, never a bare width @media'
+        }
+        @{
+            Id = 'deep-selector'; Extensions = @('.scss', '.css'); Skill = 'html-scss'
+            Pattern = '::ng-deep\b'
+            Message = 'never ::ng-deep: use the library theming API or the global vendor overrides partial'
+        }
+        @{
+            Id = 'important'; Extensions = @('.scss', '.css'); Skill = 'html-scss'
+            Pattern = '!important\b'
+            Message = 'no !important: fix the specificity instead'
+        }
+        @{
+            Id = 'scss-import'; Extensions = @('.scss'); Skill = 'html-scss'
+            Pattern = '^\s*@import\b'
+            Message = 'use @use / @forward, never @import'
         }
         @{
             Id = 'wrapper-class'; Extensions = @('.html', '.scss', '.css', '.ts'); Skill = 'html-scss'

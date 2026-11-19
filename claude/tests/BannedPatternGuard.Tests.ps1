@@ -30,7 +30,22 @@ Describe 'Find-BannedPattern' {
         @{ Rule = 'getter'; Path = 'a/week.ts'; Text = '  protected get isEmpty() {' }
         @{ Rule = 'explicit-public'; Path = 'a/week.ts'; Text = '    public readonly label = computed(() => 1);' }
         @{ Rule = 'explicit-public'; Path = 'a/week.ts'; Text = 'constructor(public readonly start: Date) {}' }
-        @{ Rule = 'input-decorator'; Path = 'a/card.ts'; Text = '@Input() url = "";' }
+        @{ Rule = 'decorator-api'; Path = 'a/card.ts'; Text = '@Input() url = "";' }
+        @{ Rule = 'decorator-api'; Path = 'a/card.ts'; Text = '@Output() saved = new EventEmitter<void>();' }
+        @{ Rule = 'decorator-api'; Path = 'a/card.ts'; Text = "@ViewChild('table') table!: ElementRef;" }
+        @{ Rule = 'standalone-flag'; Path = 'a/card.ts'; Text = '    standalone: true,' }
+        @{ Rule = 'any-type'; Path = 'a/card.ts'; Text = 'readonly parse = (value: any) => value;' }
+        @{ Rule = 'any-type'; Path = 'a/card.ts'; Text = 'form.patchValue(value as any);' }
+        @{ Rule = 'any-type'; Path = 'a/card.ts'; Text = 'const items: any[] = [];' }
+        @{ Rule = 'non-null-assertion'; Path = 'a/card.ts'; Text = 'this.date()!.nativeElement.focus();' }
+        @{ Rule = 'null-forgiving'; Path = 'a/Entry.cs'; Text = 'entry.AppointmentId!.Value,' }
+        @{ Rule = 'null-forgiving'; Path = 'a/Program.cs'; Text = 'provider.GetService<CaptchaSettings>()!;' }
+        @{ Rule = 'blanket-suppression'; Path = 'a/card.ts'; Text = '// @ts-ignore' }
+        @{ Rule = 'inline-style'; Path = 'a/card.html'; Text = '<div [ngStyle]="styles()">' }
+        @{ Rule = 'deep-selector'; Path = 'a/card.scss'; Text = '::ng-deep .mat-row { color: red; }' }
+        @{ Rule = 'important'; Path = 'a/card.scss'; Text = 'display: none !important;' }
+        @{ Rule = 'scss-import'; Path = 'a/card.scss'; Text = "@import 'variables';" }
+        @{ Rule = 'bare-media-query'; Path = 'a/card.scss'; Text = '@media (max-width: 600px) {' }
         @{ Rule = 'change-detector'; Path = 'a/card.ts'; Text = 'private readonly changeDetector = inject(ChangeDetectorRef);' }
         @{ Rule = 'change-detector'; Path = 'a/card.ts'; Text = 'this.changeDetector.markForCheck();' }
         @{ Rule = 'structural-directive'; Path = 'a/card.html'; Text = '<li *ngFor="let item of items">' }
@@ -67,6 +82,15 @@ Describe 'Find-BannedPattern' {
         @{ Path = 'a/card.html'; Text = '@for (item of items(); track item.id) { <li [class.selected]="item.selected()">x</li> }' }
         @{ Path = 'a/card.scss'; Text = '.calendar-grid-container { display: flex; max-height: 80%; }' }
         @{ Path = 'a/card.scss'; Text = '@media (forced-colors: active) {' }
+        @{ Path = 'a/card.ts'; Text = 'readonly saved = output<void>();' }
+        @{ Path = 'a/card.ts'; Text = 'readonly hasAny = computed(() => this.items().some((item) => item.many));' }
+        @{ Path = 'a/card.ts'; Text = 'if (!value || value !== other) {' }
+        @{ Path = 'a/card.ts'; Text = '// Shown once: we never ask again!.' }
+        @{ Path = 'a/card.ts'; Text = "readonly message = 'Saved!';" }
+        @{ Path = 'a/Entry.cs'; Text = 'if (!entry.IsPast && entry.Id != other.Id) {' }
+        @{ Path = 'a/Entry.cs'; Text = '/// Looks up a localized string similar to See you!.' }
+        @{ Path = 'a/card.ts'; Text = '// @ts-expect-error the library types lack the overload' }
+        @{ Path = 'a/card.scss'; Text = "@use 'variables';" }
         @{ Path = 'a/card.scss'; Text = '$gap: 2px; .icon { width: $icon-size; }' }
         @{ Path = 'a/card.scss'; Text = 'width: $gap-2vw;' }
         @{ Path = 'a/card.scss'; Text = '.top-10vh { top: 0; }' }
@@ -148,6 +172,9 @@ Describe 'Test-GuardedPath' {
         @{ Path = 'C:\repo\node_modules\x\index.ts' }
         @{ Path = '/repo/src/Api/obj/Debug/Generated.cs' }
         @{ Path = '/repo/Infrastructure/Migrations/20260101_Init.cs' }
+        @{ Path = 'C:\repo\Api\Resources\Labels.Designer.cs' }
+        @{ Path = '/repo/src/Api/Client.g.cs' }
+        @{ Path = '/repo/src/app/api/client.generated.ts' }
     ) {
         Test-GuardedPath -Path $Path | Should -BeFalse
     }
