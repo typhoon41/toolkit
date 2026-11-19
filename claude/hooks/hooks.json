@@ -44,6 +44,12 @@
             "command": "pwsh -NoProfile -NonInteractive -File \"${CLAUDE_PLUGIN_ROOT}/hooks/Invoke-BannedPatternGuard.ps1\"",
             "statusMessage": "Checking banned patterns...",
             "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -NonInteractive -File \"${CLAUDE_PLUGIN_ROOT}/hooks/Invoke-DotnetFormat.ps1\"",
+            "statusMessage": "Formatting C# whitespace...",
+            "timeout": 60
           }
         ]
       }
