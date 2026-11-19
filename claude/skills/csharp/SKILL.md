@@ -8,6 +8,14 @@ description: C# and ASP.NET Core conventions - async naming, thin controllers, r
 Builds on `code-design` (names, files, braces, models), which is not repeated here. Where the solution references
 the Gmf packages, `gmf-packages` names the concrete types.
 
+## Project notes
+
+Repository facts this skill relies on - where models, contracts, services, repositories and DI modules live,
+validation message language, how a recipient's culture is set, wire formats - live in
+`.claude/project-notes/csharp.md`. Read it before working. If it is missing and the task needs one of those facts,
+create it from `references/project-notes.template.md` (next to this skill) with only what you verified in the
+repository. A project fact goes there, never into a copy of this skill.
+
 ## No `Async` suffix
 
 A method returning `Task` / `Task<T>` / `ValueTask` has no `Async` suffix; the return type says it. Keep the suffix

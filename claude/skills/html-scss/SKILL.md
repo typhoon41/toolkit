@@ -7,6 +7,14 @@ description: HTML template and SCSS conventions - styling only in stylesheets, h
 
 Builds on `code-design`. Library utility classes (scss-solutions) are covered by `scss-solutions`.
 
+## Project notes
+
+Repository facts this skill relies on - the variables, breakpoints and elements modules, global partials, the
+vendor overrides partial, styles defined once globally, what global element styles already set - live in
+`.claude/project-notes/html-scss.md`. Read it before working. If it is missing and the task needs one of those
+facts, create it from `references/project-notes.template.md` (next to this skill) with only what you verified in
+the repository. A project fact goes there, never into a copy of this skill.
+
 ## All styling lives in stylesheets
 
 Never set a style outside SCSS: no `style="..."` attribute, no `[style.x]` / `[style.--custom]` binding, no

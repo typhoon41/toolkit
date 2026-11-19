@@ -7,6 +7,14 @@ description: Angular (20+, zoneless, signals) and TypeScript conventions - compo
 
 Builds on `code-design`; markup and styling rules, including host-element styling, live in `html-scss`.
 
+## Project notes
+
+Repository facts this skill relies on - selector prefix, shared components, path aliases, routing helpers, i18n
+command and locale files, exempt areas, pinned packages - live in `.claude/project-notes/angular.md`. Read it
+before working. If it is missing and the task needs one of those facts, create it from
+`references/project-notes.template.md` (next to this skill) with only what you verified in the repository. A
+project fact goes there, never into a copy of this skill.
+
 ## Components
 
 ```ts
@@ -84,12 +92,12 @@ Signals only, no NgRx:
 
 ## Project building blocks
 
+The concrete names are in the project notes.
+
 - **Shared components first.** Before writing a native `<input>`, `<select>`, `<textarea>`, `<dialog>` or a
-  collapsible section, look in the project's shared component folder and use the component that exists.
-- **Path aliases.** Imports that cross a feature boundary use the `tsconfig` path aliases (`@shared/...`,
-  `@features/...`), never `../../`.
+  collapsible section, use the shared component that exists for it.
+- **Path aliases.** Imports that cross a feature boundary use the `tsconfig` path aliases, never `../../`.
 - **Routing.** Navigate through the project's route definitions, never hand-built route strings.
-- **i18n.** User-facing strings use `` $localize`:@@key.name:default text` ``. Run the extraction script after
+- **i18n.** User-facing strings use `` $localize`:@@key.name:default text` ``. Run the extraction command after
   adding keys and add the translation to every locale file; a removed string is removed from every locale file in
-  the same change. Areas the project marks as internal (for example an admin module) may be exempt - follow the
-  project's own instructions.
+  the same change. Exempt areas use plain strings.
