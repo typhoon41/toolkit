@@ -71,7 +71,7 @@ All hooks are PowerShell 7 scripts in `hooks/` sharing the `ConventionHooks` mod
 
 | Event | Script | What it does |
 |---|---|---|
-| PreToolUse `Edit\|Write\|MultiEdit` | `Invoke-SkillGate.ps1` | Blocks the edit until the skills that own the file are loaded (`RequiredSkills.psd1`: `.cs` → code-design + csharp, `.ts` → code-design + angular, `.html` → + html-scss, `.scss`/`.css` → code-design + html-scss), naming the `Skill` calls to make. Tracked per session and per subagent. |
+| PreToolUse `Edit\|Write\|MultiEdit` | `Invoke-SkillGate.ps1` | Blocks the edit until the skills that own the file are loaded (`RequiredSkills.psd1`: `.cs` → code-design + csharp, `.ts` and `.html` → code-design + angular + html-scss, `.scss`/`.css` → code-design + html-scss), naming the `Skill` calls to make. Tracked per session and per subagent. |
 | PostToolUse `Skill`, UserPromptExpansion | `Invoke-SkillGate.ps1` | Records a loaded `conventions:<skill>`, from the Skill tool or a `/conventions:<skill>` command. |
 | PostToolUse `Edit\|Write\|MultiEdit` | `Invoke-BannedPatternGuard.ps1` | Checks only the text just written against `BannedPatterns.psd1`; findings go back to Claude (exit 2) naming the owning skill. The edit is kept. |
 | PostToolUse `Edit\|Write\|MultiEdit` | `Invoke-DotnetFormat.ps1` | Runs `dotnet format whitespace` on an edited `.cs` file when the project root has an `.editorconfig`, and tells Claude to re-read the file if it changed. |

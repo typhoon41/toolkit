@@ -81,10 +81,19 @@ Describe 'Invoke-SkillGate.ps1' {
     }
 
     It 'records a skill the user ran as a slash command' {
-        foreach ($skill in 'code-design', 'angular') {
+        foreach ($skill in 'code-design', 'angular', 'html-scss') {
             Invoke-Gate @{ hook_event_name = 'UserPromptExpansion'; session_id = 'session-1'; command_name = "conventions:$skill"; command_source = 'plugin' } $script:Root | Out-Null
         }
         (Invoke-Gate (New-EditPayload 'C:\repo\src\week.ts') $script:Root).ExitCode | Should -Be 0
+    }
+
+    It 'requires html-scss for a TypeScript edit' {
+        foreach ($skill in 'code-design', 'angular') {
+            Invoke-Gate (New-SkillPayload "conventions:$skill") $script:Root | Out-Null
+        }
+        $result = Invoke-Gate (New-EditPayload 'C:\repo\src\week.ts') $script:Root
+        $result.ExitCode | Should -Be 2
+        $result.Output | Should -Match 'conventions:html-scss'
     }
 
     It 'ignores skills of other plugins with the same name' {
