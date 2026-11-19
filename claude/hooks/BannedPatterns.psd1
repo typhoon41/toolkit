@@ -55,7 +55,7 @@
         }
         @{
             Id = 'any-type'; Extensions = @('.ts'); Skill = 'angular'
-            Pattern = '(?::\s*|\bas\s+|<\s*)any\b(?=\s*(?:[\[\]>,;)=|&{]|$))'
+            Pattern = '(?:[:<,|&]\s*|\bas\s+)any\b(?=\s*(?:[\[\]>,;)=|&{]|$))'
             Message = 'no any: use unknown and narrow it'
         }
         @{

@@ -37,6 +37,9 @@ Describe 'Find-BannedPattern' {
         @{ Rule = 'any-type'; Path = 'a/card.ts'; Text = 'readonly parse = (value: any) => value;' }
         @{ Rule = 'any-type'; Path = 'a/card.ts'; Text = 'form.patchValue(value as any);' }
         @{ Rule = 'any-type'; Path = 'a/card.ts'; Text = 'const items: any[] = [];' }
+        @{ Rule = 'any-type'; Path = 'a/card.ts'; Text = 'readonly values: Record<string, any> = {};' }
+        @{ Rule = 'any-type'; Path = 'a/card.ts'; Text = 'readonly cache = new Map<string, any[]>();' }
+        @{ Rule = 'any-type'; Path = 'a/card.ts'; Text = 'readonly value = input<string | any>();' }
         @{ Rule = 'non-null-assertion'; Path = 'a/card.ts'; Text = 'this.date()!.nativeElement.focus();' }
         @{ Rule = 'null-forgiving'; Path = 'a/Entry.cs'; Text = 'entry.AppointmentId!.Value,' }
         @{ Rule = 'null-forgiving'; Path = 'a/Program.cs'; Text = 'provider.GetService<CaptchaSettings>()!;' }
@@ -84,6 +87,7 @@ Describe 'Find-BannedPattern' {
         @{ Path = 'a/card.scss'; Text = '@media (forced-colors: active) {' }
         @{ Path = 'a/card.ts'; Text = 'readonly saved = output<void>();' }
         @{ Path = 'a/card.ts'; Text = 'readonly hasAny = computed(() => this.items().some((item) => item.many));' }
+        @{ Path = 'a/card.ts'; Text = '// if any, skip the refresh' }
         @{ Path = 'a/card.ts'; Text = 'if (!value || value !== other) {' }
         @{ Path = 'a/card.ts'; Text = '// Shown once: we never ask again!.' }
         @{ Path = 'a/card.ts'; Text = "readonly message = 'Saved!';" }
