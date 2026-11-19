@@ -19,9 +19,11 @@ repository. A project fact goes there, never into a copy of this skill.
 ## No `Async` suffix
 
 A method returning `Task` / `Task<T>` / `ValueTask` has no `Async` suffix; the return type says it. Keep the suffix
-only where a framework member forces the name: `BackgroundService.ExecuteAsync` / `StartAsync` / `StopAsync`,
-EF Core `SaveChangesAsync` (and overrides), filter `OnActionExecutionAsync` / `OnResultExecutionAsync`, middleware
-`InvokeAsync`, `IAsyncDisposable.DisposeAsync`, `IHostedService` members.
+only where a base type or framework interface you implement fixes the name: overrides (EF Core
+`SaveChangesAsync`, `BackgroundService.ExecuteAsync`, ...), MVC filter `On…Async` callbacks
+(`OnActionExecutionAsync`, `OnAuthorizationAsync`, `OnExceptionAsync`, ...), authorization handler
+`Handle…Async`, middleware `InvokeAsync`, `IHostedService` `StartAsync` / `StopAsync`,
+`IAsyncDisposable.DisposeAsync`, `IModelBinder.BindModelAsync`.
 
 ## Thin controllers
 

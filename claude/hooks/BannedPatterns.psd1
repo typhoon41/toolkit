@@ -30,7 +30,7 @@
         }
         @{
             Id = 'async-suffix'; Extensions = @('.cs'); Skill = 'csharp'
-            Pattern = '\b(?:Task|ValueTask)(?:<[^()]*>)?\s+(?!(?:ExecuteAsync|StartAsync|StopAsync|SaveChangesAsync|OnActionExecutionAsync|OnResultExecutionAsync|InvokeAsync|DisposeAsync|InitializeAsync)\b)\w+Async\s*[(<]'
+            Pattern = '^(?!.*\boverride\b).*?\b(?:Task|ValueTask)(?:<[^()]*>)?\s+(?!(?:On\w+Async|Handle\w*Async|ExecuteAsync|StartAsync|StopAsync|SaveChangesAsync|InvokeAsync|DisposeAsync|InitializeAsync|BindModelAsync|ExecuteResultAsync|ProcessAsync)\b)\w+Async\s*[(<]'
             Message = 'no Async suffix on Task-returning methods (framework overrides excepted)'
         }
         @{

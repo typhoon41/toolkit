@@ -26,6 +26,7 @@ Describe 'Find-BannedPattern' {
         @{ Rule = 'grab-bag-file'; Path = 'src/date-utils.spec.ts'; Text = '' }
         @{ Rule = 'async-suffix'; Path = 'a/Service.cs'; Text = 'public async Task<bool> UpdateEntryAsync(Guid id)' }
         @{ Rule = 'async-suffix'; Path = 'a/IService.cs'; Text = 'Task<IList<Entry>> GetEntriesAsync(Period period);' }
+        @{ Rule = 'async-suffix'; Path = 'a/Service.cs'; Text = 'private async Task<int> CountEntriesAsync(Period period)' }
         @{ Rule = 'getter'; Path = 'a/week.ts'; Text = '    get label(): string {' }
         @{ Rule = 'getter'; Path = 'a/week.ts'; Text = '  protected get isEmpty() {' }
         @{ Rule = 'explicit-public'; Path = 'a/week.ts'; Text = '    public readonly label = computed(() => 1);' }
@@ -78,6 +79,10 @@ Describe 'Find-BannedPattern' {
         @{ Path = 'a/Context.cs'; Text = 'public override Task<int> SaveChangesAsync(CancellationToken token = default)' }
         @{ Path = 'a/Service.cs'; Text = 'await repository.SaveChangesAsync();' }
         @{ Path = 'a/Service.cs'; Text = 'public async Task<bool> UpdateEntry(Guid id)' }
+        @{ Path = 'a/Filter.cs'; Text = 'public async Task OnAuthorizationAsync(AuthorizationFilterContext context)' }
+        @{ Path = 'a/Filter.cs'; Text = 'public Task OnResourceExecutionAsync(ResourceExecutingContext context, ResourceExecutionDelegate next)' }
+        @{ Path = 'a/Formatter.cs'; Text = 'public override Task<InputFormatterResult> ReadRequestBodyAsync(InputFormatterContext context)' }
+        @{ Path = 'a/Handler.cs'; Text = 'protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, OwnerRequirement requirement)' }
         @{ Path = 'a/week.ts'; Text = 'readonly label: Signal<string> = computed(() => this.start.format());' }
         @{ Path = 'a/week.ts'; Text = 'const value = map.get(key);' }
         @{ Path = 'a/week.ts'; Text = 'readonly url = input.required<string>();' }
