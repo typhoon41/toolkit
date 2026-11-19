@@ -82,6 +82,22 @@ Describe 'Find-BannedPattern' {
         $hits | Should -BeNullOrEmpty
     }
 
+    It 'reports inline-style when the file only mentions an HTML document: <Name>' -ForEach @(
+        @{ Name = 'marker in a comment'; Content = "<!-- unlike <html> documents, no inline styles -->`n<div style=`"margin: 0;`"></div>" }
+        @{ Name = 'doctype after markup'; Content = "<div>sample</div>`n<!DOCTYPE html>`n<div style=`"margin: 0;`"></div>" }
+    ) {
+        $hits = @(Find-BannedPattern -Path 'src/app/card.html' -Text @('<div style="margin: 0;">') -Rule $script:Rules -FileContent $Content)
+        $hits.RuleId | Should -Contain 'inline-style'
+    }
+
+    It 'exempts a file that starts as an HTML document: <Name>' -ForEach @(
+        @{ Name = 'byte order mark'; Content = "$([char]0xFEFF)<!DOCTYPE html>`n<html><body style=`"margin: 0;`"></body></html>" }
+        @{ Name = 'leading comment'; Content = "<!-- License`n header -->`n<html lang=`"en`"><body style=`"margin: 0;`"></body></html>" }
+    ) {
+        Find-BannedPattern -Path 'src/mail/confirmation.html' -Text @('<body style="margin: 0;">') -Rule $script:Rules -FileContent $Content |
+            Should -BeNullOrEmpty
+    }
+
     It 'reports inline-style in a component template under an email-named folder' {
         Get-HitRule -Path 'src/app/email-settings/form.html' -Text '<div style="margin: 0;">' | Should -Contain 'inline-style'
     }

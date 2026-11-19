@@ -5,7 +5,8 @@
       Target      'Text' (default): the written text; 'Path': the file path
       Pattern     .NET regular expression, matched per line of the target
       ExcludeWhenFileMatches  optional regular expression; the rule is skipped for a file whose content it matches
-                              (inline-style: complete HTML documents, i.e. email templates, need inline styles)
+                              (inline-style: a file that starts with <!DOCTYPE html> / <html> is a complete
+                              document such as an email template, which needs inline styles)
       Message     what to do instead
       Skill       the plugin skill that owns the rule
     A rule belongs here only when a regular expression can find it without false positives in normal code.
@@ -65,7 +66,7 @@
         @{
             Id = 'inline-style'; Extensions = @('.html'); Skill = 'html-scss'
             Pattern = '\sstyle\s*=\s*["'']|\[style[.\]]'
-            ExcludeWhenFileMatches = '(?i)<!doctype\s+html|<html[\s>]'
+            ExcludeWhenFileMatches = '(?is)\A\uFEFF?\s*(?:<!--.*?-->\s*)*(?:<!doctype\s+html\b|<html[\s>])'
             Message = 'no style attribute or [style] binding: use a class (an @for-generated one for runtime values)'
         }
         @{
