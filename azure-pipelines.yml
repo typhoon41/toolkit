@@ -42,8 +42,27 @@ steps:
     displayName: Test release tooling
     workingDirectory: release
 
+  - pwsh: |
+      $issues = @(Invoke-ScriptAnalyzer -Path ./hooks -Recurse -Settings ../release/PSScriptAnalyzerSettings.psd1)
+      $issues | Format-Table ScriptName, Line, RuleName, Message -Wrap | Out-String -Width 200 | Write-Host
+      if ($issues.Count -gt 0) { exit 1 }
+    displayName: Analyze Claude plugin hooks
+    workingDirectory: claude
+
+  - pwsh: |
+      $configuration = New-PesterConfiguration
+      $configuration.Run.Path = './tests'
+      $configuration.Run.Exit = $true
+      $configuration.TestResult.Enabled = $true
+      $configuration.TestResult.OutputPath = "$env:AGENT_TEMPDIRECTORY/claude-tests.xml"
+      Invoke-Pester -Configuration $configuration
+    displayName: Test Claude plugin hooks
+    workingDirectory: claude
+
   - task: PublishTestResults@2
     condition: always()
     inputs:
       testResultsFormat: NUnit
-      testResultsFiles: $(Agent.TempDirectory)/release-tests.xml
+      testResultsFiles: |
+        $(Agent.TempDirectory)/release-tests.xml
+        $(Agent.TempDirectory)/claude-tests.xml
