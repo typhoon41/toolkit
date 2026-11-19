@@ -52,6 +52,15 @@ Describe 'Invoke-DotnetFormat.ps1' {
         [IO.File]::ReadAllText($project.File) | Should -Be $script:Misindented
     }
 
+    It 'leaves a file outside the project root untouched' -Skip:(-not $script:HasDotnet) {
+        $project = New-Project -WithEditorConfig
+        $outside = New-Project
+        $result = Invoke-Format $project.Root $outside.File
+        $result.ExitCode | Should -Be 0
+        $result.Output.Trim() | Should -BeNullOrEmpty
+        [IO.File]::ReadAllText($outside.File) | Should -Be $script:Misindented
+    }
+
     It 'ignores files that are not C#' {
         $project = New-Project -WithEditorConfig
         $other = Join-Path $project.Root 'notes.ts'
