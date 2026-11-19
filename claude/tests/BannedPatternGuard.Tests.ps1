@@ -120,6 +120,17 @@ Describe 'Find-BannedPattern' {
     }
 }
 
+Describe 'Test-PatternMatch' {
+    It 'returns false instead of throwing when the match times out' {
+        $catastrophic = [regex]::new('^(a+)+$', [Text.RegularExpressions.RegexOptions]::None, [TimeSpan]::FromMilliseconds(50))
+        Test-PatternMatch -Pattern $catastrophic -Text (('a' * 40) + '!') | Should -BeFalse
+    }
+
+    It 'returns the match result otherwise' {
+        Test-PatternMatch -Pattern ([regex]'grid') -Text 'display: grid' | Should -BeTrue
+    }
+}
+
 Describe 'Get-WrittenText' {
     It 'returns Write content, Edit new_string and every MultiEdit new_string' {
         $toolInput = [pscustomobject]@{

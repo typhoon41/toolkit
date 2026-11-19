@@ -10,12 +10,13 @@ function Find-BannedPattern {
     )
     $extension = [IO.Path]::GetExtension($Path).ToLowerInvariant()
     $content = if ($FileContent) { $FileContent } else { $Text -join "`n" }
+    # A timed-out exclusion counts as "not exempt", a timed-out line check as "no hit" (Test-PatternMatch).
     $applicable = $Rule | Where-Object {
-        $_.Extensions -contains $extension -and -not ($_.ExcludeWhenFileMatches -and $_.ExcludeWhenFileMatches.IsMatch($content))
+        $_.Extensions -contains $extension -and -not ($_.ExcludeWhenFileMatches -and (Test-PatternMatch -Pattern $_.ExcludeWhenFileMatches -Text $content))
     }
     foreach ($candidate in $applicable) {
         $lines = if ($candidate.Target -eq 'Path') { @($Path) } else { @($Text | ForEach-Object { $_ -split '\r?\n' }) }
-        foreach ($line in $lines | Where-Object { $candidate.Pattern.IsMatch($_) } | Select-Object -Unique) {
+        foreach ($line in $lines | Where-Object { Test-PatternMatch -Pattern $candidate.Pattern -Text $_ } | Select-Object -Unique) {
             [pscustomobject]@{
                 RuleId  = $candidate.Id
                 Line    = $line.Trim()
