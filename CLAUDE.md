@@ -92,6 +92,7 @@ claude plugin validate .        # plugin; run at the repository root for the mar
   Skills stay project-neutral: project names, paths and component names belong in the consuming project.
 - `hooks/` — `hooks.json` runs `Invoke-BannedPatternGuard.ps1` on PostToolUse (Edit/Write/MultiEdit). It
   checks only the newly written text, reports via stderr + exit 2 (warn, never block). Rules are data in
-  `BannedPatterns.psd1`, each naming its owning skill; the module `BannedPatternGuard/` follows the
-  one-function-per-file layout of `release/`. A new rule needs a reporting and an accepting test case.
+  `BannedPatterns.psd1`, each naming its owning skill. Every hook script imports the one module
+  `ConventionHooks/`, which follows the one-function-per-file layout of `release/`. A new rule needs a reporting
+  and an accepting test case.
 - Releasing: bump `version` in `claude/.claude-plugin/plugin.json` and in the marketplace entry together.

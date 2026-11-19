@@ -1,5 +1,5 @@
 BeforeAll {
-    Import-Module (Join-Path $PSScriptRoot '../hooks/BannedPatternGuard') -Force
+    Import-Module (Join-Path $PSScriptRoot '../hooks/ConventionHooks') -Force
     $script:Rules = @(Read-BannedPatternRule -Path (Join-Path $PSScriptRoot '../hooks/BannedPatterns.psd1'))
     $script:GuardScript = Join-Path $PSScriptRoot '../hooks/Invoke-BannedPatternGuard.ps1'
 

@@ -13,10 +13,9 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
-Import-Module (Join-Path $PSScriptRoot 'BannedPatternGuard') -Force
+Import-Module (Join-Path $PSScriptRoot 'ConventionHooks') -Force
 
-[Console]::InputEncoding = [Text.UTF8Encoding]::new($false)
-$payload = [Console]::In.ReadToEnd() | ConvertFrom-Json
+$payload = Read-HookPayload
 $toolInput = $payload.tool_input
 $path = [string]$toolInput.file_path
 if (-not $path -or -not (Test-GuardedPath -Path $path)) {
