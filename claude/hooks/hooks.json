@@ -1,0 +1,17 @@
+{
+  "description": "Flags banned patterns in the text Claude just wrote (warns, never blocks).",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -NonInteractive -File \"${CLAUDE_PLUGIN_ROOT}/hooks/Invoke-BannedPatternGuard.ps1\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}
