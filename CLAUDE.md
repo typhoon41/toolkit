@@ -89,10 +89,13 @@ claude plugin validate .        # plugin; run at the repository root for the mar
 
 - `skills/<name>/SKILL.md` — one skill per concern. **Every rule has exactly one owning skill**; others refer
   to it by name (`code-design` holds the cross-language rules). No checklists that restate a skill's body.
-  Skills stay project-neutral: project names, paths and component names belong in the consuming project.
-- `hooks/` — `hooks.json` runs `Invoke-BannedPatternGuard.ps1` on PostToolUse (Edit/Write/MultiEdit). It
-  checks only the newly written text, reports via stderr + exit 2 (warn, never block). Rules are data in
-  `BannedPatterns.psd1`, each naming its owning skill. Every hook script imports the one module
-  `ConventionHooks/`, which follows the one-function-per-file layout of `release/`. A new rule needs a reporting
-  and an accepting test case.
+  Skills stay project-neutral: repository facts go in the consuming project's `.claude/project-notes/<skill>.md`,
+  shaped by the skill's `references/project-notes.template.md`.
+- `hooks/` — PowerShell 7 entry scripts, all importing the one module `ConventionHooks/` (one function per file,
+  as in `release/`); `claude/README.md` has the event table. `Invoke-SkillGate.ps1` blocks edits until the skills
+  in `RequiredSkills.psd1` are loaded (marker per session/subagent in the temp folder);
+  `Invoke-BannedPatternGuard.ps1` checks only newly written text against `BannedPatterns.psd1` and reports via
+  stderr + exit 2 (never undoes the edit); `Invoke-DotnetFormat.ps1` formats `.cs` whitespace when an
+  `.editorconfig` exists. A new guard rule needs a reporting and an accepting test case and a scan of a real
+  project for false positives.
 - Releasing: bump `version` in `claude/.claude-plugin/plugin.json` and in the marketplace entry together.

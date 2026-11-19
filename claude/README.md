@@ -1,17 +1,18 @@
 # claude
 
-The `conventions` Claude Code plugin: the coding conventions every project follows, as skills Claude loads when
-the task matches, plus a hook that flags banned patterns in what Claude has just written. The repository root's
-`.claude-plugin/marketplace.json` publishes it as the `toolkit` marketplace.
+The `conventions` Claude Code plugin: the coding conventions every project follows, as skills, plus hooks that
+make sure the owning skills are loaded before Claude edits a file, flag banned patterns in what it wrote, and
+format C# whitespace. The repository root's `.claude-plugin/marketplace.json` publishes it as the `toolkit`
+marketplace.
 
 ## Use it in a project
 
-Commit this to the project's `.claude/settings.json`; everyone who trusts the folder is offered the plugins:
+Commit this to the project's `.claude/settings.json`:
 
 ```json
 {
   "extraKnownMarketplaces": {
-    "toolkit": { "source": { "source": "github", "repo": "typhoon41/toolkit" } },
+    "toolkit": { "source": { "source": "github", "repo": "typhoon41/toolkit" }, "autoUpdate": true },
     "chrome-devtools-plugins": { "source": { "source": "github", "repo": "ChromeDevTools/chrome-devtools-mcp" } }
   },
   "enabledPlugins": {
@@ -23,39 +24,60 @@ Commit this to the project's `.claude/settings.json`; everyone who trusts the fo
 }
 ```
 
+Once a teammate trusts the folder, Claude Code registers the marketplace and reports the plugin as not installed;
+install it once with:
+
+```sh
+claude plugin install conventions@toolkit --scope project
+```
+
+With `autoUpdate`, a new plugin `version` is fetched in the background after startup; run `/reload-plugins` when
+asked. On demand: `claude plugin update conventions@toolkit`.
+
 The language servers (`csharp-ls`, `typescript-language-server`) come from the official LSP plugins and must be on
 `PATH`. chrome-devtools gives `browser-verification` a browser. Drop the entries a project doesn't need.
 
 Locally, without GitHub: `/plugin marketplace add <path to this repository>`, then
 `/plugin install conventions@toolkit`.
 
-Project-specific rules (component names, locales, wire formats, folder paths) stay in the project's own
-`CLAUDE.md` or `.claude/skills/`; they build on these skills and never repeat them.
+## Project notes
+
+The skills are project-neutral. Repository facts they need - shared components, path aliases, locale files, where
+services and DI modules live, the SCSS modules - go in `.claude/project-notes/<skill>.md` in the project
+(`angular.md`, `csharp.md`, `html-scss.md`). The skill reads the file before working and, when it is missing,
+creates it from its `references/project-notes.template.md` with only what it verified. Commit the notes; never copy
+a skill into a project to change it.
 
 ## Skills
 
 | Skill | Applies to |
 |---|---|
-| `code-design` | Any code: names, files, braces, rich models, no enums, one object per input, no second copy |
-| `csharp` | `.cs`: async naming, thin controllers, enum replacements, repositories, side effects after commit |
+| `code-design` | Any code: names, files, control flow, comments, failures, rich models, no enums, no second copy |
+| `csharp` | `.cs`: async naming, thin controllers, validation, nullability, repositories and queries, logging, security |
 | `gmf-packages` | C# in solutions referencing `Gmf.*` packages: unit of work, events, conflicts, Autofac |
-| `angular` | `.ts` / Angular templates: components, signals, class style, state, HTTP, forms, i18n |
-| `html-scss` | `.html` / `.scss`: styling only in SCSS, host elements, selectors, layout, DRY modules |
+| `angular` | `.ts` / Angular templates: components, signal APIs, templates, class style, TypeScript, state, errors, i18n |
+| `html-scss` | `.html` / `.scss`: styling only in SCSS, host elements, selectors, mobile-first layout, values, modules |
 | `scss-solutions` | Projects using `@typhoon41/scss-solutions`: utility classes and mixins |
 | `accessibility` | User-facing UI: WCAG 2.2 AA |
-| `browser-verification` | Finishing any UI change: run and measure in a browser |
-| `conventional-commits` | Commit messages, PR titles, releases |
+| `browser-verification` | Finishing any UI change: lint, run and measure in a browser |
+| `conventional-commits` | Commit messages, PR titles and descriptions, releases |
 
 Every rule has one owner. When a convention changes, edit the skill that owns it and nothing else.
 
-## Banned-pattern guard
+## Hooks
 
-`hooks/hooks.json` runs `hooks/Invoke-BannedPatternGuard.ps1` (PowerShell 7) after every Edit / Write. It checks
-only the text that was written, so existing code is never reported, and skips `node_modules`, `bin`, `obj`, `dist`
-and EF migrations. Findings are fed back to Claude (exit code 2) with the owning skill; the edit itself is kept.
+All hooks are PowerShell 7 scripts in `hooks/` sharing the `ConventionHooks` module. They skip `node_modules`,
+`bin`, `obj`, `dist`, `.angular`, EF migrations and generated files (`*.Designer.cs`, `*.g.cs`, `*.generated.*`).
 
-Rules are data in `hooks/BannedPatterns.psd1`. Add a rule only when a regular expression finds it without false
-positives, and add a reporting and an accepting case to `tests/BannedPatternGuard.Tests.ps1`.
+| Event | Script | What it does |
+|---|---|---|
+| PreToolUse `Edit\|Write\|MultiEdit` | `Invoke-SkillGate.ps1` | Blocks the edit until the skills that own the file are loaded (`RequiredSkills.psd1`: `.cs` → code-design + csharp, `.ts` → code-design + angular, `.html` → + html-scss, `.scss`/`.css` → code-design + html-scss), naming the `Skill` calls to make. Tracked per session and per subagent. |
+| PostToolUse `Skill`, UserPromptExpansion | `Invoke-SkillGate.ps1` | Records a loaded `conventions:<skill>`, from the Skill tool or a `/conventions:<skill>` command. |
+| PostToolUse `Edit\|Write\|MultiEdit` | `Invoke-BannedPatternGuard.ps1` | Checks only the text just written against `BannedPatterns.psd1`; findings go back to Claude (exit 2) naming the owning skill. The edit is kept. |
+| PostToolUse `Edit\|Write\|MultiEdit` | `Invoke-DotnetFormat.ps1` | Runs `dotnet format whitespace` on an edited `.cs` file when the project root has an `.editorconfig`, and tells Claude to re-read the file if it changed. |
+
+Add a guard rule only when a regular expression finds it without false positives (scan a real project first), and
+add a reporting and an accepting case to `tests/BannedPatternGuard.Tests.ps1`.
 
 ## Development
 
