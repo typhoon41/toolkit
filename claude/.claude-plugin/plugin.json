@@ -1,0 +1,10 @@
+{
+  "name": "conventions",
+  "description": "Code-design, C#/.NET, Angular, HTML/SCSS, accessibility and commit conventions, with a hook that flags banned patterns.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Nikola Dragicevic"
+  },
+  "repository": "https://github.com/typhoon41/toolkit",
+  "keywords": ["conventions", "csharp", "dotnet", "angular", "scss", "accessibility"]
+}
