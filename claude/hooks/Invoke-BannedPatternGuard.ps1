@@ -23,7 +23,9 @@ if (-not $path -or -not (Test-GuardedPath -Path $path)) {
     exit 0
 }
 
-$hits = @(Find-BannedPattern -Path $path -Text (Get-WrittenText -ToolInput $toolInput) -Rule (Read-BannedPatternRule -Path $RulePath))
+# PostToolUse runs after the write, so the file on disk is the result; an Edit's new text alone may lack context.
+$fileContent = if (Test-Path -LiteralPath $path -PathType Leaf) { [string](Get-Content -LiteralPath $path -Raw) } else { '' }
+$hits = @(Find-BannedPattern -Path $path -Text (Get-WrittenText -ToolInput $toolInput) -Rule (Read-BannedPatternRule -Path $RulePath) -FileContent $fileContent)
 if ($hits.Count -eq 0) {
     exit 0
 }

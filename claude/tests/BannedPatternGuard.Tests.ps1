@@ -72,9 +72,18 @@ Describe 'Find-BannedPattern' {
         @{ Path = 'a/card.scss'; Text = '.top-10vh { top: 0; }' }
         @{ Path = 'a/calendar-helper-text.ts'; Text = 'export class CalendarHelperText {}' }
         @{ Path = 'a/notes.md'; Text = 'enum Status { display: grid; 100vh }' }
-        @{ Path = 'C:\repo\Api\Resources\Email Templates\confirmation.html'; Text = '<body style="margin: 0;">' }
     ) {
         Get-HitRule -Path $Path -Text $Text | Should -BeNullOrEmpty
+    }
+
+    It 'exempts a complete HTML document from inline-style, whatever its path' {
+        $hits = Find-BannedPattern -Path 'C:\repo\Templates\confirmation-email.html' -Text @('<body style="margin: 0;">') `
+            -Rule $script:Rules -FileContent "<!DOCTYPE html>`n<html>`n<body style=`"margin: 0;`"></body>`n</html>"
+        $hits | Should -BeNullOrEmpty
+    }
+
+    It 'reports inline-style in a component template under an email-named folder' {
+        Get-HitRule -Path 'src/app/email-settings/form.html' -Text '<div style="margin: 0;">' | Should -Contain 'inline-style'
     }
 
     It 'checks every line of a multi-line text' {
@@ -121,6 +130,13 @@ Describe 'Invoke-BannedPatternGuard.ps1' {
         $result = Invoke-Guard @{ tool_name = 'Edit'; tool_input = @{ file_path = 'C:\repo\src\week.ts'; old_string = 'get label() {'; new_string = 'readonly label = computed(() => 1);' } }
         $result.ExitCode | Should -Be 0
         $result.Output.Trim() | Should -BeNullOrEmpty
+    }
+
+    It 'exempts an edit to an existing complete HTML document although the new text lacks <html>' {
+        $template = Join-Path $TestDrive 'confirmation.html'
+        Set-Content -LiteralPath $template -Value "<!DOCTYPE html>`n<html><body><table><td style=`"padding: 0`"></td></table></body></html>"
+        $result = Invoke-Guard @{ tool_name = 'Edit'; tool_input = @{ file_path = $template; old_string = '<td>'; new_string = '<td style="padding: 0">' } }
+        $result.ExitCode | Should -Be 0
     }
 
     It 'exits 0 for a skipped path' {
