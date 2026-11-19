@@ -15,13 +15,23 @@ done, run the app and look.
 - Use the browser tools available in the session (chrome-devtools MCP, Claude in Chrome). If none is available,
   say so instead of claiming the change was verified.
 
+## Lint first
+
+Run the project's lint and read its **warnings** too: warning-level rules don't fail the build, so a green CI run
+is not proof the change is clean.
+
 ## Measure, don't eyeball
 
-- Check at three widths: desktop (~1440 CSS px), tablet (~800 CSS px) and mobile (~390 CSS px).
+- Check at four widths: desktop (~1440 CSS px), tablet (~800 CSS px), mobile (~390 CSS px) and the 320 CSS px
+  reflow width, where nothing may scroll sideways or get cut off.
 - Compare bounding rectangles (`getBoundingClientRect()`) of the elements the change affects - alignment, size,
   overflow - instead of judging a screenshot.
 - Viewport emulation may work in device pixels on a scaled display: set the `mobile` / device-scale flag, or
   multiply by the display scale (at 150%, 1440 CSS px is 2160 device px), and confirm `window.innerWidth`.
+- Emulate `forced-colors: active` and `prefers-reduced-motion: reduce` for a change that touches colours, focus
+  styles or motion.
+- Tab through the changed UI with the keyboard: every control is reachable in reading order, focus is visible,
+  nothing traps it.
 - Read the console and the failed network requests. An error page may hide the real status code: check the
   actual response, not the page text.
 

@@ -7,6 +7,10 @@ description: Using the scss-solutions library - its global utility classes (layo
 
 The library generates global utility classes and mixins. Use them; never re-implement them.
 
+The installed package is the authority, not this page: before writing a mixin, function or utility class, list
+what `node_modules/@typhoon41/scss-solutions/src` exports. When something is almost right, extend the library
+(with a test there) instead of keeping a forked copy in the app.
+
 ## Utility classes - applied in HTML only
 
 | Class | Produces |

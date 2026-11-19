@@ -1,6 +1,6 @@
 ---
 name: accessibility
-description: WCAG 2.2 Level AA rules for user-facing markup - semantics, keyboard and focus, contrast, forced colours, reflow, labels, forms, images, navigation, tables. Apply when building or reviewing UI components, forms, navigation or any user-facing template.
+description: WCAG 2.2 Level AA rules for user-facing markup - semantics, keyboard and focus, states, target size, time and motion, contrast, forced colours, reflow, labels, forms, images, navigation, tables. Apply when building or reviewing UI components, forms, navigation or any user-facing template.
 ---
 
 # Accessibility (WCAG 2.2 AA)
@@ -29,6 +29,17 @@ Never claim the result is "fully accessible"; say what was checked.
   visually hidden until focused.
 - A composite widget (tabs, listbox, menu, date picker, grid) has one tab stop and moves focus inside with arrow
   keys, by roving `tabindex` (one item `0`, the rest `-1`) or `aria-activedescendant`.
+- State changes are programmatic, not only visual: expanded, selected, checked, pressed, invalid and busy update
+  their ARIA state or native property together with the look.
+- Pointer targets are at least 24 × 24 CSS px, or spaced so a 24 px circle around each touches no other; enlarge
+  the hit area, not the icon.
+
+## Time and motion
+
+- A time limit can be turned off, adjusted or extended.
+- Content that moves, scrolls or updates by itself for more than 5 seconds can be paused or stopped.
+- Nothing flashes more than three times per second.
+- Video has captions; audio and video have a transcript.
 
 ## Contrast and colour
 
@@ -42,7 +53,8 @@ Never claim the result is "fully accessible"; say what was checked.
 
 - The UI adapts to Windows High Contrast / forced colours by itself. Add `@media (forced-colors: active)` only
   where system defaults fall short, and use system colour keywords there (`CanvasText`, `ButtonText`,
-  `ButtonBorder`), never fixed colours; don't rely on box shadows or gradients in that mode.
+  `ButtonBorder`), never fixed colours; don't rely on box shadows or gradients in that mode. A focus ring drawn
+  with `box-shadow` also sets `outline: 2px solid transparent`, which forced colours turns visible.
 - No `forced-color-adjust: none` unless justified, with an accessible alternative.
 - Icons follow the text colour: SVG `fill` / `stroke: currentColor`, no colours baked into the SVG.
 
@@ -60,7 +72,8 @@ Never claim the result is "fully accessible"; say what was checked.
   one (prefer `<label for>`). The accessible name contains the visible label text (voice control); repeated
   labels ("Remove") get an `aria-label` that keeps the text and adds context.
 - Help text is linked with `aria-describedby`.
-- Required fields are marked visually and with `aria-required="true"`.
+- Required fields are marked visually and with the native `required` attribute; `aria-required="true"` only on a
+  control that cannot take `required` (a custom widget).
 - Errors explain how to fix the input, set `aria-invalid="true"` (removed once valid) and are linked with
   `aria-describedby`. Don't disable submit just to block it; on an invalid submit, focus the first invalid field.
 

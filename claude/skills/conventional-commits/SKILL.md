@@ -18,7 +18,8 @@ type(optional scope)!: description
 - `type` is lowercase and from the table; a colon and **one space** follow it.
 - `scope` names the area: `fix(calendar): keep the week when saving an entry`.
 - The description is imperative ("add", not "added"/"adds") and says what changes for the user.
-- The PR title uses the same format.
+- The PR title uses the same format. The PR description links the ticket, then one paragraph on what changed and
+  why, written for a reviewer who has not read the ticket - not a changelog, no headings.
 
 | Type | Release notes section |
 |---|---|

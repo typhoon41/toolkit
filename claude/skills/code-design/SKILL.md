@@ -32,8 +32,28 @@ there; they never restate a rule from here. A rule is overridden only by the use
 
 ## Control flow
 
-Every `if`, `else`, `for`, `foreach`, `while` and `switch` body has braces, 1TBS: `{` on the keyword's line, the
-body and the closing `}` on lines of their own - also for one-statement bodies.
+- Every `if`, `else`, `for`, `foreach`, `while` and `switch` body has braces, 1TBS: `{` on the keyword's line,
+  the body and the closing `}` on lines of their own - also for one-statement bodies.
+- Handle edge cases first with guard clauses, so the main path stays flat; more than 3-4 levels of nesting means
+  the function needs splitting.
+- **~20-30 lines is a function's split trigger**, as ~120 is a file's.
+- Don't pass an argument equal to the parameter's default value.
+
+## Comments
+
+A comment says only *why* - a reason the code cannot express - in as few words as possible. Never narrate what
+the code does; rename or extract instead. A comment the change makes untrue is fixed in the same change. No
+commented-out code, and no `TODO` without a ticket reference.
+
+## Failures
+
+- **Never swallow a failure.** A `catch` either recovers (with a real fallback) or wraps the error with context
+  and rethrows. An empty catch, or log-and-continue, is a defect. Exceptions are not control flow.
+- **Validate at system boundaries** (requests, files, external responses) and trust the types inside.
+- **Never silence a signal.** No blanket suppressions (`@ts-ignore`, `@ts-nocheck`, `#pragma warning disable`
+  without a rule id, lowering a lint rule's severity locally). When a suppression is unavoidable, use the
+  narrowest one - one rule, one line - with the reason beside it.
+- **Generated code is never edited by hand**: change its source and regenerate.
 
 ## Models
 
