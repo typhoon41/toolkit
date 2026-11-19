@@ -79,7 +79,7 @@
         }
         @{
             Id = 'viewport-unit'; Extensions = @('.scss', '.css'); Skill = 'html-scss'
-            Pattern = '(?<![\w#$-])\d*\.?\d+(?:[dsl]?v[hwib]|vmin|vmax)\b'
+            Pattern = '(?<![\w#$-])-?\d*\.?\d+(?:[dsl]?v[hwib]|vmin|vmax)\b'
             Message = 'no viewport units (iOS Safari): use % (it resolves against the viewport for dialogs/overlays)'
         }
         @{

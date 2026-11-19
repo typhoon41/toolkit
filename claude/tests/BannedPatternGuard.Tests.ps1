@@ -42,6 +42,8 @@ Describe 'Find-BannedPattern' {
         @{ Rule = 'css-grid'; Path = 'a/card.scss'; Text = '  display: grid;' }
         @{ Rule = 'viewport-unit'; Path = 'a/card.scss'; Text = '  max-height: 80vh;' }
         @{ Rule = 'viewport-unit'; Path = 'a/card.css'; Text = 'height: calc(100dvh - 2rem);' }
+        @{ Rule = 'viewport-unit'; Path = 'a/card.scss'; Text = 'transform: translateX(-100vw);' }
+        @{ Rule = 'viewport-unit'; Path = 'a/card.scss'; Text = 'margin-top: -.5vh;' }
         @{ Rule = 'bare-media-query'; Path = 'a/card.scss'; Text = '@media (min-width: 930px) {' }
         @{ Rule = 'wrapper-class'; Path = 'a/card.html'; Text = '<div class="grid-scroll-wrapper">' }
         @{ Rule = 'wrapper-class'; Path = 'a/card.scss'; Text = '.grid-scroll-wrapper {' }
@@ -66,6 +68,8 @@ Describe 'Find-BannedPattern' {
         @{ Path = 'a/card.scss'; Text = '.calendar-grid-container { display: flex; max-height: 80%; }' }
         @{ Path = 'a/card.scss'; Text = '@media (forced-colors: active) {' }
         @{ Path = 'a/card.scss'; Text = '$gap: 2px; .icon { width: $icon-size; }' }
+        @{ Path = 'a/card.scss'; Text = 'width: $gap-2vw;' }
+        @{ Path = 'a/card.scss'; Text = '.top-10vh { top: 0; }' }
         @{ Path = 'a/calendar-helper-text.ts'; Text = 'export class CalendarHelperText {}' }
         @{ Path = 'a/notes.md'; Text = 'enum Status { display: grid; 100vh }' }
         @{ Path = 'C:\repo\Api\Resources\Email Templates\confirmation.html'; Text = '<body style="margin: 0;">' }
