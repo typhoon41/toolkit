@@ -1,13 +1,48 @@
 {
-  "description": "Flags banned patterns in the text Claude just wrote (warns, never blocks).",
+  "description": "Convention hooks: require the owning skills before an edit, flag banned patterns after it (warn only).",
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -NonInteractive -File \"${CLAUDE_PLUGIN_ROOT}/hooks/Invoke-SkillGate.ps1\"",
+            "statusMessage": "Checking convention skills...",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "UserPromptExpansion": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -NonInteractive -File \"${CLAUDE_PLUGIN_ROOT}/hooks/Invoke-SkillGate.ps1\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
+      {
+        "matcher": "Skill",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -NonInteractive -File \"${CLAUDE_PLUGIN_ROOT}/hooks/Invoke-SkillGate.ps1\"",
+            "timeout": 30
+          }
+        ]
+      },
       {
         "matcher": "Edit|Write|MultiEdit",
         "hooks": [
           {
             "type": "command",
             "command": "pwsh -NoProfile -NonInteractive -File \"${CLAUDE_PLUGIN_ROOT}/hooks/Invoke-BannedPatternGuard.ps1\"",
+            "statusMessage": "Checking banned patterns...",
             "timeout": 30
           }
         ]
