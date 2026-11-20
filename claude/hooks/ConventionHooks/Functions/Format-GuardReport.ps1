@@ -1,5 +1,4 @@
 function Format-GuardReport {
-    # The feedback Claude receives: one block per hit, naming the rule, the offending line and the owning skill.
     param(
         [Parameter(Mandatory)] [string] $Path,
         [Parameter(Mandatory)] [object[]] $Hit

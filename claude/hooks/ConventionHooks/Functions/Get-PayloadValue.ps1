@@ -1,5 +1,5 @@
 function Get-PayloadValue {
-    # A string property of a hook payload object, or '' when the property is absent (safe under strict mode).
+    # Safe under strict mode: an absent property gives ''.
     param(
         [Parameter(Mandatory)] [AllowNull()] [object] $Payload,
         [Parameter(Mandatory)] [string] $Name

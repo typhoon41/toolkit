@@ -1,6 +1,6 @@
 function Get-SkillMarkerPath {
-    # The file recording which skills are loaded: one per session, and one per subagent, because a subagent does
-    # not inherit the skills its parent loaded. Without a session id, an hourly bucket keeps the gate working.
+    # One file per session and per subagent, because a subagent does not inherit its parent's skills. Without a
+    # session id, an hourly bucket keeps the gate working.
     param(
         [Parameter(Mandatory)] [object] $Payload,
         [Parameter(Mandatory)] [string] $MarkerRoot

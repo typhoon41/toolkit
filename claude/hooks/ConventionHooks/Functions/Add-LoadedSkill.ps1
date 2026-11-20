@@ -1,5 +1,4 @@
 function Add-LoadedSkill {
-    # Records that a skill of this plugin was loaded, in the marker file of the session or subagent.
     param(
         [Parameter(Mandatory)] [string] $MarkerPath,
         [Parameter(Mandatory)] [string] $Skill

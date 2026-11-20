@@ -1,7 +1,5 @@
 function Test-ProjectDependency {
-    # Whether the project a file belongs to - the nearest package.json at or above the file's folder - lists the
-    # package in dependencies, devDependencies or peerDependencies (Angular libraries). False without a package.json
-    # or when it cannot be read.
+    # peerDependencies count too (Angular libraries).
     param(
         [Parameter(Mandatory)] [string] $Path,
         [Parameter(Mandatory)] [string] $Package

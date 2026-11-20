@@ -1,6 +1,4 @@
 function Get-RequiredSkill {
-    # The skills an edit of the file needs: those of its extension, plus those its project's dependencies add
-    # (for example angular when the nearest package.json depends on @angular/core).
     param(
         [Parameter(Mandatory)] [string] $Path,
         [Parameter(Mandatory)] [hashtable] $Configuration

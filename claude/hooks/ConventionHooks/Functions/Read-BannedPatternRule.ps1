@@ -1,7 +1,4 @@
 function Read-BannedPatternRule {
-    # The rules of BannedPatterns.psd1 as objects; Target defaults to 'Text', ExcludeWhenFileMatches and
-    # WhenProjectDependsOn to none.
-    # Every regular expression gets a match timeout (see Test-PatternMatch).
     param([Parameter(Mandatory)] [string] $Path)
     $timeout = [TimeSpan]::FromSeconds(1)
     $options = [Text.RegularExpressions.RegexOptions]::None
