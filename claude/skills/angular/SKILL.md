@@ -1,6 +1,6 @@
 ---
 name: angular
-description: Angular (20+, zoneless, signals) conventions - components, signal APIs, signals instead of getters, templates without logic, @for tracking, component styling and host elements, state, HTTP, forms, errors, shared components, routing, i18n. Apply whenever writing, refactoring or reviewing code or templates in an Angular project.
+description: Angular (20+, zoneless, signals) conventions - components, signal APIs, computed signals for derived state, templates without logic, @for tracking, component styling and host elements, state, HTTP, forms, errors, shared components, routing, i18n. Apply whenever writing, refactoring or reviewing code or templates in an Angular project.
 ---
 
 # Angular
@@ -41,12 +41,10 @@ Builds on `typescript` (class style, typing, async code), `html-scss` (markup an
   | `ngAfterViewInit`, DOM after render | `viewChild()` + `afterNextRender(() => ..., { injector })` |
   | `ngOnDestroy`, teardown | `inject(DestroyRef).onDestroy(...)` or `takeUntilDestroyed()` |
 
-  No Promise is left floating in the constructor.
-
 ## Signals
 
-- **Derived state is a signal, never a getter**: `readonly x: Signal<T> = computed(() => ...)` on every class -
-  component, model, value object. Sources stay plain `readonly` fields or `signal()`s; a private mutable flag is
+- **Derived state is `computed()`** - the reactive primitive `typescript` defers to:
+  `readonly x: Signal<T> = computed(() => ...)` on every class - component, model, value object. Sources stay plain `readonly` fields or `signal()`s; a private mutable flag is
   exposed with `.asReadonly()`.
 - Call sites invoke it: a bare `week.label` is an always-truthy Signal object and silently breaks boolean checks.
 - Members only the template or host bindings use are `protected readonly`; members other classes call stay plain
@@ -109,7 +107,8 @@ Signals only, no NgRx:
 
 - Reads that follow signal inputs: `httpResource()`; normalise the wire format in its `parse` function at the
   service boundary.
-- Every other HTTP call is awaited: `await lastValueFrom(this.http.post(...))`.
+- Every other HTTP call, and any other one-value Observable, is awaited through RxJS's
+  `await lastValueFrom(this.http.post(...))` / `await firstValueFrom(...)`.
 - A real stream is subscribed with `takeUntilDestroyed()` as its teardown.
 
 ## Errors

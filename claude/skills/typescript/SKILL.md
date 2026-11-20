@@ -32,12 +32,12 @@ these.
 ## Asynchronous code
 
 - **`async` / `await`, always.** Never `.then()` / `.catch()` chains, and never a Promise left floating or
-  discarded with `void`. The one exception is a lazy `import()` that picks a single export,
-  `import('./page').then(module => module.Page)`: the module-loading idiom bundlers and routers expect.
+  discarded with `void`. The one exception is a lazy `import()` that picks a single export, written on one line:
+  `import('./page').then(module => module.Page)`, the module-loading idiom bundlers and routers expect.
 - **Subscribe only to a real stream** - a source that keeps emitting values over time (events, a WebSocket, a
   store) - and always tear the subscription down.
-- A source that delivers one value (an HTTP call, a single lookup) is awaited:
-  `await firstValueFrom(source)` / `await lastValueFrom(source)`, never `subscribe()`.
+- A source that delivers one value (an HTTP call, a single lookup) is turned into a Promise and awaited, never
+  subscribed to. The framework or library skill names the conversion.
 
 ## Modules
 
