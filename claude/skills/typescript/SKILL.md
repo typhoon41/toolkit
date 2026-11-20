@@ -1,6 +1,6 @@
 ---
 name: typescript
-description: Framework-independent TypeScript conventions - class member style (arrow-function properties, no getters, no public), typing without any or non-null assertions, async/await instead of subscriptions and then-chains, module imports. Apply whenever writing, refactoring or reviewing .ts files, in any project.
+description: Framework-independent TypeScript conventions - class member style (arrow-function properties, no getters, no public), typing without any or non-null assertions, async/await instead of subscriptions and then-chains, modules as single abstractions instead of export-const sacks, imports. Apply whenever writing, refactoring or reviewing .ts files, in any project.
 ---
 
 # TypeScript
@@ -42,4 +42,25 @@ these.
 
 ## Modules
 
-Imports that cross a feature boundary use the `tsconfig` path aliases, never `../../`.
+- **No `export const` sacks.** A module exports one named abstraction (`code-design`'s one-abstraction rule),
+  never a pile of `export const` / `export function` values. Find the abstraction they hide and extract it:
+  - functions that share a subject become **one class** named after that subject - its members `static readonly`
+    when it holds no state - which is the preferred shape;
+  - a function with no such subject goes in **its own file**, named after the function;
+  - a constant lives on the class that owns its concept (`static readonly`), not in a module-level list.
+
+  ```ts
+  // Wrong - date-formatting.ts
+  export const shortDateFormat = 'd.M.';
+  export const toIsoDate = (date: Date) => ...;
+  export const fromIsoDate = (iso: string) => ...;
+
+  // Right - calendar-date.ts
+  export class CalendarDate {
+      static readonly shortFormat = 'd.M.';
+      static readonly fromIso = (iso: string): CalendarDate => ...;
+      readonly toIso = (): string => ...;
+  }
+  ```
+
+- Imports that cross a feature boundary use the `tsconfig` path aliases, never `../../`.
