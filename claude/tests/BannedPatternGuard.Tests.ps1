@@ -54,6 +54,8 @@ Describe 'Find-BannedPattern' {
         @{ Rule = 'promise-then'; Path = 'a/card.ts'; Text = 'this.load().catch(error => this.fail(error));' }
         @{ Rule = 'promise-then'; Path = 'a/card.ts'; Text = 'const total = this.sum().then(result => result.value);' }
         @{ Rule = 'promise-then'; Path = 'a/routes.ts'; Text = '                .then(module => module.RequestSentPage)),' }
+        @{ Rule = 'promise-then'; Path = 'a/routes.ts'; Text = "import('./page').then(module => module.Page).catch(handleError);" }
+        @{ Rule = 'promise-then'; Path = 'a/routes.ts'; Text = "import('./page').then(module => { register(module); });" }
         @{ Rule = 'style-binding'; Path = 'a/card.html'; Text = '<div [ngStyle]="styles()">' }
         @{ Rule = 'deep-selector'; Path = 'a/card.scss'; Text = '::ng-deep .mat-row { color: red; }' }
         @{ Rule = 'important'; Path = 'a/card.scss'; Text = 'display: none !important;' }

@@ -67,7 +67,7 @@
         }
         @{
             Id = 'promise-then'; Extensions = @('.ts'); Skill = 'typescript'
-            Pattern = '^(?!.*\bimport\s*\([^)]*\)\s*\.then\s*\(\s*(\w+)\s*=>\s*\1\.\w+\s*\)).*\.(?:then|catch)\s*\('
+            Pattern = '\.catch\s*\(|\.then\s*\((?!(?<=\bimport\s*\([^)]*\)\s*\.then\s*\()\s*(\w+)\s*=>\s*\1\.\w+\s*\))'
             Message = 'use async / await, never .then() / .catch() chains (a one-line lazy import picking one export is the only exception)'
         }
         @{
