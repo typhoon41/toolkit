@@ -89,5 +89,6 @@ never secrets, tokens or personal data.
 ## Determinism and build
 
 - Inject `TimeProvider`; never read `DateTime.Now` / `UtcNow`.
+- `nameof()` wherever a string names a member.
 - Package versions only in `Directory.Packages.props`; a `PackageReference` never carries `Version`.
 - A change adds no compiler or analyzer warnings.
