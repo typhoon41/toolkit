@@ -1,4 +1,4 @@
-# Test helper: a throwaway git repository with files and commits. Dot-source it in BeforeAll.
+# Dot-source it in BeforeAll.
 
 function New-TestRepository {
     param([Parameter(Mandatory)] [string] $Path)
