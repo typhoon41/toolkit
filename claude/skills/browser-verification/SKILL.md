@@ -12,7 +12,8 @@ If it is not connected or keeps failing, say the UI was **not** verified instead
 2. **Run** the app as the project documents (its `CLAUDE.md` or `run` skill); for the backend, the lightest standalone
    way it offers.
 3. **Use the changed flow like a user** in a new tab: the happy path and at least one failure path (invalid input, an
-   empty state). Record a multi-step flow with `gif_creator`.
+   empty state). Record a multi-step flow with `gif_creator`. Warn the user before an action that opens an
+   `alert` / `confirm` / `prompt`: it blocks the extension.
 4. **Console and network**: `read_console_messages` with a `pattern` for the app's errors, `read_network_requests` for
    failed calls - an error page may hide the real status code, so check the response.
 5. **Measure, don't eyeball**:

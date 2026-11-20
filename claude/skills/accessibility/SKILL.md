@@ -13,10 +13,12 @@ the decisions and the often-missed points. Never claim "fully accessible": say w
 - Use the project's shared component or an existing usage of the pattern; the result still needs the right name,
   role, value, states, keyboard behaviour and focus handling.
 - Otherwise native elements first; ARIA only where native semantics fall short, never on top of working ones.
+- Landmarks (`header`, `nav`, `main`, `footer`); headings without skipped levels, one `h1` for the page topic.
 - `<title>` reads "Page - section - site".
 
 ## Keyboard and focus
 
+- Every interactive element is keyboard operable, with visible focus, no trap, and tab order following reading order.
 - Static content is not tabbable (`tabindex="-1"` only for programmatic focus). Hidden content (`hidden`,
   `display: none`, `visibility: hidden`, inside `aria-hidden="true"`) contains nothing focusable.
 - A skip link is the first focusable element, visually hidden until focused, targeting
@@ -61,8 +63,10 @@ the decisions and the often-missed points. Never claim "fully accessible": say w
 
 ## Images, navigation, tables
 
-- An informative `<svg>` gets `role="img"` + `aria-label` / `aria-labelledby`; decorative images `alt=""` or
-  `aria-hidden="true"`.
+- Informative images: meaningful `alt` (`<img>`) or `role="img"` + `aria-label` / `aria-labelledby` (`<svg>`);
+  decorative: `alt=""` or `aria-hidden="true"`.
+- Time limits can be turned off, adjusted or extended; anything moving or auto-updating for over 5 s can be paused;
+  nothing flashes more than 3 times per second; video has captions, audio and video a transcript.
 - Site navigation is `<nav>` with lists of links, never `role="menu"` / `menubar`. Expandable sections toggle through
   a `<button>` with `aria-expanded`; `Escape` may close them.
 - Static tabular data is a `<table>` with `<th>`; `role="grid"` only for truly interactive grids, with arrow-key

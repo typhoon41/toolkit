@@ -82,6 +82,7 @@ never secrets, tokens or personal data.
   access that object.
 - A response model carries only the fields the client uses; no sensitive data in query strings (URLs are logged).
 - Raw SQL only through parameterised `FromSql` / `ExecuteSql`, never interpolated into `FromSqlRaw` / `ExecuteSqlRaw`.
+- No secrets or connection strings in code or committed `appsettings`: user secrets locally, a vault when deployed.
 - Exception details never reach a response (generic `ProblemDetails`); Swagger / OpenAPI only in Development.
 
 ## Determinism and build
