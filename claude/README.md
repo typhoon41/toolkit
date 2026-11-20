@@ -40,14 +40,6 @@ The language servers (`csharp-ls`, `typescript-language-server`) come from the o
 Locally, without GitHub: `/plugin marketplace add <path to this repository>`, then
 `/plugin install conventions@toolkit`.
 
-## Project notes
-
-The skills are project-neutral. Repository facts they need - shared components, path aliases, locale files, where
-services and DI modules live, the SCSS modules - go in `.claude/project-notes/<skill>.md` in the project
-(`angular.md`, `csharp.md`, `html-scss.md`). The skill reads the file before working and, when it is missing,
-creates it from its `references/project-notes.template.md` with only what it verified. Commit the notes; never copy
-a skill into a project to change it.
-
 ## Skills
 
 | Skill | Applies to |

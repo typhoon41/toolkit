@@ -89,8 +89,8 @@ claude plugin validate .        # plugin; run at the repository root for the mar
 
 - `skills/<name>/SKILL.md` — one skill per concern. **Every rule has exactly one owning skill**; others refer
   to it by name (`code-design` holds the cross-language rules). No checklists that restate a skill's body.
-  Skills stay project-neutral: repository facts go in the consuming project's `.claude/project-notes/<skill>.md`,
-  shaped by the skill's `references/project-notes.template.md`.
+  Skills stay project-neutral and framework-independent: repository facts go in the consuming project's
+  `CLAUDE.md`, and a framework's rules live only in that framework's skill.
 - `hooks/` — PowerShell 7 entry scripts, all importing the one module `ConventionHooks/` (one function per file,
   as in `release/`); `claude/README.md` has the event table. `Invoke-SkillGate.ps1` blocks edits until the skills
   in `RequiredSkills.psd1` are loaded (marker per session/subagent in the temp folder);

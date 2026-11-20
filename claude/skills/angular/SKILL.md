@@ -7,14 +7,6 @@ description: Angular (20+, zoneless, signals) and TypeScript conventions - compo
 
 Builds on `code-design`; markup and styling rules, including host-element styling, live in `html-scss`.
 
-## Project notes
-
-Repository facts this skill relies on - selector prefix, shared components, path aliases, routing helpers, i18n
-command and locale files, exempt areas, pinned packages - live in `.claude/project-notes/angular.md`. Read it
-before working. If it is missing and the task needs one of those facts, create it from
-`references/project-notes.template.md` (next to this skill) with only what you verified in the repository. A
-project fact goes there, never into a copy of this skill.
-
 ## Components
 
 ```ts
