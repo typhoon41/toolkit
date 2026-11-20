@@ -47,7 +47,7 @@ Describe 'Find-BannedPattern' {
         @{ Rule = 'blanket-suppression'; Path = 'a/card.ts'; Text = '// @ts-ignore' }
         @{ Rule = 'promise-then'; Path = 'a/card.ts'; Text = 'this.save().then(() => this.close());' }
         @{ Rule = 'promise-then'; Path = 'a/card.ts'; Text = 'fetch(url).then(response => response.json()).then(render);' }
-        @{ Rule = 'inline-style'; Path = 'a/card.html'; Text = '<div [ngStyle]="styles()">' }
+        @{ Rule = 'style-binding'; Path = 'a/card.html'; Text = '<div [ngStyle]="styles()">' }
         @{ Rule = 'deep-selector'; Path = 'a/card.scss'; Text = '::ng-deep .mat-row { color: red; }' }
         @{ Rule = 'important'; Path = 'a/card.scss'; Text = 'display: none !important;' }
         @{ Rule = 'scss-import'; Path = 'a/card.scss'; Text = "@import 'variables';" }
@@ -58,7 +58,7 @@ Describe 'Find-BannedPattern' {
         @{ Rule = 'element-style'; Path = 'a/card.ts'; Text = 'document.body.style.overflow = "hidden";' }
         @{ Rule = 'element-style'; Path = 'a/card.ts'; Text = 'element.style.setProperty("--x", "1");' }
         @{ Rule = 'inline-style'; Path = 'a/card.html'; Text = '<div style="margin-top: 16px">' }
-        @{ Rule = 'inline-style'; Path = 'a/card.html'; Text = '<div [style.pointer-events]="value()">' }
+        @{ Rule = 'style-binding'; Path = 'a/card.html'; Text = '<div [style.pointer-events]="value()">' }
         @{ Rule = 'host-selector'; Path = 'a/card.scss'; Text = ':host { display: block; }' }
         @{ Rule = 'css-grid'; Path = 'a/card.scss'; Text = '  display: grid;' }
         @{ Rule = 'viewport-unit'; Path = 'a/card.scss'; Text = '  max-height: 80vh;' }

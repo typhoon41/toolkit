@@ -1,12 +1,12 @@
 ---
 name: angular
-description: Angular (20+, zoneless, signals) conventions - components, signal APIs, signals instead of getters, templates without logic, @for tracking, state, HTTP, forms, errors, shared components, routing, i18n. Apply whenever writing, refactoring or reviewing code or templates in an Angular project.
+description: Angular (20+, zoneless, signals) conventions - components, signal APIs, signals instead of getters, templates without logic, @for tracking, component styling and host elements, state, HTTP, forms, errors, shared components, routing, i18n. Apply whenever writing, refactoring or reviewing code or templates in an Angular project.
 ---
 
 # Angular
 
-Builds on `typescript` (class style, typing, async code) and `code-design`; neither is restated here. Markup and
-SCSS rules that hold without Angular live in `html-scss`.
+Builds on `typescript` (class style, typing, async code), `html-scss` (markup and stylesheets) and
+`code-design`; none is restated here.
 
 ## Components
 
@@ -67,6 +67,22 @@ SCSS rules that hold without Angular live in `html-scss`.
 - **`@for` tracks a stable identity**: the domain id, else a unique primitive, else `$index`. Never `track item`
   (object identity changes whenever the array is rebuilt). With `$index`, a child that keeps per-item state must
   reset it when its input changes.
+
+## Component styling
+
+The Angular side of `html-scss`'s rules:
+
+- **The host element replaces wrappers.** Give the component host a class in the decorator,
+  `host: { class: 'calendar-grid-container' }`, instead of wrapping it in an element in the parent template.
+- Style a host class in the stylesheet of the **component whose template renders it**: the host carries that
+  parent's encapsulation attribute, so the rule matches and stays in the parent's lazy bundle. Only a routed page
+  (no parent template) is styled in the global partials. Never in the component's own stylesheet, never `:host`.
+- When markup moves to another component, every rule that styled it moves to that component's stylesheet:
+  encapsulation silently stops the old rule matching.
+- No `[style.x]`, `[style.--custom]` or `[ngStyle]` bindings. Bind classes the model computes:
+  `[class]="entry.placementClasses()"`, `[class.selected]="entry.selected()"`.
+- Never `::ng-deep`; `ViewEncapsulation.None` only with a comment giving the reason.
+- Keep templates flat: when nesting grows deep, extract a child component.
 
 ## State
 

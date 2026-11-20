@@ -37,9 +37,8 @@ is not proof the change is clean.
 
 ## After moving markup
 
-When markup moves between components, every rule that styled it must move to the stylesheet of the component
-that now renders the element (see `html-scss`, host elements). Stylesheets are encapsulated per component, so a
-rule left behind silently stops matching.
+When markup moves between components with component-scoped stylesheets, check that every rule styling it moved
+too: a rule left behind silently stops matching. Measure the moved elements again.
 
 ## Report
 

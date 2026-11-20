@@ -95,12 +95,17 @@
         }
         @{
             Id = 'inline-style'; Extensions = @('.html'); Skill = 'html-scss'
-            Pattern = '\sstyle\s*=\s*["'']|\[style[.\]]|\[ngStyle\]'
+            Pattern = '\sstyle\s*=\s*["'']'
             ExcludeWhenFileMatches = '(?is)\A\uFEFF?\s*(?><!--(?:(?!-->).)*-->\s*)*(?:<!doctype\s+html(?=[\s>])|<html[\s>])'
-            Message = 'no style attribute or [style] binding: use a class (an @for-generated one for runtime values)'
+            Message = 'no style attribute: use a class (an @for-generated one for runtime values)'
         }
         @{
-            Id = 'host-selector'; Extensions = @('.scss', '.css'); Skill = 'html-scss'
+            Id = 'style-binding'; Extensions = @('.html', '.ts'); Skill = 'angular'
+            Pattern = '\[style[.\]]|\[ngStyle\]'
+            Message = 'no [style] / [ngStyle] binding: bind a class the model computes'
+        }
+        @{
+            Id = 'host-selector'; Extensions = @('.scss', '.css'); Skill = 'angular'
             Pattern = ':host\b'
             Message = 'no :host: give the host a class in the decorator and style it where the element is rendered'
         }
@@ -120,7 +125,7 @@
             Message = 'mobile-first: use the project min-width breakpoint mixins, never a bare width @media'
         }
         @{
-            Id = 'deep-selector'; Extensions = @('.scss', '.css'); Skill = 'html-scss'
+            Id = 'deep-selector'; Extensions = @('.scss', '.css'); Skill = 'angular'
             Pattern = '::ng-deep\b'
             Message = 'never ::ng-deep: use the library theming API or the global vendor overrides partial'
         }
