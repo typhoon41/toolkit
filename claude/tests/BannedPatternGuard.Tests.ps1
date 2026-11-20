@@ -51,6 +51,9 @@ Describe 'Find-BannedPattern' {
         @{ Rule = 'lifecycle-hook'; Path = 'a/card.ts'; Text = 'export class Card implements OnInit, AfterViewInit {' }
         @{ Rule = 'promise-then'; Path = 'a/card.ts'; Text = 'this.save().then(() => this.close());' }
         @{ Rule = 'promise-then'; Path = 'a/card.ts'; Text = 'fetch(url).then(response => response.json()).then(render);' }
+        @{ Rule = 'promise-then'; Path = 'a/card.ts'; Text = 'this.load().catch(error => this.fail(error));' }
+        @{ Rule = 'promise-then'; Path = 'a/card.ts'; Text = 'const total = this.sum().then(result => result.value);' }
+        @{ Rule = 'promise-then'; Path = 'a/routes.ts'; Text = '                .then(module => module.RequestSentPage)),' }
         @{ Rule = 'style-binding'; Path = 'a/card.html'; Text = '<div [ngStyle]="styles()">' }
         @{ Rule = 'deep-selector'; Path = 'a/card.scss'; Text = '::ng-deep .mat-row { color: red; }' }
         @{ Rule = 'important'; Path = 'a/card.scss'; Text = 'display: none !important;' }
@@ -102,7 +105,7 @@ Describe 'Find-BannedPattern' {
         @{ Path = 'a/card.ts'; Text = 'export class Card implements ControlValueAccessor {' }
         @{ Path = 'a/card.ts'; Text = 'inject(DestroyRef).onDestroy(() => this.datePicker()?.destroy());' }
         @{ Path = 'a/routes.ts'; Text = "() => import('@features/home/home-page').then(module => module.HomePage))," }
-        @{ Path = 'a/routes.ts'; Text = '                .then(module => module.RequestSentPage)),' }
+        @{ Path = 'a/card.ts'; Text = '} catch (error) {' }
         @{ Path = 'a/card.ts'; Text = 'if (!value || value !== other) {' }
         @{ Path = 'a/card.ts'; Text = '// Shown once: we never ask again!.' }
         @{ Path = 'a/card.ts'; Text = "readonly message = 'Saved!';" }
