@@ -1,5 +1,3 @@
-# CI for the toolkit itself: tests and static analysis on every push and PR.
-
 trigger:
   branches:
     include: [ main ]
@@ -11,58 +9,88 @@ pr:
 pool:
   vmImage: ubuntu-latest
 
-steps:
-  - checkout: self
-    fetchDepth: 1
+jobs:
+  - job: Version
+    displayName: Read plugin version
+    steps:
+      - checkout: self
+        fetchDepth: 1
 
-  - task: UseDotNet@2
-    displayName: Install .NET SDK
-    inputs:
-      version: 10.x
+      - pwsh: |
+          $plugin = (Get-Content claude/.claude-plugin/plugin.json -Raw | ConvertFrom-Json).version
+          $listed = ((Get-Content .claude-plugin/marketplace.json -Raw | ConvertFrom-Json).plugins | Where-Object name -eq 'conventions').version
+          if ($listed -ne $plugin) {
+            Write-Host "##vso[task.logissue type=error].claude-plugin/marketplace.json lists $listed, claude/.claude-plugin/plugin.json has $plugin."
+            exit 1
+          }
+          Write-Host "##vso[task.setvariable variable=Number;isOutput=true]$plugin"
+        name: Plugin
+        displayName: Read plugin version
 
-  - pwsh: |
-      Install-Module Pester -MinimumVersion 5.6.0 -Scope CurrentUser -Force -SkipPublisherCheck
-      Install-Module PSScriptAnalyzer -Scope CurrentUser -Force
-    displayName: Install Pester and PSScriptAnalyzer
+  - job: Test
+    displayName: Analyze and test
+    dependsOn: Version
+    variables:
+      version: $[ dependencies.Version.outputs['Plugin.Number'] ]
+      # Keyed on the version, so the counter restarts at 1 after every version bump.
+      revision: $[ counter(dependencies.Version.outputs['Plugin.Number'], 1) ]
+    steps:
+      - checkout: self
+        fetchDepth: 1
 
-  - pwsh: |
-      $issues = @('./module', './scripts' | ForEach-Object { Invoke-ScriptAnalyzer -Path $_ -Recurse -Settings ./PSScriptAnalyzerSettings.psd1 })
-      $issues | Format-Table ScriptName, Line, RuleName, Message -Wrap | Out-String -Width 200 | Write-Host
-      if ($issues.Count -gt 0) { exit 1 }
-    displayName: Analyze release tooling
-    workingDirectory: release
+      - pwsh: |
+          Import-Module ./release/module/ReleaseTooling
+          Set-PipelineBuildNumber -BuildNumber "$env:VERSION.$env:REVISION"
+        displayName: Name the run
 
-  - pwsh: |
-      $configuration = New-PesterConfiguration
-      $configuration.Run.Path = './tests'
-      $configuration.Run.Exit = $true
-      $configuration.TestResult.Enabled = $true
-      $configuration.TestResult.OutputPath = "$env:AGENT_TEMPDIRECTORY/release-tests.xml"
-      Invoke-Pester -Configuration $configuration
-    displayName: Test release tooling
-    workingDirectory: release
+      - task: UseDotNet@2
+        displayName: Install .NET SDK
+        inputs:
+          version: 10.x
 
-  - pwsh: |
-      $issues = @(Invoke-ScriptAnalyzer -Path ./hooks -Recurse -Settings ../release/PSScriptAnalyzerSettings.psd1)
-      $issues | Format-Table ScriptName, Line, RuleName, Message -Wrap | Out-String -Width 200 | Write-Host
-      if ($issues.Count -gt 0) { exit 1 }
-    displayName: Analyze Claude plugin hooks
-    workingDirectory: claude
+      - pwsh: |
+          Install-Module Pester -MinimumVersion 5.6.0 -Scope CurrentUser -Force -SkipPublisherCheck
+          Install-Module PSScriptAnalyzer -Scope CurrentUser -Force
+        displayName: Install Pester and PSScriptAnalyzer
 
-  - pwsh: |
-      $configuration = New-PesterConfiguration
-      $configuration.Run.Path = './tests'
-      $configuration.Run.Exit = $true
-      $configuration.TestResult.Enabled = $true
-      $configuration.TestResult.OutputPath = "$env:AGENT_TEMPDIRECTORY/claude-tests.xml"
-      Invoke-Pester -Configuration $configuration
-    displayName: Test Claude plugin hooks
-    workingDirectory: claude
+      - pwsh: |
+          $issues = @('./module', './scripts' | ForEach-Object { Invoke-ScriptAnalyzer -Path $_ -Recurse -Settings ./PSScriptAnalyzerSettings.psd1 })
+          $issues | Format-Table ScriptName, Line, RuleName, Message -Wrap | Out-String -Width 200 | Write-Host
+          if ($issues.Count -gt 0) { exit 1 }
+        displayName: Analyze release tooling
+        workingDirectory: release
 
-  - task: PublishTestResults@2
-    condition: always()
-    inputs:
-      testResultsFormat: NUnit
-      testResultsFiles: |
-        $(Agent.TempDirectory)/release-tests.xml
-        $(Agent.TempDirectory)/claude-tests.xml
+      - pwsh: |
+          $configuration = New-PesterConfiguration
+          $configuration.Run.Path = './tests'
+          $configuration.Run.Exit = $true
+          $configuration.TestResult.Enabled = $true
+          $configuration.TestResult.OutputPath = "$env:AGENT_TEMPDIRECTORY/release-tests.xml"
+          Invoke-Pester -Configuration $configuration
+        displayName: Test release tooling
+        workingDirectory: release
+
+      - pwsh: |
+          $issues = @(Invoke-ScriptAnalyzer -Path ./hooks -Recurse -Settings ../release/PSScriptAnalyzerSettings.psd1)
+          $issues | Format-Table ScriptName, Line, RuleName, Message -Wrap | Out-String -Width 200 | Write-Host
+          if ($issues.Count -gt 0) { exit 1 }
+        displayName: Analyze Claude plugin hooks
+        workingDirectory: claude
+
+      - pwsh: |
+          $configuration = New-PesterConfiguration
+          $configuration.Run.Path = './tests'
+          $configuration.Run.Exit = $true
+          $configuration.TestResult.Enabled = $true
+          $configuration.TestResult.OutputPath = "$env:AGENT_TEMPDIRECTORY/claude-tests.xml"
+          Invoke-Pester -Configuration $configuration
+        displayName: Test Claude plugin hooks
+        workingDirectory: claude
+
+      - task: PublishTestResults@2
+        condition: always()
+        inputs:
+          testResultsFormat: NUnit
+          testResultsFiles: |
+            $(Agent.TempDirectory)/release-tests.xml
+            $(Agent.TempDirectory)/claude-tests.xml
