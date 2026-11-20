@@ -1,15 +1,13 @@
 ---
 name: scss-solutions
-description: Using the scss-solutions library - its global utility classes (layout, columns, typography) and positioning mixins. Apply when writing or reviewing templates or SCSS in a project whose package.json depends on @typhoon41/scss-solutions.
+description: Using the scss-solutions library - its global utility classes (layout, columns, typography), positioning and breakpoint mixins. Apply when writing or reviewing templates or SCSS in a project whose package.json depends on @typhoon41/scss-solutions.
 ---
 
 # scss-solutions
 
-The library generates global utility classes and mixins. Use them; never re-implement them.
-
-The installed package is the authority, not this page: before writing a mixin, function or utility class, list
-what `node_modules/@typhoon41/scss-solutions/src` exports. When something is almost right, extend the library
-(with a test there) instead of keeping a forked copy in the app.
+Use the library's utility classes and mixins; never re-implement them. The installed package is the authority: before
+writing a mixin, function or utility class, list what `node_modules/@typhoon41/scss-solutions/src` exports. When
+something is almost right, extend the library (with a test there) instead of forking it into the app.
 
 ## Utility classes - applied in HTML only
 
@@ -28,8 +26,8 @@ what `node_modules/@typhoon41/scss-solutions/src` exports. When something is alm
 | `clickable` | `cursor: pointer` |
 
 - Apply the class in HTML instead of writing its properties in SCSS.
-- **Never use one as a selector** in app SCSS (`.notes .column-12 { }`): that couples styles to the grid and breaks
-  when the markup stops needing that width. Add a semantic class next to it and style that:
+- **Never use one as a selector** in app SCSS (`.notes .column-12 { }`) - it breaks when the markup changes width.
+  Style a semantic class beside it:
 
 ```html
 <div class="field-container column-12">...</div>
