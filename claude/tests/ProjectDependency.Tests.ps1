@@ -18,6 +18,11 @@ Describe 'Test-ProjectDependency' {
         Test-ProjectDependency -Path (Join-Path $root 'src/app/card.ts') -Package '@angular/core' | Should -BeTrue
     }
 
+    It 'finds a peer dependency of a library' {
+        $root = New-ProjectFolder '{ "peerDependencies": { "@angular/core": "^20.0.0" } }'
+        Test-ProjectDependency -Path (Join-Path $root 'src/app/card.ts') -Package '@angular/core' | Should -BeTrue
+    }
+
     It 'finds a dev dependency' {
         $root = New-ProjectFolder '{ "devDependencies": { "@angular/core": "^20.0.0" } }'
         Test-ProjectDependency -Path (Join-Path $root 'src/app/card.ts') -Package '@angular/core' | Should -BeTrue

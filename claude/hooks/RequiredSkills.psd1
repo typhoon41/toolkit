@@ -19,6 +19,7 @@
             '.ts'   = @('angular')
             '.html' = @('angular')
             '.scss' = @('angular')
+            '.css'  = @('angular')
         }
     }
 }

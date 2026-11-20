@@ -102,7 +102,7 @@ Describe 'Invoke-SkillGate.ps1' {
     }
 
     It 'adds angular to <File> in an Angular project' -ForEach @(
-        @{ File = 'card.ts' }, @{ File = 'card.html' }, @{ File = 'card.scss' }
+        @{ File = 'card.ts' }, @{ File = 'card.html' }, @{ File = 'card.scss' }, @{ File = 'card.css' }
     ) {
         $project = Join-Path $TestDrive ([guid]::NewGuid())
         New-Item -ItemType Directory -Path (Join-Path $project 'src/app') -Force | Out-Null

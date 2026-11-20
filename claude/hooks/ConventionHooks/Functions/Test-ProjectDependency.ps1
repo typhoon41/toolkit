@@ -1,6 +1,7 @@
 function Test-ProjectDependency {
     # Whether the project a file belongs to - the nearest package.json at or above the file's folder - lists the
-    # package in dependencies or devDependencies. False without a package.json or when it cannot be read.
+    # package in dependencies, devDependencies or peerDependencies (Angular libraries). False without a package.json
+    # or when it cannot be read.
     param(
         [Parameter(Mandatory)] [string] $Path,
         [Parameter(Mandatory)] [string] $Package
@@ -15,7 +16,7 @@ function Test-ProjectDependency {
             catch {
                 return $false
             }
-            foreach ($section in 'dependencies', 'devDependencies') {
+            foreach ($section in 'dependencies', 'devDependencies', 'peerDependencies') {
                 if ($project[$section] -is [Collections.IDictionary] -and $project[$section].Contains($Package)) {
                     return $true
                 }
