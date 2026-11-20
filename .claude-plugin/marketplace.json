@@ -1,0 +1,17 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "toolkit",
+  "description": "Claude Code plugins shared by every project, maintained next to the rest of the toolkit.",
+  "owner": {
+    "name": "Nikola Dragicevic"
+  },
+  "plugins": [
+    {
+      "name": "conventions",
+      "description": "Code-design, C#/.NET, Angular, HTML/SCSS, accessibility and commit conventions, with a hook that flags banned patterns.",
+      "version": "1.0.0",
+      "source": "./claude",
+      "category": "development"
+    }
+  ]
+}

@@ -4,11 +4,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-Shared tooling consumed by other projects, which reference this repository from Azure Pipelines at a
-**pinned tag** (`resources.repositories` with `ref: refs/tags/vX.Y.Z`). A change here reaches a project
-only when that project moves its `ref`, so tag a new `vX.Y.Z` after changes. Today the only folder is
-`release/`: PowerShell 7 scripts + Azure Pipelines templates that version, write release notes for, and
-publish NuGet / npm packages and GitHub releases.
+Shared tooling consumed by other projects, one folder per tool:
+
+- `release/` — PowerShell 7 scripts + Azure Pipelines templates that version, write release notes for, and
+  publish NuGet / npm packages and GitHub releases. Projects reference this repository from Azure Pipelines
+  at a **pinned tag** (`resources.repositories` with `ref: refs/tags/vX.Y.Z`); a change reaches a project
+  only when it moves its `ref`, so tag a new `vX.Y.Z` after changes.
+- `claude/` — the `conventions` Claude Code plugin, published by the root `.claude-plugin/marketplace.json`
+  (marketplace `toolkit`). See "Claude plugin (`claude/`)" below.
 
 ## Commands
 
@@ -75,3 +78,24 @@ Key invariants the code enforces (see `release/docs/RELEASING.md` for the error-
   builds fake GitHub release contexts — dot-source them in `BeforeAll`.
 - User-facing docs live in `release/docs/` (CONTRIBUTING, ADOPTING, RELEASING, RECOVERY); update them
   when behaviour or error messages change.
+
+## Claude plugin (`claude/`)
+
+```powershell
+Invoke-Pester ./tests                                                                      # from claude/
+Invoke-ScriptAnalyzer -Path ./hooks -Recurse -Settings ../release/PSScriptAnalyzerSettings.psd1
+claude plugin validate .        # plugin; run at the repository root for the marketplace
+```
+
+- `skills/<name>/SKILL.md` — one skill per concern. **Every rule has exactly one owning skill**; others refer
+  to it by name (`code-design` holds the cross-language rules). No checklists that restate a skill's body.
+  Skills stay project-neutral and framework-independent: repository facts go in the consuming project's
+  `CLAUDE.md`, and a framework's rules live only in that framework's skill.
+- `hooks/` — PowerShell 7 entry scripts, all importing the one module `ConventionHooks/` (one function per file,
+  as in `release/`); `claude/README.md` has the event table. `Invoke-SkillGate.ps1` blocks edits until the skills
+  in `RequiredSkills.psd1` are loaded (marker per session/subagent in the temp folder);
+  `Invoke-BannedPatternGuard.ps1` checks only newly written text against `BannedPatterns.psd1` and reports via
+  stderr + exit 2 (never undoes the edit); `Invoke-DotnetFormat.ps1` formats `.cs` whitespace when an
+  `.editorconfig` exists. A new guard rule needs a reporting and an accepting test case and a scan of a real
+  project for false positives.
+- Releasing: bump `version` in `claude/.claude-plugin/plugin.json` and in the marketplace entry together.

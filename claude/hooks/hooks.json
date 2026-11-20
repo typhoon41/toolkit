@@ -1,0 +1,58 @@
+{
+  "description": "Convention hooks: require the owning skills before an edit, flag banned patterns after it (warn only).",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -NonInteractive -File \"${CLAUDE_PLUGIN_ROOT}/hooks/Invoke-SkillGate.ps1\"",
+            "statusMessage": "Checking convention skills...",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "UserPromptExpansion": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -NonInteractive -File \"${CLAUDE_PLUGIN_ROOT}/hooks/Invoke-SkillGate.ps1\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Skill",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -NonInteractive -File \"${CLAUDE_PLUGIN_ROOT}/hooks/Invoke-SkillGate.ps1\"",
+            "timeout": 30
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -NonInteractive -File \"${CLAUDE_PLUGIN_ROOT}/hooks/Invoke-BannedPatternGuard.ps1\"",
+            "statusMessage": "Checking banned patterns...",
+            "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -NonInteractive -File \"${CLAUDE_PLUGIN_ROOT}/hooks/Invoke-DotnetFormat.ps1\"",
+            "statusMessage": "Formatting C# whitespace...",
+            "timeout": 60
+          }
+        ]
+      }
+    ]
+  }
+}

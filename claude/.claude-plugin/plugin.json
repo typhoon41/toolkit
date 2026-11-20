@@ -1,0 +1,12 @@
+{
+  "name": "conventions",
+  "displayName": "Toolkit Conventions",
+  "description": "Code-design, C#/.NET, Angular, HTML/SCSS, accessibility and commit conventions, with hooks that load the owning skills before an edit, flag banned patterns after it and format C# whitespace.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Nikola Dragicevic"
+  },
+  "repository": "https://github.com/typhoon41/toolkit",
+  "homepage": "https://github.com/typhoon41/toolkit/tree/main/claude",
+  "keywords": ["conventions", "csharp", "dotnet", "angular", "typescript", "scss", "accessibility", "hooks"]
+}
