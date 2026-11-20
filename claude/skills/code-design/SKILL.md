@@ -40,7 +40,7 @@ makes untrue. No commented-out code; no `TODO` without a ticket reference.
 ## Failures
 
 - **Never swallow a failure**: a `catch` recovers with a real fallback or rethrows with context. An empty catch or
-  log-and-continue is a defect.
+  log-and-continue is a defect, and exceptions never branch on an expected outcome.
 - Validate at system boundaries (requests, files, deserialisation, external responses); trust the types inside.
 - **No blanket suppressions** (`@ts-ignore`, `@ts-nocheck`, `#pragma warning disable` without a rule id, a locally
   lowered lint severity). When unavoidable: one rule, one line, the reason beside it.
