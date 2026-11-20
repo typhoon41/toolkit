@@ -1,9 +1,6 @@
-# For applications (a 'pipeline' unit whose version comes from the pipeline): put these steps after the
-# production deployment. They generate the release notes (optional) and publish the GitHub release and
-# tag at the built commit. Builds that are not on the release branch do nothing here.
-# The Build stage must have run resolve-release-plan.yml with pipelineVersion and publishPlan: true.
-# Run these steps in a deployment job whose environment has an Exclusive lock (and lockBehavior: sequential
-# in the pipeline), so two production runs never release at the same time and out of order.
+# After the production deployment, in a deployment job whose environment has an Exclusive lock (and lockBehavior:
+# sequential), so two runs never release out of order. The Build stage must run resolve-release-plan.yml with
+# pipelineVersion and publishPlan: true.
 
 parameters:
   - name: releaseNotes

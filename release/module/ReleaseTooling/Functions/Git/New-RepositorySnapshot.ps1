@@ -1,9 +1,4 @@
 function New-RepositorySnapshot {
-    <#
-        The repository's files as they are in the working tree, or at -Revision (e.g. HEAD^).
-        Ask it with $snapshot.ReadText('path/relative/to/root'), which returns $null when the file
-        does not exist there, and $snapshot.Exists('path').
-    #>
     param(
         [Parameter(Mandatory)] [string] $RepositoryRoot,
         [string] $Revision

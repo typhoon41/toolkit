@@ -1,10 +1,5 @@
 function Get-PipelineReleaseDecision {
-    <#
-        Whether an application unit (version from the pipeline) releases in this build: every build of the
-        release branch does, with a version higher than every release. Re-running the build of an already
-        tagged commit is allowed (the release step verifies instead of creating).
-        Returns @{ CanRelease; AlreadyReleased; Highest; Problem; Warning }.
-    #>
+    # Re-running the build of an already tagged commit is allowed: the release step verifies instead of creating.
     param(
         [Parameter(Mandatory)] $Candidate,
         [AllowNull()] [AllowEmptyCollection()] [object[]] $Releases,

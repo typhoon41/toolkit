@@ -1,5 +1,4 @@
 function Assert-AbandonAllowed {
-    # Abandon is refused while this build's packages are on the feed, or while a recent push may still be indexing.
     param(
         [Parameter(Mandatory)] $Context,
         [Parameter(Mandatory)] $Release,

@@ -1,5 +1,4 @@
 function Disable-NpmTokenAuthentication {
-    # Removes a configuration made by Enable-NpmTokenAuthentication; does nothing for $null.
     param([AllowNull()] [AllowEmptyString()] [string] $File)
     if (-not $File) {
         return

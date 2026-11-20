@@ -1,5 +1,5 @@
 function ConvertTo-TrustedFeedHost {
-    # Host names from the comma-separated trustedFeedHosts pipeline parameter; an unresolved $(...) macro is none.
+    # An unresolved $(...) macro means no trusted hosts.
     param([AllowNull()] [AllowEmptyString()] [string] $Text)
     if (-not $Text -or $Text -match '^\$\(') {
         return , @()

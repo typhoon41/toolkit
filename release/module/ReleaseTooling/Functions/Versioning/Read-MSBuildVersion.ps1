@@ -1,9 +1,4 @@
 function Read-MSBuildVersion {
-    <#
-        The <Version> a project packs with: the csproj's own <Version>, otherwise the one in the nearest
-        Directory.Build.props above it (following a props file up only when it imports its parent).
-        Returns @{ Text; SourceFile } or $null when the project file does not exist in -Snapshot.
-    #>
     param([Parameter(Mandatory)] $Snapshot, [Parameter(Mandatory)] [string] $ProjectPath)
     $projectText = $Snapshot.ReadText($ProjectPath)
     if ($null -eq $projectText) {

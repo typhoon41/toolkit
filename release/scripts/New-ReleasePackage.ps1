@@ -3,13 +3,8 @@
     Packs every NuGet and npm unit of a release plan with its planned version into <OutDirectory>/<unit>/.
 
 .DESCRIPTION
-    NuGet: dotnet pack per project with -p:Version/PackageVersion, RepositoryUrl and RepositoryCommit, so
-    the publish step can prove which commit a package came from.
-    npm:   npm version (working copy only, restored afterwards) + npm pack.
-
-    When -NotesDirectory holds <unit>.txt / <unit>.md (New-ReleaseNotes.ps1), a releasing unit carries
-    its notes: NuGet as PackageReleaseNotes, npm as RELEASE-NOTES.md in the tarball. Without notes the
-    packages are built as they are. Pipeline (application) units are skipped.
+    NuGet packages record RepositoryUrl and RepositoryCommit, so the publish step can prove their commit. With
+    -NotesDirectory (New-ReleaseNotes.ps1) a releasing unit carries its notes. Pipeline units are skipped.
 #>
 [CmdletBinding()]
 param(

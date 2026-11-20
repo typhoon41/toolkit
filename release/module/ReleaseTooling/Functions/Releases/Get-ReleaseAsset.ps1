@@ -1,6 +1,4 @@
 function Get-ReleaseAsset {
-    # Assets of a release, one per output item (collect with @()); -Name returns the one with that name
-    # (or $null), -Attempts only the attempt assets.
     param(
         [Parameter(Mandatory)] $Context,
         [AllowNull()] $Release,

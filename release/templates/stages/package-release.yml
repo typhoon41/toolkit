@@ -1,9 +1,5 @@
-# Complete pipeline for NuGet/npm packages: Build (every branch and PR, jobs/package-build.yml) and
-# Release (only when a unit's version was bumped on the release branch, behind the approval environment,
-# jobs/package-publish.yml).
-#
-# The Build stage holds no publishing secrets. Only the Release stage references releaseVariableGroup
-# (NuGetApiKey / NpmToken / GitHubToken); protect it and the environment as described in docs/ADOPTING.md.
+# NuGet/npm pipeline: Build on every branch and PR; Release only when a version bump reaches the release branch.
+# Only Release references releaseVariableGroup: protect it and the environment (docs/ADOPTING.md).
 
 parameters:
   - name: buildSteps               # restore/build/test of your projects (install SDKs and Node here)

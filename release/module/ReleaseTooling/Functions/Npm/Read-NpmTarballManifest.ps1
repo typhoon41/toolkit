@@ -1,5 +1,4 @@
 function Read-NpmTarballManifest {
-    # The package.json inside an npm tarball (.tgz), as a hashtable.
     param([Parameter(Mandatory)] [string] $Path)
     $file = [IO.File]::OpenRead($Path)
     try {

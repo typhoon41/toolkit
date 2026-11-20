@@ -1,8 +1,5 @@
 function Get-NpmPublishedIntegrity {
-    <#
-        Integrity of <name>@<version> on the registry, or $null when that version (or the package) does not
-        exist. Any other failure throws: an outage must never be read as "not published".
-    #>
+    # Only "not found" returns $null; any other failure throws, so an outage is never read as "not published".
     param(
         [Parameter(Mandatory)] [string] $Name,
         [Parameter(Mandatory)] [string] $Version,

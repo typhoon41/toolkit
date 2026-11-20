@@ -1,5 +1,4 @@
 function Get-VersionProblem {
-    # Human-readable reason why a version string is rejected (for error messages).
     param([AllowNull()] [AllowEmptyString()] [string] $Text)
     if (-not $Text) {
         return 'it is empty'

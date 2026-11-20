@@ -1,5 +1,4 @@
 function New-GitHubClient {
-    # Connection settings for the GitHub REST API. An empty token means anonymous access (public repositories).
     param(
         [Parameter(Mandatory)] [ValidatePattern('^[A-Za-z0-9._-]+/[A-Za-z0-9._-]+$')] [string] $Repository,
         [AllowEmptyString()] [string] $Token,

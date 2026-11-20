@@ -1,9 +1,5 @@
 function Get-PackageReleaseDecision {
-    <#
-        Whether a NuGet/npm unit releases in this build. Only the commit that CHANGES the version releases
-        it, only on the release branch, only if it is not tagged yet and higher than every release.
-        Returns @{ CanRelease; AlreadyReleased; Highest; Problem; Warning }. A Problem fails the build.
-    #>
+    # Only the release-branch commit that changes the version releases it. A Problem fails the build.
     param(
         [Parameter(Mandatory)] $Candidate,
         [AllowNull()] [AllowEmptyString()] [string] $PreviousText,

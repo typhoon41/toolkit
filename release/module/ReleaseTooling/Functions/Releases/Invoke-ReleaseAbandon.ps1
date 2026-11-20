@@ -1,10 +1,6 @@
 function Invoke-ReleaseAbandon {
-    <#
-        Maintainer-only. Marks a started-but-unfinishable draft as SUPERSEDED so a higher version may be released.
-        Allowed only when this build's packages are provably NOT what is on the feed: the feed holds a different
-        package under the version, or nothing is there and the latest push attempt is older than
-        -MinimumAgeMinutes (indexing lag has passed). The draft and its assets stay as a record.
-    #>
+    # Maintainer-only. Allowed only when the feed provably lacks this build's packages: another package holds the
+    # version, or nothing is there and the last push attempt is older than -MinimumAgeMinutes (indexing lag).
     param([Parameter(Mandatory)] $Context, [AllowNull()] $Release, [int] $MinimumAgeMinutes = 60)
     if (-not $Release) {
         throw "No draft release for $($Context.Tag)."

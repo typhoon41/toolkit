@@ -1,5 +1,4 @@
 function Confirm-PublishedRelease {
-    # An earlier attempt already published the release: verify its tag and assets, clean up state assets.
     param([Parameter(Mandatory)] $Context, [Parameter(Mandatory)] $Release)
     $commit = Assert-TagTarget -Context $Context
     if (-not $commit) {

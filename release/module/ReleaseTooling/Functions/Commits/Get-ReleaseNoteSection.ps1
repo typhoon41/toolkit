@@ -1,8 +1,4 @@
 function Get-ReleaseNoteSection {
-    <#
-        Section a commit belongs to, ESLint-style. Without -ConventionalCommit (the message did not
-        follow the convention) the commit is a chore.
-    #>
     param([AllowNull()] $ConventionalCommit)
     if (-not $ConventionalCommit) {
         return 'Chores'

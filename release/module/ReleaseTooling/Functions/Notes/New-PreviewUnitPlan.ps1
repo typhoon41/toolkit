@@ -1,5 +1,4 @@
 function New-PreviewUnitPlan {
-    # A unit plan for previewing notes locally: the unit from release.json at the version you intend to release.
     param(
         [Parameter(Mandatory)] [string] $RepositoryRoot,
         [Parameter(Mandatory)] [string] $UnitName,

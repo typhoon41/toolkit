@@ -1,12 +1,4 @@
 function Get-BranchLabel {
-    <#
-        Up to three core words of a branch name, lowercase and joined with '-', for run names and
-        feature-branch package versions:
-          refs/heads/features/calendar-fixes          -> calendar-fixes
-          users/nikola/ABC-123-add-login-page-flow    -> abc-add-login
-        Drops the refs/heads/ prefix, a leading type folder (feature/, bugfix/, ...), users/<name>/,
-        pure numbers and filler words. Returns '' when nothing is left.
-    #>
     param([AllowNull()] [AllowEmptyString()] [string] $BranchName, [int] $MaximumWords = 3)
     if (-not $BranchName) {
         return ''

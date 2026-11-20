@@ -1,5 +1,4 @@
 function Invoke-Git {
-    # Runs git in the current location and returns its output lines; throws on a non-zero exit code.
     param([Parameter(ValueFromRemainingArguments)] [string[]] $Arguments)
     if ([Console]::OutputEncoding.WebName -ne 'utf-8') {
         [Console]::OutputEncoding = [Text.UTF8Encoding]::new()   # non-ASCII author names and file content

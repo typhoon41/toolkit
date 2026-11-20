@@ -1,19 +1,11 @@
 <#
 .SYNOPSIS
-    Publishes the tarball of every releasing npm unit of a plan. Idempotent: safe to re-run.
+    Publishes the tarball of every releasing npm unit of a plan. Safe to re-run.
 
 .DESCRIPTION
-    For each unit's .tgz in <PackagesPath>/<unit>/:
-      - its package.json must carry the plan's version;
-      - if the version is already on the registry with the same integrity (npm pack is reproducible),
-        it was published by an earlier attempt of this build and is skipped; with different bytes the
-        step fails (the version is taken);
-      - otherwise it is published with dist-tag 'latest', or 'next' for a prerelease.
-
-    Authentication: NPM_TOKEN environment variable (a temporary user config references it; the token is
-    never written to disk; sent only to npmjs.org, Azure Artifacts or -TrustedFeedHost), or an .npmrc prepared
-    earlier, e.g. by npmAuthenticate@0 for Azure Artifacts.
-    The registry is the unit's npmRegistry unless -Registry is given.
+    A version already on the registry with the same integrity is skipped (npm pack is reproducible); other bytes fail.
+    NPM_TOKEN goes only to npmjs.org, Azure Artifacts or -TrustedFeedHost and is never written to disk; an .npmrc
+    prepared by npmAuthenticate@0 works instead.
 #>
 [CmdletBinding()]
 param(

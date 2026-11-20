@@ -1,5 +1,4 @@
 function Get-GitHubCommitFile {
-    # Paths a commit changed (renames count under both names), cached in -Cache by SHA.
     param([Parameter(Mandatory)] $Client, [Parameter(Mandatory)] [string] $Commit, [Parameter(Mandatory)] [hashtable] $Cache)
     if (-not $Cache.ContainsKey($Commit)) {
         $details = Invoke-GitHubApi -Client $Client -Path "commits/$Commit"

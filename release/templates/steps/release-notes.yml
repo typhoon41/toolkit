@@ -1,6 +1,4 @@
-# Optional: release notes for every releasing unit, as <notesDirectory>/<unit>.md and .txt. Leave this
-# step out and packages are built without notes and GitHub releases get a minimal body.
-# Needs only READ access to the repository (public repositories work without a token).
+# Optional: without it packages carry no notes and GitHub releases get a minimal body. Needs only read access.
 
 parameters:
   - name: planFile

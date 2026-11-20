@@ -1,5 +1,5 @@
 function Invoke-GitHubApi {
-    # Emits the response (arrays are enumerated). Error messages never include response bodies.
+    # Error messages never include response bodies.
     param(
         [Parameter(Mandatory)] $Client,
         [Parameter(Mandatory)] [string] $Path,              # relative to /repos/{repository}/, or an absolute URL

@@ -1,12 +1,5 @@
 function ConvertTo-ReleaseVersion {
-    <#
-        Returns a version object, or $null when the text is not a canonical release version.
-        Canonical = what NuGet uses for package identity, so a git tag, a NuGet and an npm version agree:
-          - major.minor.patch, no leading zeros, each fits in Int32
-          - optional prerelease: dot-separated lowercase identifiers (alpha, beta.2, rc.1); numeric
-            identifiers have no leading zeros
-          - no build metadata (+...)
-    #>
+    # Canonical means NuGet package identity, so a git tag, a NuGet and an npm version agree.
     param([AllowNull()] [AllowEmptyString()] [string] $Text)
     $number = '(?:0|[1-9][0-9]*)'
     $identifier = '(?:0|[1-9][0-9]*|[0-9]*[a-z-][0-9a-z-]*)'

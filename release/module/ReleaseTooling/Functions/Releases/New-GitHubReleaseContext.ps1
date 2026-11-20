@@ -1,8 +1,4 @@
 function New-GitHubReleaseContext {
-    <#
-        Everything the GitHub release functions need about one unit's release: the client, the unit plan,
-        its version and tag, the commit to tag, the asset files and the package identities on the feed.
-    #>
     param(
         [Parameter(Mandatory)] $Client,
         [Parameter(Mandatory)] $UnitPlan,

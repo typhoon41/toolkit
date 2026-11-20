@@ -1,9 +1,6 @@
 function New-ReleasePlan {
-    <#
-        The release plan of this build: one entry per unit of release.json (see New-UnitReleasePlan).
-        Run it from the repository root with tags fetched. Units with a problem are kept in the plan with
-        their 'problem' set, so a caller can report every problem at once.
-    #>
+    # Run from the repository root with tags fetched. A unit with a problem stays in the plan, so a caller can report
+    # every problem at once.
     param(
         [Parameter(Mandatory)] [string] $RepositoryRoot,
         [Parameter(Mandatory)] [string] $SourceBranch,
@@ -33,7 +30,6 @@ function New-ReleasePlan {
     $units = @(foreach ($unit in $configuration.Units) {
         New-UnitReleasePlan -Unit $unit -Context $context
     })
-    # The configured unit names the run; otherwise the first releasing unit, otherwise the first unit.
     $runNameUnit = @(
         @($units | Where-Object { $_.name -eq $configuration.RunNameUnit })
         @($units | Where-Object { $_.canRelease })

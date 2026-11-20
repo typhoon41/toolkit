@@ -1,11 +1,6 @@
 function Publish-ApplicationRelease {
-    <#
-        GitHub release + tag for an application (pipeline) unit, after its deployment. There are no assets, so
-        no draft phase is needed: an existing published release is verified, a leftover draft is published,
-        otherwise the release is created and published at once. Safe to re-run.
-        Runs inside a deployment job whose environment has an Exclusive lock, so the order check below, read fresh
-        right before publishing, can't be raced by another production run (release-application.yml).
-    #>
+    # No assets, so no draft phase. The order check cannot be raced: the deployment job holds an Exclusive
+    # environment lock (release-application.yml).
     param([Parameter(Mandatory)] $Context, [string] $NotesFile)
     $releases = Get-GitHubRelease -Client $Context.Client
     $release = Find-UnitRelease -Context $Context -Releases $releases

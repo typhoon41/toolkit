@@ -1,5 +1,4 @@
 function Read-PackageNuspec {
-    # Id, Version and recorded repository commit of a .nupkg / .snupkg.
     param([Parameter(Mandatory)] [string] $Path)
     $archive = [IO.Compression.ZipFile]::OpenRead($Path)
     try {

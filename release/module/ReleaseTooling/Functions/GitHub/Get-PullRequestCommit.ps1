@@ -1,5 +1,5 @@
 function Get-PullRequestCommit {
-    # All commits of a pull request, oldest first, or throws when GitHub can't return them all (its limit is 250).
+    # GitHub lists at most 250 commits of a pull request.
     param([Parameter(Mandatory)] $Client, [Parameter(Mandatory)] $PullRequest)
     $commits = @(Get-GitHubCollection -Client $Client -Path "pulls/$($PullRequest.number)/commits")
     if ($commits.Count -lt [int]$PullRequest.commits) {

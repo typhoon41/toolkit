@@ -1,9 +1,5 @@
 function Get-NpmPackageState {
-    <#
-        Where an npm tarball of this build stands on its registry: Absent, Published (the registry holds
-        these exact bytes; npm pack is reproducible) or Foreign (the version is taken by different bytes).
-        Returns @{ Label; State; Detail }.
-    #>
+    # Published means the registry holds these exact bytes, which holds because npm pack is reproducible.
     param([Parameter(Mandatory)] [string] $File, [Parameter(Mandatory)] [string] $Registry)
     $manifest = Read-NpmTarballManifest $File
     $label = "$($manifest['name']) $($manifest['version'])"

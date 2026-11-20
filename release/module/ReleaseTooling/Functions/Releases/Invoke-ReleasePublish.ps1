@@ -1,9 +1,4 @@
 function Invoke-ReleasePublish {
-    <#
-        Publishes the draft, which makes GitHub create the tag at the commit. Only after Prepare completed
-        (the marker is on the draft) and every package is on its feed as this build's exact package; the
-        release order is re-checked (no higher version may have been released while this run waited).
-    #>
     param([Parameter(Mandatory)] $Context, [AllowNull()] $Release, [int] $FeedWaitMinutes = 15)
     if (-not $Release) {
         throw "No draft release for $($Context.Tag); run the Prepare phase first."

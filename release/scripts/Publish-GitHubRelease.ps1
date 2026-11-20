@@ -1,22 +1,11 @@
 <#
 .SYNOPSIS
-    Creates the GitHub release of every releasing unit of a plan, in resumable phases. Every phase can be
-    re-run after any failure, including a lost API response.
+    Creates the GitHub release of every releasing unit of a plan in phases; each is safe to re-run after any failure.
 
 .DESCRIPTION
-    Package units (nuget, npm), around the feed push:
-      -Action Prepare   create or resume a DRAFT release for the unit's tag at the plan's commit, set its notes
-                        (<NotesDirectory>/<unit>.md, or a minimal body without notes) and make its assets match
-                        the unit's packages exactly; then mark it as publishing (frozen). Run before the push.
-      -Action Publish   once the marker is on the draft and every package is on its feed (waiting up to
-                        -FeedWaitMinutes for indexing), re-check ordering and publish the draft (creates the tag).
-      -Action Abandon   maintainer-only: mark a started-but-unfinishable draft as superseded (-Unit required).
-      -Action Restore   maintainer-only: recreate a missing draft when the feed already holds this build's
-                        packages (-Unit required; needs the complete original artifacts).
-    Application units (pipeline): Publish creates and publishes the release and tag at once; the other actions
-    skip them.
-
-    Token: GITHUB_TOKEN environment variable (Contents: write). See docs/RELEASING.md for every refusal.
+    Package units: Prepare (a frozen draft with assets) before the feed push, Publish (creates the tag) after it.
+    Abandon and Restore are maintainer-only and need -Unit. Application units: Publish creates release and tag at once.
+    GITHUB_TOKEN needs Contents: write. docs/RELEASING.md lists every refusal.
 #>
 [CmdletBinding()]
 param(

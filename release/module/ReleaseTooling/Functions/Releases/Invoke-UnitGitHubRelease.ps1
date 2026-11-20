@@ -1,5 +1,4 @@
 function Invoke-UnitGitHubRelease {
-    # One release phase (Prepare / Publish / Abandon / Restore) for one package unit.
     param(
         [Parameter(Mandatory)] [ValidateSet('Prepare', 'Publish', 'Abandon', 'Restore')] [string] $Action,
         [Parameter(Mandatory)] $Client,
