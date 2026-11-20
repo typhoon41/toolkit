@@ -4,6 +4,8 @@
       Extensions  file extensions the rule applies to
       Target      'Text' (default): the written text; 'Path': the file path
       Pattern     .NET regular expression, matched per line of the target
+      WhenProjectDependsOn    optional npm package; the rule applies only when the nearest package.json above the
+                              file depends on it (framework rules)
       ExcludeWhenFileMatches  optional regular expression; the rule is skipped for a file whose content it matches
                               (inline-style: a file that starts with <!DOCTYPE html> / <html> is a complete
                               document such as an email template, which needs inline styles)
@@ -44,12 +46,12 @@
             Message = 'public is the default: omit it (template-only members are protected readonly)'
         }
         @{
-            Id = 'decorator-api'; Extensions = @('.ts'); Skill = 'angular'
+            Id = 'decorator-api'; Extensions = @('.ts'); Skill = 'angular'; WhenProjectDependsOn = '@angular/core'
             Pattern = '@(?:Input|Output|ViewChild|ViewChildren|ContentChild|ContentChildren)\s*\('
             Message = 'use the signal APIs input() / output() / viewChild() / contentChild(), never the decorators'
         }
         @{
-            Id = 'standalone-flag'; Extensions = @('.ts'); Skill = 'angular'
+            Id = 'standalone-flag'; Extensions = @('.ts'); Skill = 'angular'; WhenProjectDependsOn = '@angular/core'
             Pattern = '\bstandalone\s*:\s*true\b'
             Message = 'standalone is the default: remove standalone: true'
         }
@@ -79,17 +81,17 @@
             Message = 'never silence the compiler: fix the error, or use @ts-expect-error with the reason'
         }
         @{
-            Id = 'lifecycle-hook'; Extensions = @('.ts'); Skill = 'angular'
+            Id = 'lifecycle-hook'; Extensions = @('.ts'); Skill = 'angular'; WhenProjectDependsOn = '@angular/core'
             Pattern = '\bng(?:OnInit|OnChanges|DoCheck|AfterContentInit|AfterContentChecked|AfterViewInit|AfterViewChecked|OnDestroy)\s*\(|\bimplements\b[^{]*\b(?:OnInit|OnChanges|DoCheck|AfterContentInit|AfterContentChecked|AfterViewInit|AfterViewChecked|OnDestroy)\b'
             Message = 'no lifecycle hooks: computed(), an effect() in the constructor, afterNextRender or DestroyRef'
         }
         @{
-            Id = 'change-detector'; Extensions = @('.ts'); Skill = 'angular'
+            Id = 'change-detector'; Extensions = @('.ts'); Skill = 'angular'; WhenProjectDependsOn = '@angular/core'
             Pattern = '\bChangeDetectorRef\b|\.detectChanges\s*\(|\.markForCheck\s*\('
             Message = 'zoneless: make the template state a signal; post-render DOM work goes in afterNextRender'
         }
         @{
-            Id = 'structural-directive'; Extensions = @('.html', '.ts'); Skill = 'angular'
+            Id = 'structural-directive'; Extensions = @('.html', '.ts'); Skill = 'angular'; WhenProjectDependsOn = '@angular/core'
             Pattern = '\*ng(?:If|For|Switch\w*)\b'
             Message = 'use @if / @for / @switch control flow'
         }
@@ -105,12 +107,12 @@
             Message = 'no style attribute: use a class (an @for-generated one for runtime values)'
         }
         @{
-            Id = 'style-binding'; Extensions = @('.html', '.ts'); Skill = 'angular'
+            Id = 'style-binding'; Extensions = @('.html', '.ts'); Skill = 'angular'; WhenProjectDependsOn = '@angular/core'
             Pattern = '\[style[.\]]|\[ngStyle\]'
             Message = 'no [style] / [ngStyle] binding: bind a class the model computes'
         }
         @{
-            Id = 'host-selector'; Extensions = @('.scss', '.css'); Skill = 'angular'
+            Id = 'host-selector'; Extensions = @('.scss', '.css'); Skill = 'angular'; WhenProjectDependsOn = '@angular/core'
             Pattern = ':host\b'
             Message = 'no :host: give the host a class in the decorator and style it where the element is rendered'
         }
@@ -130,7 +132,7 @@
             Message = 'mobile-first: use the project min-width breakpoint mixins, never a bare width @media'
         }
         @{
-            Id = 'deep-selector'; Extensions = @('.scss', '.css'); Skill = 'angular'
+            Id = 'deep-selector'; Extensions = @('.scss', '.css'); Skill = 'angular'; WhenProjectDependsOn = '@angular/core'
             Pattern = '::ng-deep\b'
             Message = 'never ::ng-deep: use the library theming API or the global vendor overrides partial'
         }

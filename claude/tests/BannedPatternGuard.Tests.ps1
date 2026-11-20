@@ -3,9 +3,10 @@ BeforeAll {
     $script:Rules = @(Read-BannedPatternRule -Path (Join-Path $PSScriptRoot '../hooks/BannedPatterns.psd1'))
     $script:GuardScript = Join-Path $PSScriptRoot '../hooks/Invoke-BannedPatternGuard.ps1'
 
+    # Samples are judged as part of an Angular project unless -ProjectPackage says otherwise.
     function Get-HitRule {
-        param([string] $Path, [string] $Text)
-        @(Find-BannedPattern -Path $Path -Text @($Text) -Rule $script:Rules | ForEach-Object RuleId)
+        param([string] $Path, [string] $Text, [string[]] $ProjectPackage = @('@angular/core'))
+        @(Find-BannedPattern -Path $Path -Text @($Text) -Rule $script:Rules -ProjectPackage $ProjectPackage | ForEach-Object RuleId)
     }
 
     function Invoke-Guard {
@@ -154,6 +155,19 @@ Describe 'Find-BannedPattern' {
 
     It 'reports inline-style in a component template under an email-named folder' {
         Get-HitRule -Path 'src/app/email-settings/form.html' -Text '<div style="margin: 0;">' | Should -Contain 'inline-style'
+    }
+
+    It 'skips the Angular rules outside an Angular project: <Text>' -ForEach @(
+        @{ Path = 'a/card.ts'; Text = '@Input() url = "";' }
+        @{ Path = 'a/card.ts'; Text = 'ngOnInit(): void {' }
+        @{ Path = 'a/widget.scss'; Text = ':host { display: block; }' }
+        @{ Path = 'a/card.html'; Text = '<div [ngStyle]="styles()">' }
+    ) {
+        Get-HitRule -Path $Path -Text $Text -ProjectPackage @() | Should -BeNullOrEmpty
+    }
+
+    It 'keeps the framework-independent rules outside an Angular project' {
+        Get-HitRule -Path 'a/week.ts' -Text 'readonly parse = (value: any) => value;' -ProjectPackage @() | Should -Contain 'any-type'
     }
 
     It 'checks every line of a multi-line text' {

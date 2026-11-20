@@ -87,13 +87,29 @@ Describe 'Invoke-SkillGate.ps1' {
         (Invoke-Gate (New-EditPayload 'C:\repo\src\week.ts') $script:Root).ExitCode | Should -Be 0
     }
 
-    It 'requires typescript for a TypeScript edit' {
-        foreach ($skill in 'code-design', 'angular', 'html-scss') {
-            Invoke-Gate (New-SkillPayload "conventions:$skill") $script:Root | Out-Null
-        }
-        $result = Invoke-Gate (New-EditPayload 'C:\repo\src\week.ts') $script:Root
+    It 'requires only code-design and typescript for TypeScript outside an Angular project' {
+        $project = Join-Path $TestDrive ([guid]::NewGuid())
+        New-Item -ItemType Directory -Path (Join-Path $project 'src') -Force | Out-Null
+        Set-Content -LiteralPath (Join-Path $project 'package.json') -Value '{ "dependencies": { "express": "^5.0.0" } }'
+        $result = Invoke-Gate (New-EditPayload (Join-Path $project 'src/server.ts')) $script:Root
         $result.ExitCode | Should -Be 2
         $result.Output | Should -Match 'conventions:typescript'
+        $result.Output | Should -Not -Match 'conventions:angular'
+        foreach ($skill in 'code-design', 'typescript') {
+            Invoke-Gate (New-SkillPayload "conventions:$skill") $script:Root | Out-Null
+        }
+        (Invoke-Gate (New-EditPayload (Join-Path $project 'src/server.ts')) $script:Root).ExitCode | Should -Be 0
+    }
+
+    It 'adds angular to <File> in an Angular project' -ForEach @(
+        @{ File = 'card.ts' }, @{ File = 'card.html' }, @{ File = 'card.scss' }
+    ) {
+        $project = Join-Path $TestDrive ([guid]::NewGuid())
+        New-Item -ItemType Directory -Path (Join-Path $project 'src/app') -Force | Out-Null
+        Set-Content -LiteralPath (Join-Path $project 'package.json') -Value '{ "dependencies": { "@angular/core": "^20.0.0" } }'
+        $result = Invoke-Gate (New-EditPayload (Join-Path $project "src/app/$File")) $script:Root
+        $result.ExitCode | Should -Be 2
+        $result.Output | Should -Match 'conventions:angular'
     }
 
     It 'ignores skills of other plugins with the same name' {

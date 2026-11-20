@@ -8,8 +8,8 @@
       UserPromptExpansion          records `/conventions:<skill>` run by the user.
       PreToolUse (Edit|Write|...)  blocks (exit 2) an edit of a file whose extension needs skills that are not
                                    loaded yet, naming the Skill calls to make; the edit is retried afterwards.
-    Loaded skills are tracked per session and per subagent (Get-SkillMarkerPath). Required skills per extension
-    live in RequiredSkills.psd1.
+    Loaded skills are tracked per session and per subagent (Get-SkillMarkerPath). Required skills per extension,
+    and the ones a project dependency adds, live in RequiredSkills.psd1 (Get-RequiredSkill).
 #>
 [CmdletBinding()]
 param(
@@ -42,11 +42,14 @@ switch (Get-PayloadValue -Payload $payload -Name 'hook_event_name') {
 }
 
 $path = Get-PayloadValue -Payload $toolInput -Name 'file_path'
-$extension = [IO.Path]::GetExtension($path).ToLowerInvariant()
-if (-not $path -or -not $configuration.Extensions.ContainsKey($extension) -or -not (Test-GuardedPath -Path $path)) {
+if (-not $path -or -not (Test-GuardedPath -Path $path)) {
     exit 0
 }
-$missing = @(Get-MissingSkill -MarkerPath $markerPath -Required $configuration.Extensions[$extension])
+$required = @(Get-RequiredSkill -Path $path -Configuration $configuration)
+if ($required.Count -eq 0) {
+    exit 0
+}
+$missing = @(Get-MissingSkill -MarkerPath $markerPath -Required $required)
 if ($missing.Count -eq 0) {
     exit 0
 }

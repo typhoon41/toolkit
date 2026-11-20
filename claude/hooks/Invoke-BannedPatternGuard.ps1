@@ -24,7 +24,11 @@ if (-not $path -or -not (Test-GuardedPath -Path $path)) {
 
 # PostToolUse runs after the write, so the file on disk is the result; an Edit's new text alone may lack context.
 $fileContent = if (Test-Path -LiteralPath $path -PathType Leaf) { [string](Get-Content -LiteralPath $path -Raw) } else { '' }
-$hits = @(Find-BannedPattern -Path $path -Text (Get-WrittenText -ToolInput $toolInput) -Rule (Read-BannedPatternRule -Path $RulePath) -FileContent $fileContent)
+$rules = @(Read-BannedPatternRule -Path $RulePath)
+# Framework rules apply only in projects that depend on the framework (nearest package.json).
+$projectPackages = @($rules.WhenProjectDependsOn | Where-Object { $_ } | Select-Object -Unique |
+    Where-Object { Test-ProjectDependency -Path $path -Package $_ })
+$hits = @(Find-BannedPattern -Path $path -Text (Get-WrittenText -ToolInput $toolInput) -Rule $rules -FileContent $fileContent -ProjectPackage $projectPackages)
 if ($hits.Count -eq 0) {
     exit 0
 }
