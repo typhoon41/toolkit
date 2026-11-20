@@ -112,6 +112,16 @@ Describe 'Invoke-SkillGate.ps1' {
         $result.Output | Should -Match 'conventions:angular'
     }
 
+    It 'requires code-design for <File>' -ForEach @(
+        @{ File = 'Publish.ps1' }, @{ File = 'Hooks.psm1' }, @{ File = 'Rules.psd1' }, @{ File = 'azure-pipelines.yml' }, @{ File = 'build.yaml' }
+    ) {
+        $result = Invoke-Gate (New-EditPayload "C:\repo\$File") $script:Root
+        $result.ExitCode | Should -Be 2
+        $result.Output | Should -Match 'conventions:code-design'
+        Invoke-Gate (New-SkillPayload 'conventions:code-design') $script:Root | Out-Null
+        (Invoke-Gate (New-EditPayload "C:\repo\$File") $script:Root).ExitCode | Should -Be 0
+    }
+
     It 'ignores skills of other plugins with the same name' {
         Invoke-Gate (New-SkillPayload 'other:code-design') $script:Root | Out-Null
         Invoke-Gate (New-SkillPayload 'csharp') $script:Root | Out-Null
