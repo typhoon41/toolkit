@@ -35,7 +35,9 @@ With `autoUpdate`, a new plugin `version` is fetched in the background after sta
 asked. On demand: `claude plugin update conventions@toolkit`.
 
 The language servers (`csharp-ls`, `typescript-language-server`) come from the official LSP plugins and must be on
-`PATH`. chrome-devtools gives `browser-verification` a browser. Drop the entries a project doesn't need.
+`PATH`. `browser-verification` tests in Chrome through the **Claude in Chrome** extension (install it and connect
+it to Claude Code; it is not a plugin); chrome-devtools adds the media emulation it lacks (forced colours, reduced
+motion). Drop the entries a project doesn't need.
 
 Locally, without GitHub: `/plugin marketplace add <path to this repository>`, then
 `/plugin install conventions@toolkit`.
@@ -52,7 +54,7 @@ Locally, without GitHub: `/plugin marketplace add <path to this repository>`, th
 | `html-scss` | `.html` / `.scss`, framework-free: styling only in SCSS, selectors, mobile-first layout, values, modules |
 | `scss-solutions` | Projects using `@typhoon41/scss-solutions`: utility classes and mixins |
 | `accessibility` | User-facing UI: WCAG 2.2 AA |
-| `browser-verification` | Finishing any UI change: lint, run and measure in a browser |
+| `browser-verification` | Finishing any UI change: lint, run, test with Claude in Chrome and measure |
 | `conventional-commits` | Commit messages, PR titles and descriptions, releases |
 
 Every rule has one owner. When a convention changes, edit the skill that owns it and nothing else. Framework
