@@ -79,6 +79,11 @@
             Message = 'never silence the compiler: fix the error, or use @ts-expect-error with the reason'
         }
         @{
+            Id = 'lifecycle-hook'; Extensions = @('.ts'); Skill = 'angular'
+            Pattern = '\bng(?:OnInit|OnChanges|DoCheck|AfterContentInit|AfterContentChecked|AfterViewInit|AfterViewChecked|OnDestroy)\s*\(|\bimplements\b[^{]*\b(?:OnInit|OnChanges|DoCheck|AfterContentInit|AfterContentChecked|AfterViewInit|AfterViewChecked|OnDestroy)\b'
+            Message = 'no lifecycle hooks: computed(), an effect() in the constructor, afterNextRender or DestroyRef'
+        }
+        @{
             Id = 'change-detector'; Extensions = @('.ts'); Skill = 'angular'
             Pattern = '\bChangeDetectorRef\b|\.detectChanges\s*\(|\.markForCheck\s*\('
             Message = 'zoneless: make the template state a signal; post-render DOM work goes in afterNextRender'

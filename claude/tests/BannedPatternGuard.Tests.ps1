@@ -45,6 +45,9 @@ Describe 'Find-BannedPattern' {
         @{ Rule = 'null-forgiving'; Path = 'a/Entry.cs'; Text = 'entry.AppointmentId!.Value,' }
         @{ Rule = 'null-forgiving'; Path = 'a/Program.cs'; Text = 'provider.GetService<CaptchaSettings>()!;' }
         @{ Rule = 'blanket-suppression'; Path = 'a/card.ts'; Text = '// @ts-ignore' }
+        @{ Rule = 'lifecycle-hook'; Path = 'a/card.ts'; Text = '    ngOnInit(): void {' }
+        @{ Rule = 'lifecycle-hook'; Path = 'a/card.ts'; Text = 'ngOnDestroy() {' }
+        @{ Rule = 'lifecycle-hook'; Path = 'a/card.ts'; Text = 'export class Card implements OnInit, AfterViewInit {' }
         @{ Rule = 'promise-then'; Path = 'a/card.ts'; Text = 'this.save().then(() => this.close());' }
         @{ Rule = 'promise-then'; Path = 'a/card.ts'; Text = 'fetch(url).then(response => response.json()).then(render);' }
         @{ Rule = 'style-binding'; Path = 'a/card.html'; Text = '<div [ngStyle]="styles()">' }
@@ -95,6 +98,8 @@ Describe 'Find-BannedPattern' {
         @{ Path = 'a/card.ts'; Text = 'readonly saved = output<void>();' }
         @{ Path = 'a/card.ts'; Text = 'readonly hasAny = computed(() => this.items().some((item) => item.many));' }
         @{ Path = 'a/card.ts'; Text = '// if any, skip the refresh' }
+        @{ Path = 'a/card.ts'; Text = 'export class Card implements ControlValueAccessor {' }
+        @{ Path = 'a/card.ts'; Text = 'inject(DestroyRef).onDestroy(() => this.datePicker()?.destroy());' }
         @{ Path = 'a/routes.ts'; Text = "() => import('@features/home/home-page').then(module => module.HomePage))," }
         @{ Path = 'a/routes.ts'; Text = '                .then(module => module.RequestSentPage)),' }
         @{ Path = 'a/card.ts'; Text = 'if (!value || value !== other) {' }

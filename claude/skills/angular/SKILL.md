@@ -30,9 +30,18 @@ Builds on `typescript` (class style, typing, async code), `html-scss` (markup an
 - **No `ChangeDetectorRef`.** The app is zoneless, so a view updates only when a signal it reads changes. Needing
   `detectChanges()` / `markForCheck()` means template state is not a signal yet - make it one. DOM work that needs
   the rendered view goes in `afterNextRender(() => ..., { injector })`.
-- Prefer signals to lifecycle hooks: `ngOnChanges` → `computed()`, `ngOnDestroy` → `DestroyRef.onDestroy` /
-  `takeUntilDestroyed()`, `ngAfterViewInit` → `viewChild` + `afterNextRender`. A hook is never `async`, and no
-  Promise is left floating in a hook or the constructor.
+- **No lifecycle hooks at all**: never `ngOnInit`, `ngOnChanges`, `ngDoCheck`, `ngAfterContentInit`,
+  `ngAfterViewInit`, `ngAfterViewChecked`, `ngOnDestroy` or their `implements OnInit, ...` interfaces. Each has a
+  signal-era replacement:
+
+  | Instead of | Use |
+  |---|---|
+  | `ngOnChanges`, deriving from inputs | `computed()` over the input signals |
+  | `ngOnInit`, reacting to inputs or starting work | an `effect()` registered in the constructor, or `httpResource()` for data |
+  | `ngAfterViewInit`, DOM after render | `viewChild()` + `afterNextRender(() => ..., { injector })` |
+  | `ngOnDestroy`, teardown | `inject(DestroyRef).onDestroy(...)` or `takeUntilDestroyed()` |
+
+  No Promise is left floating in the constructor.
 
 ## Signals
 
