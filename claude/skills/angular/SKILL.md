@@ -1,11 +1,12 @@
 ---
 name: angular
-description: Angular (20+, zoneless, signals) and TypeScript conventions - components, signal APIs, class member style, templates without logic, @for tracking, state, RxJS, HTTP, forms, errors, shared components, i18n, TypeScript typing. Apply whenever writing, refactoring or reviewing .ts files or Angular templates.
+description: Angular (20+, zoneless, signals) conventions - components, signal APIs, signals instead of getters, templates without logic, @for tracking, state, HTTP, forms, errors, shared components, routing, i18n. Apply whenever writing, refactoring or reviewing code or templates in an Angular project.
 ---
 
-# Angular / TypeScript
+# Angular
 
-Builds on `code-design`; markup and styling rules, including host-element styling, live in `html-scss`.
+Builds on `typescript` (class style, typing, async code) and `code-design`; neither is restated here. Markup and
+SCSS rules that hold without Angular live in `html-scss`.
 
 ## Components
 
@@ -24,13 +25,23 @@ Builds on `code-design`; markup and styling rules, including host-element stylin
 - Signal APIs only: `input()` / `input.required()`, `model()` only for two-way binding, `output()`,
   `viewChild` / `viewChildren` / `contentChild`, queried by type (`viewChild.required(EntryList)`), never by a
   template-reference string. Never the `@Input` / `@Output` / `@ViewChild` decorators.
-- `inject()` only in field initialisers; the constructor only registers `effect()`s.
+- `inject()` only in field initialisers; the constructor only registers `effect()`s. Name the dependency in full
+  (`elementReference`).
 - **No `ChangeDetectorRef`.** The app is zoneless, so a view updates only when a signal it reads changes. Needing
   `detectChanges()` / `markForCheck()` means template state is not a signal yet - make it one. DOM work that needs
   the rendered view goes in `afterNextRender(() => ..., { injector })`.
 - Prefer signals to lifecycle hooks: `ngOnChanges` → `computed()`, `ngOnDestroy` → `DestroyRef.onDestroy` /
   `takeUntilDestroyed()`, `ngAfterViewInit` → `viewChild` + `afterNextRender`. A hook is never `async`, and no
   Promise is left floating in a hook or the constructor.
+
+## Signals
+
+- **Derived state is a signal, never a getter**: `readonly x: Signal<T> = computed(() => ...)` on every class -
+  component, model, value object. Sources stay plain `readonly` fields or `signal()`s; a private mutable flag is
+  exposed with `.asReadonly()`.
+- Call sites invoke it: a bare `week.label` is an always-truthy Signal object and silently breaks boolean checks.
+- Members only the template or host bindings use are `protected readonly`; members other classes call stay plain
+  `readonly`.
 
 ## Templates render, they don't decide
 
@@ -57,31 +68,6 @@ Builds on `code-design`; markup and styling rules, including host-element stylin
   (object identity changes whenever the array is rebuilt). With `$index`, a child that keeps per-item state must
   reset it when its input changes.
 
-## Classes
-
-- **Signals, never getters.** Derived state on any class (component, model, value object) is
-  `readonly x: Signal<T> = computed(() => ...)`. Sources stay plain `readonly` fields or `signal()`s; a private
-  mutable flag is exposed with `.asReadonly()`. Call sites invoke it - a bare `week.label` is an always-truthy
-  Signal object and silently breaks boolean checks.
-- **Functions are arrow-function properties**: `readonly name = (...) => ...`, `static readonly` for statics,
-  `private` where only the class uses them. The constructor and lifecycle hooks are the only method-syntax members;
-  never mix the two styles in one class. An arrow property is declared before any field initialiser that calls it
-  (initialisers run in order), and tests spy on the instance, not the prototype.
-- A helper serving one class is its `private static readonly` member, not a module-level function beside it, and
-  never an alias of one (`static toTime = toTime`).
-- Member order: statics, state and signals, constructor, functions.
-- **Visibility:** never write `public` (it is the default). Members only the template or host bindings use are
-  `protected readonly`; members other classes call stay plain `readonly`; the rest are `private`.
-- Name injected dependencies in full (`changeDetector`, `elementReference`).
-
-## TypeScript
-
-- No `any`: use `unknown` and narrow it. A cast is a last resort; never `as any`.
-- No non-null `!` anywhere; handle the absent case.
-- No `I` prefix on interfaces, no leading `_` on names.
-- `async` / `await` over `.then()` chains; never discard a Promise with `void`.
-- Check presence by truthiness; compare explicitly only when a falsy value (`0`, `''`, `false`) is valid.
-
 ## State
 
 Signals only, no NgRx:
@@ -91,15 +77,15 @@ Signals only, no NgRx:
 | Mutable state | `signal<T>(initial)` |
 | Derived, read-only | `computed(() => ...)` |
 | Derived, resettable when its source changes | `linkedSignal({ source, computation })` |
-| Observable a template reads | `toSignal(observable, { initialValue })` (`requireSync` for synchronous sources) |
+| A stream a template reads | `toSignal(observable, { initialValue })` (`requireSync` for synchronous sources) |
 | Side effect leaving Angular (storage, a third-party widget) | `effect(() => ...)`; never to derive state |
 
-## RxJS and HTTP
+## HTTP and streams
 
 - Reads that follow signal inputs: `httpResource()`; normalise the wire format in its `parse` function at the
   service boundary.
-- One-shot Observables (every HTTP call outside `httpResource`): `await lastValueFrom(...)` /
-  `firstValueFrom(...)`. `subscribe()` only for real streams, always with `takeUntilDestroyed()`.
+- Every other HTTP call is awaited: `await lastValueFrom(this.http.post(...))`.
+- A real stream is subscribed with `takeUntilDestroyed()` as its teardown.
 
 ## Errors
 
@@ -119,11 +105,10 @@ Signals only, no NgRx:
 
 ## Project building blocks
 
-The concrete names are in the project notes.
+The concrete names are in the project's `CLAUDE.md`.
 
 - **Shared components first.** Before writing a native `<input>`, `<select>`, `<textarea>`, `<dialog>` or a
   collapsible section, use the shared component that exists for it.
-- **Path aliases.** Imports that cross a feature boundary use the `tsconfig` path aliases, never `../../`.
 - **Routing.** Navigate through the project's route definitions, never hand-built route strings.
 - **i18n.** User-facing strings use `` $localize`:@@key.name:default text` `` - the `@@` id is mandatory, since a
   generated id breaks whenever the wording changes. Reuse the shared keys (OK, Cancel, Save, ...) before adding

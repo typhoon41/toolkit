@@ -34,12 +34,12 @@
             Message = 'no Async suffix on Task-returning methods (framework overrides excepted)'
         }
         @{
-            Id = 'getter'; Extensions = @('.ts'); Skill = 'angular'
+            Id = 'getter'; Extensions = @('.ts'); Skill = 'typescript'
             Pattern = '^\s*(?:(?:private|protected|public|static|override|readonly)\s+)*get\s+\w+\s*\('
             Message = 'derived state is a computed() signal, never a get accessor'
         }
         @{
-            Id = 'explicit-public'; Extensions = @('.ts'); Skill = 'angular'
+            Id = 'explicit-public'; Extensions = @('.ts'); Skill = 'typescript'
             Pattern = '(?:^|[(,])\s*public\s+(?!class\b)'
             Message = 'public is the default: omit it (template-only members are protected readonly)'
         }
@@ -54,14 +54,19 @@
             Message = 'standalone is the default: remove standalone: true'
         }
         @{
-            Id = 'any-type'; Extensions = @('.ts'); Skill = 'angular'
+            Id = 'any-type'; Extensions = @('.ts'); Skill = 'typescript'
             Pattern = '(?:[:<,|&]\s*|\bas\s+)any\b(?=\s*(?:[\[\]>,;)=|&{]|$))'
             Message = 'no any: use unknown and narrow it'
         }
         @{
-            Id = 'non-null-assertion'; Extensions = @('.ts'); Skill = 'angular'
+            Id = 'non-null-assertion'; Extensions = @('.ts'); Skill = 'typescript'
             Pattern = '^(?!\s*(?:/[/*]|\*)).*?(?<=[\w)\]])!(?=[.;,)\[])'
             Message = 'no non-null assertion (!): handle the absent case'
+        }
+        @{
+            Id = 'promise-then'; Extensions = @('.ts'); Skill = 'typescript'
+            Pattern = '\.then\s*\((?!\s*(\w+)\s*=>\s*\1\.\w+\s*\))'
+            Message = 'use async / await, never .then() chains (a lazy import picking one export is the only exception)'
         }
         @{
             Id = 'null-forgiving'; Extensions = @('.cs'); Skill = 'csharp'

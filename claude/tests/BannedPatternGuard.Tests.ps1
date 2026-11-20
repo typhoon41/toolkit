@@ -45,6 +45,8 @@ Describe 'Find-BannedPattern' {
         @{ Rule = 'null-forgiving'; Path = 'a/Entry.cs'; Text = 'entry.AppointmentId!.Value,' }
         @{ Rule = 'null-forgiving'; Path = 'a/Program.cs'; Text = 'provider.GetService<CaptchaSettings>()!;' }
         @{ Rule = 'blanket-suppression'; Path = 'a/card.ts'; Text = '// @ts-ignore' }
+        @{ Rule = 'promise-then'; Path = 'a/card.ts'; Text = 'this.save().then(() => this.close());' }
+        @{ Rule = 'promise-then'; Path = 'a/card.ts'; Text = 'fetch(url).then(response => response.json()).then(render);' }
         @{ Rule = 'inline-style'; Path = 'a/card.html'; Text = '<div [ngStyle]="styles()">' }
         @{ Rule = 'deep-selector'; Path = 'a/card.scss'; Text = '::ng-deep .mat-row { color: red; }' }
         @{ Rule = 'important'; Path = 'a/card.scss'; Text = 'display: none !important;' }
@@ -93,6 +95,8 @@ Describe 'Find-BannedPattern' {
         @{ Path = 'a/card.ts'; Text = 'readonly saved = output<void>();' }
         @{ Path = 'a/card.ts'; Text = 'readonly hasAny = computed(() => this.items().some((item) => item.many));' }
         @{ Path = 'a/card.ts'; Text = '// if any, skip the refresh' }
+        @{ Path = 'a/routes.ts'; Text = "() => import('@features/home/home-page').then(module => module.HomePage))," }
+        @{ Path = 'a/routes.ts'; Text = '                .then(module => module.RequestSentPage)),' }
         @{ Path = 'a/card.ts'; Text = 'if (!value || value !== other) {' }
         @{ Path = 'a/card.ts'; Text = '// Shown once: we never ask again!.' }
         @{ Path = 'a/card.ts'; Text = "readonly message = 'Saved!';" }
@@ -198,7 +202,7 @@ Describe 'Invoke-BannedPatternGuard.ps1' {
         $result = Invoke-Guard @{ tool_name = 'Edit'; tool_input = @{ file_path = 'C:\repo\src\week.ts'; old_string = 'x'; new_string = 'get label() {' } }
         $result.ExitCode | Should -Be 2
         $result.Output | Should -Match 'getter'
-        $result.Output | Should -Match 'conventions:angular'
+        $result.Output | Should -Match 'conventions:typescript'
     }
 
     It 'exits 0 silently when only the replaced text breaks a rule' {
