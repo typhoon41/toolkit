@@ -37,7 +37,8 @@ these.
 - **Subscribe only to a real stream** - a source that keeps emitting values over time (events, a WebSocket, a
   store) - and always tear the subscription down.
 - A source that delivers one value (an HTTP call, a single lookup) is turned into a Promise and awaited, never
-  subscribed to. The framework or library skill names the conversion.
+  subscribed to. With RxJS - a library, used with or without a framework - that is
+  `await firstValueFrom(source)` / `await lastValueFrom(source)`.
 
 ## Modules
 

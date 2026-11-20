@@ -107,8 +107,7 @@ Signals only, no NgRx:
 
 - Reads that follow signal inputs: `httpResource()`; normalise the wire format in its `parse` function at the
   service boundary.
-- Every other HTTP call, and any other one-value Observable, is awaited through RxJS's
-  `await lastValueFrom(this.http.post(...))` / `await firstValueFrom(...)`.
+- Every other `HttpClient` call is a one-value source: await it as `typescript` says.
 - A real stream is subscribed with `takeUntilDestroyed()` as its teardown.
 
 ## Errors
