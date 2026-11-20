@@ -9,7 +9,7 @@
     {
       "name": "conventions",
       "description": "Code-design, C#/.NET, Angular, HTML/SCSS, accessibility and commit conventions, with a hook that flags banned patterns.",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "source": "./claude",
       "category": "development"
     }
