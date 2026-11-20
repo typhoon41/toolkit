@@ -24,5 +24,6 @@ If it is not connected or keeps failing, say the UI was **not** verified instead
    - For colour, focus or motion changes, emulate `forced-colors: active` and `prefers-reduced-motion: reduce` with
      the chrome-devtools MCP `emulate` tool (Claude in Chrome can't); say so when it is unavailable.
    - Markup moved between components: re-measure it - a style rule left behind silently stops matching.
-6. **Report** what you ran, the flows exercised, the widths and what you measured, any GIF; name what you could not
+6. **Close** the tab you opened with `tabs_close_mcp`.
+7. **Report** what you ran, the flows exercised, the widths and what you measured, any GIF; name what you could not
    verify.
