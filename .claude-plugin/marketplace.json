@@ -3,7 +3,7 @@
   "name": "toolkit",
   "description": "Claude Code plugins shared by every project, maintained next to the rest of the toolkit.",
   "owner": {
-    "name": "Nikola Dragicevic"
+    "name": "Nikola Dragićević"
   },
   "plugins": [
     {
