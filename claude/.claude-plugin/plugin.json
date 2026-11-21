@@ -1,7 +1,7 @@
 {
   "name": "conventions",
   "displayName": "Toolkit Conventions",
-  "description": "Code-design, C#/.NET, Angular, HTML/SCSS, accessibility and commit conventions, with hooks that load the owning skills before an edit, flag banned patterns after it and format C# whitespace.",
+  "description": "Strict code-design, C#/.NET, TypeScript, Angular, HTML/SCSS, accessibility and commit conventions, with Gmf, scss-solutions and toolkit-release integrations loaded only where a project depends on them. Hooks load the owning skills before an edit, flag banned patterns after it and format C# whitespace; projects tune them in .claude/conventions.json.",
   "version": "1.1.0",
   "author": {
     "name": "Nikola Dragićević"
