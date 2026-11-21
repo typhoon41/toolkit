@@ -5,8 +5,6 @@ description: Framework-independent HTML and SCSS conventions - styling only in s
 
 # HTML / SCSS
 
-Library utility classes: `scss-solutions`.
-
 ## All styling lives in stylesheets
 
 No `style="..."` attribute and no `element.style.x = ...` (complete HTML documents such as email templates excepted:

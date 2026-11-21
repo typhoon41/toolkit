@@ -1,9 +1,10 @@
 <#
     Skills of this plugin that must be loaded (in the session, or in the subagent doing the edit) before a file
-    with the extension is edited. WhenProjectDependsOn adds skills when the nearest package.json above the file
-    depends on the package, so a framework skill is required only in that framework's projects. Skills that apply
-    only conditionally otherwise (gmf-ecosystem, scss-solutions, accessibility) are not gated: their descriptions
-    decide.
+    with the extension is edited. WhenProjectDependsOn adds skills when the file's project depends on the package:
+    the nearest package.json for npm, the nearest .csproj (PackageReference, or a ProjectReference to <Package>.csproj)
+    and any Directory.Build.props / Directory.Packages.props above it for NuGet. 'package>=major' also requires that
+    major version, so a framework or library skill is required only where it applies. Skills that apply only
+    conditionally otherwise (accessibility, toolkit-release) are not gated: their descriptions decide.
 #>
 @{
     Plugin               = 'conventions'
@@ -20,11 +21,18 @@
         '.yaml' = @('code-design')
     }
     WhenProjectDependsOn = @{
-        '@angular/core' = @{
+        '@angular/core>=20'         = @{
             '.ts'   = @('angular')
             '.html' = @('angular')
             '.scss' = @('angular')
             '.css'  = @('angular')
         }
+        '@typhoon41/scss-solutions' = @{
+            '.html' = @('scss-solutions')
+            '.scss' = @('scss-solutions')
+        }
+        'Gmf.DDD.Common'            = @{ '.cs' = @('gmf-ecosystem') }
+        'Gmf.Net.Core.Common'       = @{ '.cs' = @('gmf-ecosystem') }
+        'Gmf.Mail.Common'           = @{ '.cs' = @('gmf-ecosystem') }
     }
 }

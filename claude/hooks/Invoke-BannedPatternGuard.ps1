@@ -25,7 +25,7 @@ if (-not $path -or -not (Test-GuardedPath -Path $path)) {
 $fileContent = if (Test-Path -LiteralPath $path -PathType Leaf) { [string](Get-Content -LiteralPath $path -Raw) } else { '' }
 $rules = @(Read-BannedPatternRule -Path $RulePath)
 $projectPackages = @($rules.WhenProjectDependsOn | Where-Object { $_ } | Select-Object -Unique |
-    Where-Object { Test-ProjectDependency -Path $path -Package $_ })
+    Where-Object { Test-ProjectDependency -Path $path -Requirement (ConvertTo-DependencyRequirement -Text $_) })
 $hits = @(Find-BannedPattern -Path $path -Text (Get-WrittenText -ToolInput $toolInput) -Rule $rules -FileContent $fileContent -ProjectPackage $projectPackages)
 if ($hits.Count -eq 0) {
     exit 0

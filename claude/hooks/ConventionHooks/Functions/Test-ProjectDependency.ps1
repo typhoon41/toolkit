@@ -1,27 +1,8 @@
 function Test-ProjectDependency {
-    # peerDependencies count too (Angular libraries).
+    # True when the file's npm project or .NET project depends on the requirement (ConvertTo-DependencyRequirement).
     param(
         [Parameter(Mandatory)] [string] $Path,
-        [Parameter(Mandatory)] [string] $Package
+        [Parameter(Mandatory)] [object] $Requirement
     )
-    $folder = Split-Path -Parent ([IO.Path]::GetFullPath($Path))
-    while ($folder) {
-        $manifest = Join-Path $folder 'package.json'
-        if (Test-Path -LiteralPath $manifest -PathType Leaf) {
-            try {
-                $project = Get-Content -LiteralPath $manifest -Raw | ConvertFrom-Json -AsHashtable
-            }
-            catch {
-                return $false
-            }
-            foreach ($section in 'dependencies', 'devDependencies', 'peerDependencies') {
-                if ($project[$section] -is [Collections.IDictionary] -and $project[$section].Contains($Package)) {
-                    return $true
-                }
-            }
-            return $false
-        }
-        $folder = Split-Path -Parent $folder
-    }
-    $false
+    (Test-NpmDependency -Path $Path -Requirement $Requirement) -or (Test-NugetDependency -Path $Path -Requirement $Requirement)
 }
