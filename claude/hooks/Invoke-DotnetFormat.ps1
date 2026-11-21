@@ -4,7 +4,8 @@
 
 .DESCRIPTION
     When the file changed, Claude is told to re-read it, or its next Edit would be refused as "modified since read".
-    Always exits 0: formatting never blocks.
+    Always exits 0: formatting never blocks. The project's .claude/conventions.json can switch it off
+    (hooks.dotnetFormat).
 #>
 [CmdletBinding()]
 param()
@@ -16,7 +17,11 @@ $payload = Read-HookPayload
 $toolInput = if ($payload.PSObject.Properties['tool_input']) { $payload.tool_input } else { $null }
 $path = Get-PayloadValue -Payload $toolInput -Name 'file_path'
 $root = Get-PayloadValue -Payload $payload -Name 'cwd'
-if (-not $path -or -not $root -or [IO.Path]::GetExtension($path) -ne '.cs' -or -not (Test-GuardedPath -Path $path)) {
+if (-not $path -or -not $root -or [IO.Path]::GetExtension($path) -ne '.cs') {
+    exit 0
+}
+$project = Read-ProjectConfiguration -Root $root
+if (-not $project.DotnetFormat -or -not (Test-GuardedPath -Path $path -ExcludedFolder $project.ExcludedFolders)) {
     exit 0
 }
 if (Invoke-WhitespaceFormat -Root $root -Path $path) {

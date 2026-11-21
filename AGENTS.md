@@ -89,13 +89,21 @@ claude plugin validate .        # plugin; run at the repository root for the mar
 
 - `skills/<name>/SKILL.md` — one skill per concern. **Every rule has exactly one owning skill**; others refer
   to it by name (`code-design` holds the cross-language rules). No checklists that restate a skill's body.
-  Skills stay project-neutral and framework-independent: repository facts go in the consuming project's
-  `CLAUDE.md`, and a framework's rules live only in that framework's skill.
+  Skills are repository-agnostic: technology-specific core skills (`dotnet`, `typescript`, `angular`, ...)
+  stay library-free. A library's rules live only in its integration skill (`gmf-ecosystem`, `scss-solutions`,
+  `toolkit-release`), gated by `RequiredSkills.psd1`. Repository facts go in the consuming project's `CLAUDE.md`.
+  The defaults stay strict; projects declare exceptions in `.claude/conventions.json`, never through softer
+  defaults.
 - `hooks/` — PowerShell 7 entry scripts, all importing the one module `ConventionHooks/` (one function per file,
-  as in `release/`); `claude/README.md` has the event table. `Invoke-SkillGate.ps1` blocks edits until the skills
-  in `RequiredSkills.psd1` are loaded (marker per session/subagent in the temp folder);
-  `Invoke-BannedPatternGuard.ps1` checks only newly written text against `BannedPatterns.psd1` and reports via
-  stderr + exit 2 (never undoes the edit); `Invoke-DotnetFormat.ps1` formats `.cs` whitespace when an
-  `.editorconfig` exists. A new guard rule needs a reporting and an accepting test case and a scan of a real
-  project for false positives.
+  as in `release/`); `claude/README.md` has the event table and the `.claude/conventions.json` reference.
+  - `Invoke-SkillGate.ps1` blocks edits until the skills in `RequiredSkills.psd1` (by extension, and by npm/NuGet
+    dependency written `package` or `package>=major`) are loaded. The marker lives per session/subagent in the
+    temp folder.
+  - `Invoke-BannedPatternGuard.ps1` checks only newly written text against `BannedPatterns.psd1` plus the
+    project's rules, and reports via stderr + exit 2. It never undoes the edit.
+  - `Invoke-DotnetFormat.ps1` formats `.cs` whitespace when an `.editorconfig` exists.
+
+  Every hook reads the project configuration first and keeps the defaults when it is missing or malformed. The
+  plugin name comes only from `.claude-plugin/plugin.json`. A new guard rule needs a reporting and an accepting
+  test case and a scan of a real project for false positives (`claude/CONTRIBUTING.md`).
 - Releasing: bump `version` in `claude/.claude-plugin/plugin.json` and in the marketplace entry together.

@@ -5,7 +5,7 @@ BeforeAll {
 
     # Samples are judged as part of an Angular project unless -ProjectPackage says otherwise.
     function Get-HitRule {
-        param([string] $Path, [string] $Text, [string[]] $ProjectPackage = @('@angular/core'))
+        param([string] $Path, [string] $Text, [string[]] $ProjectPackage = @('@angular/core>=20'))
         @(Find-BannedPattern -Path $Path -Text @($Text) -Rule $script:Rules -ProjectPackage $ProjectPackage | ForEach-Object RuleId)
     }
 

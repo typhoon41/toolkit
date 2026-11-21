@@ -1,0 +1,40 @@
+function Read-ProjectConfiguration {
+    # The project's .claude/conventions.json on top of the plugin defaults: it switches hooks off, disables rules by id,
+    # adds rules and required skills, and adds or removes excluded folders. Removals win over additions. A missing file
+    # keeps the defaults; an unreadable one keeps them too, with one warning on stderr, so a hook never fails on it.
+    param(
+        [AllowEmptyString()] [string] $Root = '',
+        [string] $DefaultsPath = (Join-Path $PSScriptRoot '../../GuardedPaths.psd1')
+    )
+    $settings = $null
+    $file = Find-ProjectConfigurationFile -Root $Root
+    if ($file) {
+        try {
+            $settings = Get-Content -LiteralPath $file -Raw | ConvertFrom-Json
+        }
+        catch {
+            [Console]::Error.WriteLine("Ignoring ${file}: it is not valid JSON ($($_.Exception.Message)).")
+        }
+    }
+    $hooks = Get-JsonProperty -Object $settings -Name 'hooks'
+    $folders = Get-JsonProperty -Object $settings -Name 'excludedFolders'
+    $removed = @(Get-JsonProperty -Object $folders -Name 'remove' -Default @())
+    $defaults = (Import-PowerShellDataFile -LiteralPath $DefaultsPath).ExcludedFolders
+    $requiredSkills = @{}
+    $extensions = Get-JsonProperty -Object $settings -Name 'requiredSkills'
+    if ($extensions -is [pscustomobject]) {
+        foreach ($extension in $extensions.PSObject.Properties) {
+            $requiredSkills[$extension.Name.ToLowerInvariant()] = @($extension.Value | ForEach-Object { [string]$_ })
+        }
+    }
+    [pscustomobject]@{
+        SkillGate          = [bool](Get-JsonProperty -Object $hooks -Name 'skillGate' -Default $true)
+        BannedPatternGuard = [bool](Get-JsonProperty -Object $hooks -Name 'bannedPatternGuard' -Default $true)
+        DotnetFormat       = [bool](Get-JsonProperty -Object $hooks -Name 'dotnetFormat' -Default $true)
+        DisabledRules      = @(Get-JsonProperty -Object $settings -Name 'disabledRules' -Default @() | ForEach-Object { [string]$_ })
+        Rules              = @(Get-JsonProperty -Object $settings -Name 'rules' -Default @() | ForEach-Object { ConvertTo-BannedPatternDefinition -Rule $_ })
+        RequiredSkills     = $requiredSkills
+        ExcludedFolders    = @(@($defaults) + @(Get-JsonProperty -Object $folders -Name 'add' -Default @()) |
+                Where-Object { $removed -notcontains $_ } | Select-Object -Unique)
+    }
+}

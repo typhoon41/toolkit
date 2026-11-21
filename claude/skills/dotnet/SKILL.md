@@ -1,11 +1,9 @@
 ---
-name: csharp
-description: C# and ASP.NET Core conventions - no Async suffix, thin controllers, validation, domain models instead of enums, repositories and queries, side effects after commit, logging, security. Apply whenever writing, refactoring or reviewing any .cs file.
+name: dotnet
+description: C#, ASP.NET Core, EF Core and FluentValidation conventions - no Async suffix, thin controllers, validation, domain models instead of enums, repositories and queries, side effects after commit, logging, security. Apply whenever writing, refactoring or reviewing any .cs file.
 ---
 
-# C# / ASP.NET Core
-
-In a solution referencing `Gmf.*` packages, `gmf-packages` names the concrete types.
+# .NET: C#, ASP.NET Core, EF Core, FluentValidation
 
 ## No `Async` suffix
 
