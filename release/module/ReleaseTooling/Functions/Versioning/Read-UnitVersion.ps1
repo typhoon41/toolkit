@@ -1,8 +1,4 @@
 function Read-UnitVersion {
-    <#
-        Version of a nuget or npm unit in -Snapshot: @{ Text; PackageNames; SourceFiles }. Every project of
-        a nuget unit must agree. Returns $null when the unit's files don't exist there (a new unit).
-    #>
     param([Parameter(Mandatory)] $Unit, [Parameter(Mandatory)] $Snapshot)
     if ($Unit.Type -eq 'npm') {
         $npm = Read-NpmVersion -Snapshot $Snapshot -PackagePath $Unit.Package

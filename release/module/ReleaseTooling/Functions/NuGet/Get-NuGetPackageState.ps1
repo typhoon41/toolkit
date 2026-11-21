@@ -1,11 +1,5 @@
 function Get-NuGetPackageState {
-    <#
-        Where a .nupkg of this build stands on its feed:
-          Absent     the version is not on the feed
-          Published  the feed holds exactly this build (same commit, same content apart from signing)
-          Foreign    the version is taken by a different package
-        Returns @{ Label; State; Detail }.
-    #>
+    # Published means the same commit and the same content apart from signing.
     param(
         [Parameter(Mandatory)] [string] $File,
         [Parameter(Mandatory)] [string] $Source,

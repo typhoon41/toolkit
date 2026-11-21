@@ -1,9 +1,5 @@
 function Get-MSBuildPropertyValue {
-    <#
-        Value of the last non-empty <Name> in the top-level PropertyGroups of an MSBuild file (the last one wins,
-        as in MSBuild), or $null. A conditional definition (Condition on the property or its PropertyGroup, or
-        inside Choose/When/Otherwise) is refused: which one applies depends on the build, not on the file.
-    #>
+    # A conditional definition is refused: which one applies depends on the build, not on the file.
     param([Parameter(Mandatory)] [string] $XmlText, [Parameter(Mandatory)] [string] $Name, [string] $FilePath)
     try {
         $document = [xml]$XmlText

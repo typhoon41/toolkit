@@ -1,21 +1,11 @@
 <#
 .SYNOPSIS
-    Pushes the packages of every releasing NuGet unit of a plan. Idempotent: safe to re-run after a
-    partial failure.
+    Pushes the packages of every releasing NuGet unit of a plan. Safe to re-run after a partial failure.
 
 .DESCRIPTION
-    For each unit's .nupkg in <PackagesPath>/<unit>/:
-      - its nuspec must carry the plan's version and record the plan's commit (set at pack time);
-      - if the version is already on the feed, the published package is downloaded and compared entry by
-        entry, ignoring only what repository signing adds:
-          identical -> pushed by an earlier attempt of this build; skipped
-          different -> fails: a DIFFERENT build of a version that is already taken
-      - otherwise it is pushed with --no-symbols.
-    Then every .snupkg is pushed with --skip-duplicate, so a failed symbol upload is always retried.
-
-    API key: NUGET_API_KEY environment variable, sent only to nuget.org or a host in -TrustedFeedHost
-    (comma-separated). Azure Artifacts (after NuGetAuthenticate@1) gets 'az'; any other host is refused. The
-    feed is the unit's nugetSource unless -Source is given.
+    A version already on the feed is compared entry by entry, signing aside: identical is skipped, different fails.
+    Symbols are pushed with --skip-duplicate, so a failed symbol upload is retried. NUGET_API_KEY goes only to
+    nuget.org or -TrustedFeedHost; Azure Artifacts gets 'az' after NuGetAuthenticate@1; other hosts are refused.
 #>
 [CmdletBinding()]
 param(

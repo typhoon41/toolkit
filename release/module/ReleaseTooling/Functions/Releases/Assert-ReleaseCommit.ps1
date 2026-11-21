@@ -1,11 +1,6 @@
 function Assert-ReleaseCommit {
-    <#
-        Refuses to touch a release whose publication started from another commit:
-          - a FROZEN draft (marker) of another commit: only the original run may finish it;
-          - an UNMARKED draft of another commit while the feed already holds the version: a leftover of an
-            interrupted Prepare or Restore, which only a maintainer can sort out.
-        Published and superseded releases have no marker and are handled by their own actions.
-    #>
+    # A frozen draft of another commit belongs to its original run; an unmarked one whose version is on the feed is
+    # a leftover of an interrupted Prepare or Restore, which only a maintainer can sort out.
     param(
         [Parameter(Mandatory)] $Context,
         [AllowNull()] $Release,

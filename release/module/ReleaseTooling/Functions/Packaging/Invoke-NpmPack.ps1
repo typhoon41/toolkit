@@ -1,10 +1,5 @@
 function Invoke-NpmPack {
-    <#
-        Packs an npm unit with the plan's package version into -OutDirectory. With -NotesFile the notes ship
-        in the tarball as RELEASE-NOTES.md (added to "files" when the package lists its files); packing fails
-        when they are left out anyway (.npmignore). The package directory, including the lock and shrinkwrap
-        files `npm version` updates, is restored afterwards, so nothing of this ends up in a commit.
-    #>
+    # `npm version` also rewrites the lock and shrinkwrap files, so the package directory is restored afterwards.
     param(
         [Parameter(Mandatory)] $UnitPlan,
         [Parameter(Mandatory)] [string] $OutDirectory,
@@ -32,8 +27,7 @@ function Invoke-NpmPack {
         }
         Write-ReleaseLog "npm pack $($UnitPlan.package) ($($UnitPlan.packageVersion))"
         Invoke-NpmCommand pack --pack-destination $destination | ForEach-Object { Write-ReleaseLog "  $_" }
-        # npm names the tarball <name without '@', '/' as '-'>-<version>.tgz (lifecycle scripts may print to stdout,
-        # so the name is derived rather than parsed from npm's output)
+        # Derived, not parsed: lifecycle scripts may print to stdout.
         $tarball = Join-Path $destination ("$(($UnitPlan.packageNames[0] -replace '^@', '') -replace '/', '-')-$($UnitPlan.packageVersion).tgz")
         if (-not (Test-Path -LiteralPath $tarball)) {
             throw "npm pack did not produce $tarball."

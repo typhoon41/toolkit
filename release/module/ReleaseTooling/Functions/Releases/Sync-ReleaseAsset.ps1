@@ -1,9 +1,4 @@
 function Sync-ReleaseAsset {
-    <#
-        Makes the release's assets match the context's files exactly (state assets aside): uploads what is
-        missing, replaces what differs, removes what this build didn't produce. -VerifyOnly changes nothing
-        and fails with -FrozenReason on any difference.
-    #>
     param(
         [Parameter(Mandatory)] $Context,
         [Parameter(Mandatory)] $Release,

@@ -1,8 +1,5 @@
 function ConvertTo-UtcTimestamp {
-    <#
-        GitHub timestamps arrive as [DateTime] (Kind=Utc) from JSON, or as strings. Never go through string
-        conversion: Parse() on a stringified DateTime would assume local time.
-    #>
+    # Never through a string: Parse() on a stringified DateTime would assume local time.
     param([Parameter(Mandatory)] $Value)
     if ($Value -is [DateTimeOffset]) {
         return $Value.ToUniversalTime()

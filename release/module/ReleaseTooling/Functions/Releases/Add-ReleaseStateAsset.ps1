@@ -1,5 +1,4 @@
 function Add-ReleaseStateAsset {
-    # Uploads a small JSON state asset to a release.
     param([Parameter(Mandatory)] $Context, [Parameter(Mandatory)] $Release, [Parameter(Mandatory)] [string] $Name, [Parameter(Mandatory)] $Content)
     $file = Join-Path ([IO.Path]::GetTempPath()) "$([Guid]::NewGuid().ToString('n'))-$Name"
     try {

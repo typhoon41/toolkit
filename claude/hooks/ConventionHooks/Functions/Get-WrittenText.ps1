@@ -1,5 +1,4 @@
 function Get-WrittenText {
-    # The text a tool call wrote: Write's content, Edit's new_string, or each new_string of MultiEdit's edits.
     param([Parameter(Mandatory)] [AllowNull()] [object] $ToolInput)
     if ($null -eq $ToolInput) {
         return

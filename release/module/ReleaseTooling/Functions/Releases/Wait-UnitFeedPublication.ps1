@@ -1,9 +1,5 @@
 function Wait-UnitFeedPublication {
-    <#
-        Waits until every primary package of the context is on its feed as this build's exact package. A
-        foreign package fails at once; an absent one is re-checked every -IntervalSeconds until -TimeoutMinutes
-        have passed, because a feed (nuget.org especially) indexes a push only after some minutes.
-    #>
+    # A feed (nuget.org especially) indexes a push only after some minutes.
     param(
         [Parameter(Mandatory)] $Context,
         [int] $TimeoutMinutes = 15,

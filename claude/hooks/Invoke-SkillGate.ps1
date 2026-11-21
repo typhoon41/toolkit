@@ -3,13 +3,8 @@
     Requires the owning convention skills to be loaded before a source file is edited.
 
 .DESCRIPTION
-    One script for three hook events:
-      PostToolUse (Skill)          records a loaded `conventions:<skill>`.
-      UserPromptExpansion          records `/conventions:<skill>` run by the user.
-      PreToolUse (Edit|Write|...)  blocks (exit 2) an edit of a file whose extension needs skills that are not
-                                   loaded yet, naming the Skill calls to make; the edit is retried afterwards.
-    Loaded skills are tracked per session and per subagent (Get-SkillMarkerPath). Required skills per extension,
-    and the ones a project dependency adds, live in RequiredSkills.psd1 (Get-RequiredSkill).
+    PostToolUse (Skill) and UserPromptExpansion record a loaded conventions:<skill>; PreToolUse blocks (exit 2) an
+    edit until the skills RequiredSkills.psd1 names for the file are loaded.
 #>
 [CmdletBinding()]
 param(

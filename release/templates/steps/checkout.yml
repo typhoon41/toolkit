@@ -1,6 +1,5 @@
-# Checks out the project (full history and tags: versions are compared with release tags) and this
-# toolkit next to it. With two checkouts Azure would move the project to s/<repository name>; pinning
-# 'self' to 's' keeps it in $(Build.SourcesDirectory), and the toolkit lands in $(Pipeline.Workspace)/toolkit.
+# Full history and tags: versions are compared with release tags. Pinning 'self' to 's' keeps the project in
+# $(Build.SourcesDirectory) despite the second checkout; the toolkit lands in $(Pipeline.Workspace)/toolkit.
 
 parameters:
   - name: toolkitRepository        # the alias under resources.repositories in the consuming pipeline

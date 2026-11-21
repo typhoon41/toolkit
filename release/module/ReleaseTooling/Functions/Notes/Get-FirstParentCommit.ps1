@@ -1,5 +1,4 @@
 function Get-FirstParentCommit {
-    # Commits of -Range on the first-parent line (one per merged PR), newest first, limited to -Scope paths.
     param(
         [Parameter(Mandatory)] [string] $Range,
         [AllowEmptyCollection()] [string[]] $Scope = @()

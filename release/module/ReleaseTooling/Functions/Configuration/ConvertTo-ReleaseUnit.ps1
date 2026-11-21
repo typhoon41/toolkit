@@ -1,5 +1,4 @@
 function ConvertTo-ReleaseUnit {
-    # One validated release unit from a release.json "units" entry.
     param([Parameter(Mandatory)] [hashtable] $Definition, [switch] $IsOnlyUnit)
     $name = [string]$Definition['name']
     if ($name -notmatch '^[A-Za-z0-9][A-Za-z0-9._-]*$') {

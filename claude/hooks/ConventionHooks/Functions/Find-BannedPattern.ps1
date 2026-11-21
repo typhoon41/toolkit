@@ -1,8 +1,5 @@
 function Find-BannedPattern {
-    # The rules the written text (or, for 'Path' rules, the file path) breaks, one hit per rule and matching line.
-    # -FileContent is the whole file after the write; rules with ExcludeWhenFileMatches are checked against it,
-    # or against the written text when it is not given. A rule with WhenProjectDependsOn applies only when that
-    # package is in -ProjectPackage, the packages the file's project depends on.
+    # A timed-out exclusion counts as "not exempt", a timed-out line check as "no hit" (Test-PatternMatch).
     param(
         [Parameter(Mandatory)] [string] $Path,
         [AllowEmptyCollection()] [string[]] $Text = @(),

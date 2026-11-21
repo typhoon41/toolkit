@@ -1,9 +1,5 @@
 function Invoke-ReleasePrepare {
-    <#
-        Creates or resumes the DRAFT release (no tag yet, invisible to users), sets its notes, makes its assets
-        match this build, then writes the marker: from here on the draft is frozen and the feed push follows.
-        A frozen draft is only verified; its notes, name and target stay as they are.
-    #>
+    # Once the marker is written the draft is frozen: the feed push follows and later runs only verify it.
     param(
         [Parameter(Mandatory)] $Context,
         [AllowNull()] $Release,

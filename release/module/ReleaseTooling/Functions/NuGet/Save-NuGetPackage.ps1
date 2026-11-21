@@ -1,5 +1,4 @@
 function Save-NuGetPackage {
-    # Downloads <id> <version> from the flat container to a temporary file and returns its path.
     param(
         [Parameter(Mandatory)] [string] $FlatContainer,
         [Parameter(Mandatory)] [string] $Id,

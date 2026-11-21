@@ -1,8 +1,5 @@
 function Test-NuGetVersion {
-    <#
-        200 -> look in the version list; 404 -> the id has never been published; anything else fails closed
-        (an outage must never be read as "not published").
-    #>
+    # Anything but 200 or 404 fails closed: an outage must never be read as "not published".
     param(
         [Parameter(Mandatory)] [string] $FlatContainer,
         [Parameter(Mandatory)] [string] $Id,

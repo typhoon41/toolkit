@@ -1,9 +1,5 @@
 function New-NpmUserConfiguration {
-    <#
-        A temporary npm user configuration that authenticates to -Registry with the NPM_TOKEN environment
-        variable. The file holds only the literal ${NPM_TOKEN} reference (npm expands it), never the token.
-        Returns the file path; point NPM_CONFIG_USERCONFIG at it and delete it afterwards.
-    #>
+    # The file holds only the literal ${NPM_TOKEN} reference, which npm expands, never the token.
     param([Parameter(Mandatory)] [string] $Registry)
     $registryAddress = [Uri]$Registry
     $hostAndPath = "//$($registryAddress.Authority)$($registryAddress.AbsolutePath.TrimEnd('/'))/"

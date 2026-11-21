@@ -1,5 +1,4 @@
 function Test-ReleaseAssetMatch {
-    # Whether an uploaded release asset holds exactly the bytes of -File.
     param([Parameter(Mandatory)] $Context, [Parameter(Mandatory)] $Asset, [Parameter(Mandatory)] [IO.FileInfo] $File)
     if ($Asset.state -ne 'uploaded' -or [long]$Asset.size -ne $File.Length) {
         return $false

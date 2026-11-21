@@ -1,8 +1,4 @@
 function Get-UnitPackageFile {
-    <#
-        The package files a unit built, from <PackagesPath>/<unit>/: .nupkg/.snupkg for nuget, .tgz for npm.
-        Every package must carry the plan's version; -Require throws when there are none.
-    #>
     param(
         [Parameter(Mandatory)] $UnitPlan,
         [Parameter(Mandatory)] [string] $PackagesPath,

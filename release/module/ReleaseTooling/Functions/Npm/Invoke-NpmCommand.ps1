@@ -1,5 +1,4 @@
 function Invoke-NpmCommand {
-    # Runs npm and returns its standard output; throws on a non-zero exit code. Diagnostics go to the log.
     param([Parameter(ValueFromRemainingArguments)] [string[]] $Arguments)
     $output = & npm @Arguments 2>&1
     $exitCode = $LASTEXITCODE

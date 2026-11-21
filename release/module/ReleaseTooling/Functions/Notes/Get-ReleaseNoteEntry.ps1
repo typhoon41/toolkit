@@ -1,10 +1,4 @@
 function Get-ReleaseNoteEntry {
-    <#
-        Release note entries for first-parent commits of the release branch:
-          merged through a PR -> the PR's Conventional Commits, or its title (Get-PullRequestNoteEntry)
-          pushed directly     -> the commit itself
-        With -SkipPullRequests (offline previews) every commit stands for itself.
-    #>
     param(
         [Parameter(Mandatory)] $Client,
         [AllowEmptyCollection()] [object[]] $Commits = @(),

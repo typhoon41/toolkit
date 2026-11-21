@@ -13,6 +13,11 @@
         '.html' = @('code-design', 'html-scss')
         '.scss' = @('code-design', 'html-scss')
         '.css'  = @('code-design', 'html-scss')
+        '.ps1'  = @('code-design')
+        '.psm1' = @('code-design')
+        '.psd1' = @('code-design')
+        '.yml'  = @('code-design')
+        '.yaml' = @('code-design')
     }
     WhenProjectDependsOn = @{
         '@angular/core' = @{

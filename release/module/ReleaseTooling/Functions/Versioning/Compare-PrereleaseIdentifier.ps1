@@ -1,5 +1,4 @@
 function Compare-PrereleaseIdentifier {
-    # Numeric identifiers compare numerically and sort before alphanumeric ones.
     param([Parameter(Mandatory)] [string] $Left, [Parameter(Mandatory)] [string] $Right)
     $leftIsNumber = $Left -match '^[0-9]+$'
     $rightIsNumber = $Right -match '^[0-9]+$'

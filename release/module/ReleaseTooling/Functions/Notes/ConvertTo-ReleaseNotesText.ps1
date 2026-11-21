@@ -1,9 +1,5 @@
 function ConvertTo-ReleaseNotesText {
-    <#
-        Plain-text notes for a package's release notes field (nuget.org shows it as plain text). Ends with
-        a link to the full release; when longer than -MaximumLength, whole lines are dropped from the end
-        and the link says the list was shortened.
-    #>
+    # nuget.org shows release notes as plain text.
     param(
         [AllowEmptyCollection()] [object[]] $Entries = @(),
         [AllowEmptyString()] [string] $ReleaseUrl,

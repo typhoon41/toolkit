@@ -1,5 +1,4 @@
-# One phase of the GitHub release of every releasing unit: Prepare (draft + assets, before the feed push)
-# or Publish (after it; creates the tag). Needs a token with Contents: write.
+# Prepare runs before the feed push, Publish after it (creates the tag). Needs a token with Contents: write.
 
 parameters:
   - name: action

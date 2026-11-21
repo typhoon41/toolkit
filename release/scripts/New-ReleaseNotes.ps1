@@ -1,17 +1,10 @@
 <#
 .SYNOPSIS
-    Writes ESLint-style release notes for every releasing unit of a plan: <OutDirectory>/<unit>.md (GitHub
-    release body) and <unit>.txt (plain text for package release notes).
+    Writes the release notes of every releasing unit of a plan: <OutDirectory>/<unit>.md and <unit>.txt.
 
 .DESCRIPTION
-    Notes cover the commits since the unit's previous release tag that touch the unit's paths, grouped
-    into Breaking Changes, Features, Bug Fixes, Documentation and Chores. A merged PR contributes its
-    Conventional Commits, or its title when it has none; anything not following the convention is a chore.
-
-    In a pipeline:  -PlanFile <plan.json> -OutDirectory <dir> -Repository owner/name, token in GITHUB_TOKEN
-    Locally:        -Unit <name> -Version 1.4.0 -Preview     (repository taken from the origin remote)
-
-    The token only needs read access to pull requests and contents; public repositories work without one.
+    In a pipeline: -PlanFile <plan.json> -OutDirectory <dir> -Repository owner/name, a read token in GITHUB_TOKEN.
+    Locally: -Unit <name> -Version 1.4.0 -Preview. Public repositories need no token.
 #>
 [CmdletBinding(DefaultParameterSetName = 'Plan')]
 param(

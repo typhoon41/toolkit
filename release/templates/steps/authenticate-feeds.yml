@@ -1,8 +1,5 @@
-# Authenticates to Azure Artifacts feeds. Run it before any step that reads or writes a feed: the GitHub
-# release phases check the feeds (Prepare, Publish) and publish-packages.yml pushes to them.
-#   nugetAuthenticate: NuGetAuthenticate@1 (pushes; feed reads use $(System.AccessToken))
-#   npmAuthenticate:   npmAuthenticate@0 writes credentials into npmrcFile, an .npmrc that names the feed;
-#                      pass the same npmAuthenticate/npmrcFile to the later steps so npm uses that file
+# Run before any step that reads or writes an Azure Artifacts feed. With npmAuthenticate, pass the same
+# npmAuthenticate/npmrcFile to the later steps so npm uses that file.
 
 parameters:
   - name: nugetAuthenticate

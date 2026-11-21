@@ -1,14 +1,6 @@
 function Get-FeedHostKind {
-    <#
-        What kind of host a feed URL points to, which decides the credentials it may receive:
-          NuGetOrg        api.nuget.org
-          Npmjs           registry.npmjs.org
-          AzureArtifacts  pkgs.dev.azure.com, <organization>.pkgs.visualstudio.com
-          Trusted         one of -TrustedHost (the pipeline's trustedFeedHosts, never release.json)
-          Untrusted       anything else, or not an https URL
-        Host names are compared exactly (case-insensitively), so look-alikes such as
-        pkgs.dev.azure.com.example.io are Untrusted.
-    #>
+    # Hosts are compared exactly, so a look-alike such as pkgs.dev.azure.com.example.io is Untrusted.
+    # Trusted hosts come only from the pipeline's trustedFeedHosts, never from release.json.
     param([Parameter(Mandatory)] [string] $Url, [AllowEmptyCollection()] [string[]] $TrustedHost = @())
     $parsed = $null
     if (-not [Uri]::TryCreate($Url, [UriKind]::Absolute, [ref]$parsed) -or $parsed.Scheme -ne 'https') {

@@ -1,5 +1,4 @@
 function Assert-NoUnfinishedRelease {
-    # A new release of the unit is refused while an older one started publication but is still a draft.
     param([Parameter(Mandatory)] $Context, [AllowEmptyCollection()] [object[]] $Releases = @())
     foreach ($draft in @(@($Releases) | Where-Object { $_.draft })) {
         $tag = ConvertTo-ReleaseTag -TagName $draft.tag_name -Prefix $Context.Prefix

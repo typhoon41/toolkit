@@ -1,5 +1,4 @@
 function ConvertTo-ReleaseNotesMarkdown {
-    # GitHub release body: one "## Section" per non-empty section, then the full-changelog link.
     param(
         [AllowEmptyCollection()] [object[]] $Entries = @(),
         [AllowEmptyString()] [string] $CompareUrl

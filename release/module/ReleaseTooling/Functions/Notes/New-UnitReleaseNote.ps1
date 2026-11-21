@@ -1,8 +1,4 @@
 function New-UnitReleaseNote {
-    <#
-        Release notes for one unit of a release plan, from its previous tag (exclusive) to -Ref, limited to
-        the unit's paths. Returns @{ Markdown; Text; EntryCount; Range }.
-    #>
     param(
         [Parameter(Mandatory)] $UnitPlan,
         [Parameter(Mandatory)] $Client,

@@ -1,15 +1,10 @@
 <#
 .SYNOPSIS
-    Checks that a GitHub PR's title and commits follow the commit convention (Conventional Commits).
+    Checks that a GitHub PR's title and commits follow Conventional Commits.
 
 .DESCRIPTION
-    Warn-only by default: a commit that doesn't follow the convention still ships, as a chore in the release
-    notes. With -Enforce every such commit, and the title, fail the check.
-    Ignored: merge commits and fixup!/squash!/amend! commits.
-
-    Runs in PR validation with a READ-ONLY token (GITHUB_TOKEN), or none at all for public repositories.
-    Everything printed passes through Write-ReleaseLog / Write-PipelineIssue, which neutralise logging commands
-    hidden in titles or commit messages.
+    Warn-only unless -Enforce: a non-conventional commit still ships, as a chore. It runs on PR code, so give it a
+    read-only GITHUB_TOKEN at most.
 #>
 [CmdletBinding()]
 param(

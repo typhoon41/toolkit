@@ -1,8 +1,4 @@
 function Read-ReleaseConfiguration {
-    <#
-        Reads release.json from the repository root and returns its release units, validated, with
-        defaults applied. See docs/ADOPTING.md for the format.
-    #>
     param(
         [Parameter(Mandatory)] [string] $RepositoryRoot,
         [string] $Path = 'release.json'

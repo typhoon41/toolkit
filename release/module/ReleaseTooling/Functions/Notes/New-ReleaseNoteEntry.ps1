@@ -1,5 +1,4 @@
 function New-ReleaseNoteEntry {
-    # One line of the release notes, as Markdown (GitHub) and as plain text (NuGet).
     param(
         [Parameter(Mandatory)] [string] $Commit,
         [Parameter(Mandatory)] [AllowEmptyString()] [string] $Subject,

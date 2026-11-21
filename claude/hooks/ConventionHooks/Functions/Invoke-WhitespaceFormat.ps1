@@ -1,7 +1,6 @@
 function Invoke-WhitespaceFormat {
-    # Runs `dotnet format whitespace` on one file in folder mode (no project load, fast) and returns whether the
-    # file changed. The root's .editorconfig is the style; without it, without dotnet, or for a file outside the
-    # root, nothing runs. --include gets the path relative to the root, the form every dotnet format mode accepts.
+    # Folder mode needs no project load, so it is fast. --include takes the path relative to the root, the form every
+    # dotnet format mode accepts.
     param(
         [Parameter(Mandatory)] [string] $Root,
         [Parameter(Mandatory)] [string] $Path

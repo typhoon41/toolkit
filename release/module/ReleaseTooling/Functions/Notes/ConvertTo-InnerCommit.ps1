@@ -1,5 +1,4 @@
 function ConvertTo-InnerCommit {
-    # A pull request commit from the GitHub API as @{ Sha; Subject; Author; IsIgnored; Conventional }.
     param([Parameter(Mandatory)] $Commit)
     $subject, $body = ([string]$Commit.commit.message) -split '\r?\n', 2
     $subject = $subject.Trim()

@@ -1,9 +1,5 @@
 function Get-PreviousReleaseTag {
-    <#
-        Baseline for release notes: the highest release tag reachable from -Ref that is lower than
-        -Version. A stable release compares to the previous stable release; a prerelease to the
-        previous release of any kind. Returns $null for a first release.
-    #>
+    # A stable release compares to the previous stable release; a prerelease to the previous release of any kind.
     param(
         [Parameter(Mandatory)] [string] $Prefix,
         [Parameter(Mandatory)] $Version,

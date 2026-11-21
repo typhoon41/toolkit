@@ -1,5 +1,4 @@
-# Packs every NuGet and npm unit of the plan with its planned version into <packagesDirectory>/<unit>/,
-# embedding the release notes when release-notes.yml ran before. Install the SDKs/Node first.
+# Install the SDKs and Node first. Embeds the release notes when release-notes.yml ran before.
 
 parameters:
   - name: planFile

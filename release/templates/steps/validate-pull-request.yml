@@ -1,5 +1,4 @@
-# Checks the PR title and commits against the commit convention. Warn-only unless enforce: true.
-# Runs PR-controlled code: give it a READ-ONLY token at most, never publishing credentials.
+# Runs PR-controlled code: give it a read-only token at most, never publishing credentials.
 
 parameters:
   - name: enforce

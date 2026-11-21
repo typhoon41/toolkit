@@ -1,5 +1,4 @@
 function Compare-ReleaseVersion {
-    # SemVer 2.0 precedence: -1, 0 or 1. Matches NuGet and npm ordering for canonical versions.
     param([Parameter(Mandatory)] $Left, [Parameter(Mandatory)] $Right)
     foreach ($part in 'Major', 'Minor', 'Patch') {
         $comparison = $Left.$part.CompareTo($Right.$part)

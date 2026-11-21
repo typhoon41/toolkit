@@ -1,5 +1,4 @@
 function Compare-PackageContent {
-    # Differences between two packages' contents (empty when identical apart from signing).
     param([Parameter(Mandatory)] [string] $LocalPath, [Parameter(Mandatory)] [string] $RemotePath)
     $local = Get-PackageEntryMap $LocalPath
     $remote = Get-PackageEntryMap $RemotePath

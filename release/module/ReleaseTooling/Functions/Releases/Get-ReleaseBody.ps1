@@ -1,8 +1,5 @@
 function Get-ReleaseBody {
-    <#
-        The GitHub release body: the generated notes when -NotesFile exists, otherwise a minimal body (release
-        notes turned off). GitHub caps bodies at 125,000 characters; longer notes are cut at a line break.
-    #>
+    # GitHub caps release bodies at 125,000 characters.
     param([Parameter(Mandatory)] $Context, [string] $NotesFile, [int] $MaximumLength = 120000)
     if ($NotesFile -and (Test-Path -LiteralPath $NotesFile)) {
         $body = [IO.File]::ReadAllText($NotesFile)

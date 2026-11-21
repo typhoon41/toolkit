@@ -1,5 +1,4 @@
 function Find-UnitRelease {
-    # The GitHub release (draft or published) of the context's version, or $null. Refuses ambiguous states.
     param([Parameter(Mandatory)] $Context, [AllowEmptyCollection()] [object[]] $Releases = @())
     $same = @(@($Releases) | Where-Object {
         $tag = ConvertTo-ReleaseTag -TagName $_.tag_name -Prefix $Context.Prefix

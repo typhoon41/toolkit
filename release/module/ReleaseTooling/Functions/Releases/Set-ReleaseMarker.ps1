@@ -1,8 +1,5 @@
 function Set-ReleaseMarker {
-    <#
-        The started-marker is written once and never touched again, so no failure can un-mark the draft. Each
-        call then adds an attempt asset; Abandon's age check reads the newest one.
-    #>
+    # The marker is written once and never touched again, so no failure can un-mark the draft.
     param([Parameter(Mandatory)] $Context, [Parameter(Mandatory)] $Release)
     $names = Get-ReleaseStateName
     $now = [DateTimeOffset]::UtcNow

@@ -1,8 +1,4 @@
 function New-UnitReleasePlan {
-    <#
-        What this build does with one unit: its version, the version it packs with, whether it releases,
-        and the tags and paths its release notes use. -Context comes from New-ReleasePlan.
-    #>
     param([Parameter(Mandatory)] $Unit, [Parameter(Mandatory)] $Context)
     if ($Unit.Type -eq 'pipeline') {
         $text = $Context.PipelineVersion

@@ -1,7 +1,5 @@
-# Build job of package-release.yml: checkout -> PR convention check -> release plan -> your build/test
-# steps -> release notes (optional) -> pack -> the 'release' artifact (plan, notes, packages).
-# Holds no publishing secrets. The job is named BuildJob: the Release stage reads
-# dependencies.Build.outputs['BuildJob.ReleasePlan.HasRelease'].
+# Build job of package-release.yml; holds no publishing secrets. It is named BuildJob because the Release stage
+# reads dependencies.Build.outputs['BuildJob.ReleasePlan.HasRelease'].
 
 parameters:
   - name: buildSteps

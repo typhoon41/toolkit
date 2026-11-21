@@ -1,10 +1,6 @@
 function Invoke-ReleaseRestore {
-    <#
-        Maintainer-only. Recreates the draft when the feed already holds this build's package(s) but no draft
-        exists (a push outside the pipeline, or a deleted draft). Needs the COMPLETE original artifact set.
-        Refuses when any package on the feed is foreign, or when none of this build's packages is there.
-        Afterwards: Prepare -> publish to the feed -> Publish, which pushes what is still missing first.
-    #>
+    # Maintainer-only: the feed holds this build's packages but no draft exists (a push outside the pipeline, or a
+    # deleted draft). Needs the complete original artifact set.
     param(
         [Parameter(Mandatory)] $Context,
         [AllowNull()] $Release,

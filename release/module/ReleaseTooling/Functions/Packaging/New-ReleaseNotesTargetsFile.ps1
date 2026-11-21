@@ -1,9 +1,5 @@
 function New-ReleaseNotesTargetsFile {
-    <#
-        An MSBuild file that sets PackageReleaseNotes from -NotesFile. dotnet pack imports it through
-        CustomAfterMicrosoftCommonTargets, i.e. after the project file, so multi-line notes never have to
-        pass through the command line. Returns the path of the written file.
-    #>
+    # Imported through CustomAfterMicrosoftCommonTargets, so multi-line notes never pass through the command line.
     param([Parameter(Mandatory)] [string] $NotesFile, [Parameter(Mandatory)] [string] $OutFile)
     $notesPath = [IO.Path]::GetFullPath($NotesFile)
     if ($notesPath.Contains("'")) {

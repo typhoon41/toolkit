@@ -1,5 +1,4 @@
 function Read-NpmVersion {
-    # Name and version of a package.json in -Snapshot: @{ Name; Text; SourceFile }, or $null when it doesn't exist.
     param([Parameter(Mandatory)] $Snapshot, [Parameter(Mandatory)] [string] $PackagePath)
     $text = $Snapshot.ReadText($PackagePath)
     if ($null -eq $text) {

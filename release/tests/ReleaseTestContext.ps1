@@ -1,5 +1,4 @@
-# Test helper: a GitHub release context like New-GitHubReleaseContext builds, without reading packages.
-# Dot-source it in BeforeAll.
+# A New-GitHubReleaseContext result without reading packages. Dot-source it in BeforeAll.
 
 $script:TestCommit = 'e' * 40
 

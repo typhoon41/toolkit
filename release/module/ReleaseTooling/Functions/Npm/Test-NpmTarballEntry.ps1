@@ -1,5 +1,4 @@
 function Test-NpmTarballEntry {
-    # Whether an npm tarball (.tgz) contains package/<Name>.
     param([Parameter(Mandatory)] [string] $Path, [Parameter(Mandatory)] [string] $Name)
     $file = [IO.File]::OpenRead($Path)
     try {

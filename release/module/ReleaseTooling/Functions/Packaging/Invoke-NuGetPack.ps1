@@ -1,8 +1,4 @@
 function Invoke-NuGetPack {
-    <#
-        Packs every project of a nuget unit with the plan's package version into -OutDirectory, recording
-        the repository and commit in the nuspec. With -NotesFile the text becomes PackageReleaseNotes.
-    #>
     param(
         [Parameter(Mandatory)] $UnitPlan,
         [Parameter(Mandatory)] [ValidatePattern('^[0-9a-f]{40}$')] [string] $Commit,

@@ -1,10 +1,5 @@
 function Get-NuGetPushApiKey {
-    <#
-        The API key for `dotnet nuget push` to -Source:
-          Azure Artifacts             'az' (the credential provider from NuGetAuthenticate@1 authenticates)
-          nuget.org, a -TrustedHost   NUGET_API_KEY
-          any other host              refused, so the key never reaches a feed nobody vetted
-    #>
+    # Any host but Azure Artifacts, nuget.org or a -TrustedHost is refused, so the key never reaches an unvetted feed.
     param([Parameter(Mandatory)] [string] $Source, [AllowEmptyCollection()] [string[]] $TrustedHost = @())
     $kind = Get-FeedHostKind -Url $Source -TrustedHost $TrustedHost
     if ($kind -eq 'AzureArtifacts') {

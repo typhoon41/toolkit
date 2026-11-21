@@ -1,5 +1,4 @@
 function Get-UnitFeedState {
-    # Feed state (Absent / Published / Foreign) of every primary package of a unit: .nupkg or .tgz, not symbols.
     param(
         [Parameter(Mandatory)] $UnitPlan,
         [Parameter(Mandatory)] [AllowEmptyCollection()] [IO.FileInfo[]] $Files,

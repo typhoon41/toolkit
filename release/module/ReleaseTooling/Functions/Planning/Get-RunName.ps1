@@ -1,10 +1,4 @@
 function Get-RunName {
-    <#
-        Name of the Azure Pipelines run, from the unit that names it:
-          package unit releasing    1.3.0+4711
-          package unit otherwise    its package version (1.3.1-ci.4711, 1.3.1-calendar-fixes.4711)
-          pipeline unit             its version on the release branch, <version>-<branch words> elsewhere
-    #>
     param(
         [Parameter(Mandatory)] $UnitPlan,
         [Parameter(Mandatory)] [string] $BuildId,

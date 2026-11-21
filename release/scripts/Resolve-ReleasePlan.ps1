@@ -1,20 +1,10 @@
 <#
 .SYNOPSIS
-    Decides the version of every release unit in release.json, whether this build releases it, and the
-    name of the run. Writes the plan to -OutFile for every later step.
+    Decides each release unit's version and whether this build releases it, names the run and writes -OutFile.
 
 .DESCRIPTION
-    NuGet units: <Version> from the csproj, otherwise from the nearest Directory.Build.props.
-    npm units:   "version" from package.json.
-    Pipeline units (applications): -PipelineVersion, e.g. $(Build.BuildNumber).
-
-    A package unit releases only on the release branch, on the commit that changes its version, when that
-    version is not tagged yet and higher than every release. Other builds pack a CI version:
-    1.3.1-ci.4711 on the release branch, 1.3.1-<branch words>.4711 elsewhere.
-
-    Output variables (reference as $(<stepName>.<name>)):
-      HasRelease   'true' when at least one unit releases
-      RunName      the run name this step also applied
+    A package unit releases only from the release-branch commit that changes its version.
+    Output variables: HasRelease ('true' when a unit releases) and RunName.
 #>
 [CmdletBinding()]
 param(

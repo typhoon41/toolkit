@@ -1,6 +1,5 @@
-# Decides the version of every unit in release.json and whether this build releases it, renames the run,
-# and writes release-plan.json. Output variables: <stepName>.HasRelease, <stepName>.RunName
-# (step name 'ReleasePlan': dependencies.<Stage>.outputs['<Job>.ReleasePlan.HasRelease']).
+# Output variables: <stepName>.HasRelease and <stepName>.RunName, e.g.
+# dependencies.<Stage>.outputs['<Job>.ReleasePlan.HasRelease'].
 
 parameters:
   - name: pipelineVersion          # application units only, e.g. $(Build.BuildNumber)

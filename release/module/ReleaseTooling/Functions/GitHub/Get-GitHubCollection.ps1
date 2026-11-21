@@ -1,5 +1,4 @@
 function Get-GitHubCollection {
-    # Every item of a paged GitHub list endpoint.
     param([Parameter(Mandatory)] $Client, [Parameter(Mandatory)] [string] $Path, [int] $MaximumPages = 50)
     $separator = if ($Path.Contains('?')) { '&' } else { '?' }
     for ($page = 1; $page -le $MaximumPages; $page++) {

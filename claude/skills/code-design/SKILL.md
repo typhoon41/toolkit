@@ -34,8 +34,23 @@ Only the user, in so many words, overrides a rule here.
 
 ## Comments
 
-Only *why* - a reason the code cannot express - tersely. Never narrate: rename or extract. Fix a comment the change
-makes untrue. No commented-out code; no `TODO` without a ticket reference.
+A comment says only what the code cannot: a reason, a constraint, a trap in an external system. If the name, the
+signature or the next line already says it, write no comment - rename or extract instead.
+
+- **No header restating the name.** `Add-ReleaseStateAsset` needs no "Uploads a state asset to a release"; a
+  parameter list needs no prose copy of its parameters, types or return shape.
+- **Help blocks only on entry points** others run or call (scripts, hooks, public package APIs): a one-line synopsis,
+  plus only what a caller must know (exit codes, side effects). Internal functions get none.
+- **One or two lines.** No banners, no end-of-line narration (`# loop over units`), no history (`now`, `previously`,
+  `fixed`, `new`) - that belongs in the commit message.
+- Delete a comment your change makes redundant; fix one it makes untrue. No commented-out code; no `TODO` without a
+  ticket reference.
+
+```text
+Wrong:  # Returns the releases of the repository.
+        function Get-GitHubRelease { ... }
+Right:  # Drafts are listed only for a token with Contents: write.
+```
 
 ## Failures
 
