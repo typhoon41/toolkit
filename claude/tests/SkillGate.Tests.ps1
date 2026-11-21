@@ -45,8 +45,8 @@ Describe 'Get-SkillMarkerPath' {
 Describe 'Get-MissingSkill' {
     It 'returns the required skills not recorded yet, in order' {
         $marker = Join-Path $TestDrive 'marker.txt'
-        Add-LoadedSkill -MarkerPath $marker -Skill 'csharp'
-        Get-MissingSkill -MarkerPath $marker -Required @('code-design', 'csharp') | Should -Be @('code-design')
+        Add-LoadedSkill -MarkerPath $marker -Skill 'dotnet'
+        Get-MissingSkill -MarkerPath $marker -Required @('code-design', 'dotnet') | Should -Be @('code-design')
     }
 
     It 'returns every required skill without a marker file' {
@@ -63,12 +63,12 @@ Describe 'Invoke-SkillGate.ps1' {
         $result = Invoke-Gate (New-EditPayload 'C:\repo\src\Service.cs') $script:Root
         $result.ExitCode | Should -Be 2
         $result.Output | Should -Match 'conventions:code-design'
-        $result.Output | Should -Match 'conventions:csharp'
+        $result.Output | Should -Match 'conventions:dotnet'
     }
 
     It 'allows the edit once the skills were loaded with the Skill tool' {
         Invoke-Gate (New-SkillPayload 'conventions:code-design') $script:Root | Out-Null
-        Invoke-Gate (New-SkillPayload 'conventions:csharp') $script:Root | Out-Null
+        Invoke-Gate (New-SkillPayload 'conventions:dotnet') $script:Root | Out-Null
         (Invoke-Gate (New-EditPayload 'C:\repo\src\Service.cs') $script:Root).ExitCode | Should -Be 0
     }
 
@@ -124,13 +124,13 @@ Describe 'Invoke-SkillGate.ps1' {
 
     It 'ignores skills of other plugins with the same name' {
         Invoke-Gate (New-SkillPayload 'other:code-design') $script:Root | Out-Null
-        Invoke-Gate (New-SkillPayload 'csharp') $script:Root | Out-Null
+        Invoke-Gate (New-SkillPayload 'dotnet') $script:Root | Out-Null
         (Invoke-Gate (New-EditPayload 'C:\repo\src\Service.cs') $script:Root).ExitCode | Should -Be 2
     }
 
     It 'does not let a subagent use the skills its parent loaded' {
         Invoke-Gate (New-SkillPayload 'conventions:code-design') $script:Root | Out-Null
-        Invoke-Gate (New-SkillPayload 'conventions:csharp') $script:Root | Out-Null
+        Invoke-Gate (New-SkillPayload 'conventions:dotnet') $script:Root | Out-Null
         (Invoke-Gate (New-EditPayload 'C:\repo\src\Service.cs' -Agent 'agent-1') $script:Root).ExitCode | Should -Be 2
     }
 

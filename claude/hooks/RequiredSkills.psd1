@@ -8,7 +8,7 @@
 @{
     Plugin               = 'conventions'
     Extensions           = @{
-        '.cs'   = @('code-design', 'csharp')
+        '.cs'   = @('code-design', 'dotnet')
         '.ts'   = @('code-design', 'typescript')
         '.html' = @('code-design', 'html-scss')
         '.scss' = @('code-design', 'html-scss')

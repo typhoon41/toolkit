@@ -31,7 +31,7 @@
             Message = 'name the file after the abstraction it holds, not "utils"/"helpers"'
         }
         @{
-            Id = 'async-suffix'; Extensions = @('.cs'); Skill = 'csharp'
+            Id = 'async-suffix'; Extensions = @('.cs'); Skill = 'dotnet'
             Pattern = '^(?!.*\boverride\b).*?\b(?:Task|ValueTask)(?:<[^()]*>)?\s+(?!(?:On\w+Async|Handle\w*Async|ExecuteAsync|StartAsync|StopAsync|SaveChangesAsync|InvokeAsync|DisposeAsync|InitializeAsync|BindModelAsync|ExecuteResultAsync|ProcessAsync)\b)\w+Async\s*[(<]'
             Message = 'no Async suffix on Task-returning methods (framework overrides excepted)'
         }
@@ -71,7 +71,7 @@
             Message = 'use async / await, never .then() / .catch() chains (a one-line lazy import picking one export is the only exception)'
         }
         @{
-            Id = 'null-forgiving'; Extensions = @('.cs'); Skill = 'csharp'
+            Id = 'null-forgiving'; Extensions = @('.cs'); Skill = 'dotnet'
             Pattern = '^(?!\s*(?:/[/*]|\*)).*?(?<=[\w)\]])!(?=[.;,)\[])'
             Message = 'no null-forgiving operator (!): fix the cause of the nullability warning'
         }

@@ -47,7 +47,7 @@ Locally, without GitHub: `/plugin marketplace add <path to this repository>`, th
 | Skill | Applies to |
 |---|---|
 | `code-design` | Any code: names, files, control flow, comments, failures, rich models, no enums, no second copy |
-| `csharp` | `.cs`: async naming, thin controllers, validation, nullability, repositories and queries, logging, security |
+| `dotnet` | `.cs` (C#, ASP.NET Core, EF Core, FluentValidation): async naming, thin controllers, validation, nullability, repositories and queries, logging, security |
 | `gmf-packages` | C# in solutions referencing `Gmf.*` packages: unit of work, events, conflicts, Autofac |
 | `typescript` | Any `.ts`: arrow-function members, no getters, typing, async/await instead of subscriptions, one abstraction per module |
 | `angular` | Angular projects: components, no lifecycle hooks, signals, templates, component styling, state, errors, i18n |
@@ -68,7 +68,7 @@ All hooks are PowerShell 7 scripts in `hooks/` sharing the `ConventionHooks` mod
 
 | Event | Script | What it does |
 |---|---|---|
-| PreToolUse `Edit\|Write\|MultiEdit` | `Invoke-SkillGate.ps1` | Blocks the edit until the skills that own the file are loaded (`RequiredSkills.psd1`: `.cs` → code-design + csharp, `.ts` → code-design + typescript, `.html`/`.scss`/`.css` → code-design + html-scss, `.ps1`/`.psm1`/`.psd1`/`.yml`/`.yaml` → code-design; plus `angular` for `.ts`/`.html`/`.scss` when the nearest `package.json` depends on `@angular/core`), naming the `Skill` calls to make. Tracked per session and per subagent. |
+| PreToolUse `Edit\|Write\|MultiEdit` | `Invoke-SkillGate.ps1` | Blocks the edit until the skills that own the file are loaded (`RequiredSkills.psd1`: `.cs` → code-design + dotnet, `.ts` → code-design + typescript, `.html`/`.scss`/`.css` → code-design + html-scss, `.ps1`/`.psm1`/`.psd1`/`.yml`/`.yaml` → code-design; plus `angular` for `.ts`/`.html`/`.scss` when the nearest `package.json` depends on `@angular/core`), naming the `Skill` calls to make. Tracked per session and per subagent. |
 | PostToolUse `Skill`, UserPromptExpansion | `Invoke-SkillGate.ps1` | Records a loaded `conventions:<skill>`, from the Skill tool or a `/conventions:<skill>` command. |
 | PostToolUse `Edit\|Write\|MultiEdit` | `Invoke-BannedPatternGuard.ps1` | Checks only the text just written against `BannedPatterns.psd1`; findings go back to Claude (exit 2) naming the owning skill. The edit is kept. Angular rules apply only in projects depending on `@angular/core`. |
 | PostToolUse `Edit\|Write\|MultiEdit` | `Invoke-DotnetFormat.ps1` | Runs `dotnet format whitespace` on an edited `.cs` file when the project root has an `.editorconfig`, and tells Claude to re-read the file if it changed. |
