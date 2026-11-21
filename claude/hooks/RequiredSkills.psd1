@@ -7,7 +7,6 @@
     conditionally otherwise (accessibility, toolkit-release) are not gated: their descriptions decide.
 #>
 @{
-    Plugin               = 'conventions'
     Extensions           = @{
         '.cs'   = @('code-design', 'dotnet')
         '.ts'   = @('code-design', 'typescript')

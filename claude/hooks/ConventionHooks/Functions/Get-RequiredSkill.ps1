@@ -1,7 +1,10 @@
 function Get-RequiredSkill {
+    # The bundled extension and dependency mappings, plus the project's own extension mapping
+    # (.claude/conventions.json requiredSkills), each skill once.
     param(
         [Parameter(Mandatory)] [string] $Path,
-        [Parameter(Mandatory)] [hashtable] $Configuration
+        [Parameter(Mandatory)] [hashtable] $Configuration,
+        [hashtable] $ProjectRequiredSkill = @{}
     )
     $extension = [IO.Path]::GetExtension($Path).ToLowerInvariant()
     $skills = @(
@@ -16,6 +19,9 @@ function Get-RequiredSkill {
                     $added[$extension]
                 }
             }
+        }
+        if ($ProjectRequiredSkill.ContainsKey($extension)) {
+            $ProjectRequiredSkill[$extension]
         }
     )
     $skills | Select-Object -Unique

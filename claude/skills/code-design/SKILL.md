@@ -5,7 +5,7 @@ description: Language-independent rules for names, files, control flow, comments
 
 # Code design
 
-Only the user, in so many words, overrides a rule here.
+Only the user, in so many words, or the consuming project's `CLAUDE.md` or `.claude/conventions.json` overrides a rule here.
 
 ## Names
 
