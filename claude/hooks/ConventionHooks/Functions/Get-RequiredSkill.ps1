@@ -11,12 +11,16 @@ function Get-RequiredSkill {
         if ($Configuration.Extensions.ContainsKey($extension)) {
             $Configuration.Extensions[$extension]
         }
-        if ($Configuration.ContainsKey('WhenProjectDependsOn')) {
-            foreach ($dependency in $Configuration.WhenProjectDependsOn.Keys) {
-                $added = $Configuration.WhenProjectDependsOn[$dependency]
-                if ($added.ContainsKey($extension) -and
-                    (Test-ProjectDependency -Path $Path -Requirement (ConvertTo-DependencyRequirement -Text $dependency))) {
-                    $added[$extension]
+        $conditional = @(
+            if ($Configuration.ContainsKey('WhenProjectDependsOn')) {
+                $Configuration.WhenProjectDependsOn.Keys | Where-Object { $Configuration.WhenProjectDependsOn[$_].ContainsKey($extension) }
+            }
+        )
+        if ($conditional.Count -gt 0) {
+            $inventory = New-DependencyInventory -Path $Path
+            foreach ($dependency in $conditional) {
+                if ($inventory.Satisfies((ConvertTo-DependencyRequirement -Text $dependency))) {
+                    $Configuration.WhenProjectDependsOn[$dependency][$extension]
                 }
             }
         }

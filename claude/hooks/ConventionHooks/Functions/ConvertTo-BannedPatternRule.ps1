@@ -6,6 +6,10 @@ function ConvertTo-BannedPatternRule {
             throw "the rule has no $required."
         }
     }
+    if ($Rule.ContainsKey('WhenProjectDependsOn')) {
+        # Throws on a malformed requirement now, so the guard never fails on it later.
+        ConvertTo-DependencyRequirement -Text $Rule.WhenProjectDependsOn | Out-Null
+    }
     $timeout = [TimeSpan]::FromSeconds(1)
     $options = [Text.RegularExpressions.RegexOptions]::None
     [pscustomobject]@{

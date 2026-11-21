@@ -13,7 +13,7 @@ BeforeAll {
 
     function Test-Dependency {
         param([string] $Path, [string] $Requirement)
-        Test-ProjectDependency -Path $Path -Requirement (ConvertTo-DependencyRequirement -Text $Requirement)
+        (New-DependencyInventory -Path $Path).Satisfies((ConvertTo-DependencyRequirement -Text $Requirement))
     }
 }
 
@@ -42,6 +42,10 @@ Describe 'ConvertTo-DependencyRequirement' {
         @{ Version = '^9.0.0'; Expected = $false }
         @{ Version = 'workspace:*'; Expected = $true }
         @{ Version = '$(AngularVersion)'; Expected = $true }
+        @{ Version = '^19.0.0 || ^20.0.0'; Expected = $true }
+        @{ Version = '^18.0.0 || ^19.0.0'; Expected = $false }
+        @{ Version = '[20.0,21.0)'; Expected = $true }
+        @{ Version = '[19.0,20.0)'; Expected = $false }
         @{ Version = $null; Expected = $true }
     ) {
         (ConvertTo-DependencyRequirement -Text '@angular/core>=20').AcceptsVersion($Version) | Should -Be $Expected
@@ -52,7 +56,7 @@ Describe 'ConvertTo-DependencyRequirement' {
     }
 }
 
-Describe 'Test-ProjectDependency with npm' {
+Describe 'New-DependencyInventory with npm' {
     It 'finds a dependency in the nearest package.json above the file' {
         $root = New-ProjectFolder '{ "dependencies": { "@angular/core": "^20.0.0" } }'
         Test-Dependency (Join-Path $root 'src/app/card.ts') '@angular/core' | Should -BeTrue
@@ -94,7 +98,7 @@ Describe 'Test-ProjectDependency with npm' {
     }
 }
 
-Describe 'Test-ProjectDependency with NuGet' {
+Describe 'New-DependencyInventory with NuGet' {
     BeforeEach {
         $script:Solution = Join-Path $TestDrive ([guid]::NewGuid())
         $script:Project = Join-Path $script:Solution 'src/Api'
@@ -114,10 +118,34 @@ Describe 'Test-ProjectDependency with NuGet' {
         Test-Dependency $script:File 'Core.Common' | Should -BeFalse
     }
 
-    It 'finds a central PackageVersion in Directory.Packages.props above the project' {
+    It 'does not count a central PackageVersion the project never references' {
         Set-Content -LiteralPath (Join-Path $script:Project 'Api.csproj') -Value '<Project><ItemGroup><PackageReference Include="Other" /></ItemGroup></Project>'
         Set-Content -LiteralPath (Join-Path $script:Solution 'Directory.Packages.props') -Value '<Project><ItemGroup><PackageVersion Include="Gmf.Mail.Common" Version="1.0.0" /></ItemGroup></Project>'
+        Test-Dependency $script:File 'Gmf.Mail.Common' | Should -BeFalse
+    }
+
+    It 'takes the version of a reference without one from Directory.Packages.props' {
+        Set-Content -LiteralPath (Join-Path $script:Project 'Api.csproj') -Value '<Project><ItemGroup><PackageReference Include="Gmf.Mail.Common" /></ItemGroup></Project>'
+        Set-Content -LiteralPath (Join-Path $script:Solution 'Directory.Packages.props') -Value '<Project><ItemGroup><PackageVersion Include="Gmf.Mail.Common" Version="1.4.0" /></ItemGroup></Project>'
         Test-Dependency $script:File 'Gmf.Mail.Common' | Should -BeTrue
+        Test-Dependency $script:File 'Gmf.Mail.Common>=2' | Should -BeFalse
+    }
+
+    It 'finds a PackageReference in Directory.Build.props above the project' {
+        Set-Content -LiteralPath (Join-Path $script:Project 'Api.csproj') -Value '<Project />'
+        Set-Content -LiteralPath (Join-Path $script:Solution 'Directory.Build.props') -Value '<Project><ItemGroup><PackageReference Include="Gmf.DDD.Common"><Version>2.0.0</Version></PackageReference></ItemGroup></Project>'
+        Test-Dependency $script:File 'Gmf.DDD.Common>=2' | Should -BeTrue
+    }
+
+    It 'reads single-quoted attributes and ignores commented-out references' {
+        Set-Content -LiteralPath (Join-Path $script:Project 'Api.csproj') -Value "<Project><ItemGroup><PackageReference Include='Gmf.DDD.Common' Version='2.0.0' /><!-- <PackageReference Include=`"Gmf.Mail.Common`" /> --></ItemGroup></Project>"
+        Test-Dependency $script:File 'Gmf.DDD.Common' | Should -BeTrue
+        Test-Dependency $script:File 'Gmf.Mail.Common' | Should -BeFalse
+    }
+
+    It 'skips a .csproj that is not XML' {
+        Set-Content -LiteralPath (Join-Path $script:Project 'Api.csproj') -Value '<Project><ItemGroup>'
+        Test-Dependency $script:File 'Gmf.DDD.Common' | Should -BeFalse
     }
 
     It 'ignores a .csproj of a parent folder once the project is found' {

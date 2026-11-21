@@ -1,8 +1,8 @@
 <#
     Skills of this plugin that must be loaded (in the session, or in the subagent doing the edit) before a file
     with the extension is edited. WhenProjectDependsOn adds skills when the file's project depends on the package:
-    the nearest package.json for npm, the nearest .csproj (PackageReference, or a ProjectReference to <Package>.csproj)
-    and any Directory.Build.props / Directory.Packages.props above it for NuGet. 'package>=major' also requires that
+    the nearest package.json for npm; for NuGet a PackageReference in the nearest .csproj or a Directory.Build.props
+    above it, or a ProjectReference to <Package>.csproj (New-DependencyInventory). 'package>=major' also requires that
     major version, so a framework or library skill is required only where it applies. Skills that apply only
     conditionally otherwise (accessibility, toolkit-release) are not gated: their descriptions decide.
 #>

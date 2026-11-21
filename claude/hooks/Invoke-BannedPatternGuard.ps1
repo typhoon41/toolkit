@@ -27,8 +27,9 @@ if (-not $project.BannedPatternGuard -or -not $path -or -not (Test-GuardedPath -
 # PostToolUse runs after the write, so the file on disk is the result; an Edit's new text alone may lack context.
 $fileContent = if (Test-Path -LiteralPath $path -PathType Leaf) { [string](Get-Content -LiteralPath $path -Raw) } else { '' }
 $rules = @(Read-BannedPatternRule -Path $RulePath -ProjectRule $project.Rules -DisabledRuleId $project.DisabledRules)
-$projectPackages = @($rules.WhenProjectDependsOn | Where-Object { $_ } | Select-Object -Unique |
-    Where-Object { Test-ProjectDependency -Path $path -Requirement (ConvertTo-DependencyRequirement -Text $_) })
+$dependencies = @($rules.WhenProjectDependsOn | Where-Object { $_ } | Select-Object -Unique)
+$inventory = if ($dependencies.Count -gt 0) { New-DependencyInventory -Path $path } else { $null }
+$projectPackages = @($dependencies | Where-Object { $inventory.Satisfies((ConvertTo-DependencyRequirement -Text $_)) })
 $hits = @(Find-BannedPattern -Path $path -Text (Get-WrittenText -ToolInput $toolInput) -Rule $rules -FileContent $fileContent -ProjectPackage $projectPackages)
 if ($hits.Count -eq 0) {
     exit 0

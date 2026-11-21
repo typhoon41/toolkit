@@ -93,10 +93,12 @@ All hooks are PowerShell 7 scripts in `hooks/` sharing the `ConventionHooks` mod
 | PostToolUse `Edit\|Write\|MultiEdit` | `Invoke-BannedPatternGuard.ps1` | Checks only the text just written against `BannedPatterns.psd1` and the project's rules. Findings go back to Claude (exit 2) naming the owning skill; the edit is kept. Angular rules apply only in projects on `@angular/core` 20+. |
 | PostToolUse `Edit\|Write\|MultiEdit` | `Invoke-DotnetFormat.ps1` | Runs `dotnet format whitespace` on an edited `.cs` file when the project root has an `.editorconfig`, and tells Claude to re-read the file if it changed. |
 
-A dependency is detected from the file's nearest `package.json` (npm) or nearest `.csproj` (NuGet). For NuGet, the
-hook checks the `PackageReference` entries, a `ProjectReference` to `<Package>.csproj`, and any
-`Directory.Build.props` / `Directory.Packages.props` above the `.csproj`. A requirement written `package>=major` also
-checks the declared major version.
+A dependency is detected from the file's nearest `package.json` (npm) or nearest `.csproj` (NuGet), read once per
+hook run as XML. For NuGet, a dependency is a `PackageReference` in that `.csproj` or in a `Directory.Build.props`
+above it, or a `ProjectReference` to `<Package>.csproj`. A central `PackageVersion` in `Directory.Packages.props`
+only supplies the version of a reference; on its own it is not a dependency. A requirement written
+`package>=major` also checks the declared major version; an npm range passes when any of its `||` alternatives
+does.
 
 ## Project configuration
 
