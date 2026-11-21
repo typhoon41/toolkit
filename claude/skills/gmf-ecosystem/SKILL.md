@@ -1,9 +1,18 @@
 ---
-name: gmf-packages
-description: How to use the Gmf.DDD.Common, Gmf.Net.Core.Common and Gmf.Mail.Common packages - unit of work, domain and integration events, conflict exceptions, enumerations, Autofac registration, email. Apply when writing or reviewing C# in a solution that references any Gmf.* package.
+name: gmf-ecosystem
+description: The Gmf .NET ecosystem (Gmf.DDD.Common, Gmf.Net.Core.Common, Gmf.Mail.Common) - unit of work, domain and integration events, conflict exceptions, enumerations, entities and value objects, Autofac registration, email. Apply when writing or reviewing C# in a solution that references any Gmf.* package.
 ---
 
-# Gmf packages
+# Gmf ecosystem
+
+Builds on `dotnet`: these packages are the concrete types behind its generic rules.
+
+| `dotnet` rule | Gmf type |
+|---|---|
+| The unit of work commits once per request | `TransactionFilter` |
+| A broken invariant becomes `409 Conflict` through one filter | `DomainConflictException`, `DomainConflictFilter` |
+| A fixed set of persisted values is an enumeration class | `Enumeration<T>` |
+| Side effects are dispatched only after a successful commit | `IStoreEvents`, `BaseDbContext` |
 
 ## Unit of work
 

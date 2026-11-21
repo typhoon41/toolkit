@@ -48,7 +48,7 @@ Locally, without GitHub: `/plugin marketplace add <path to this repository>`, th
 |---|---|
 | `code-design` | Any code: names, files, control flow, comments, failures, rich models, no enums, no second copy |
 | `dotnet` | `.cs` (C#, ASP.NET Core, EF Core, FluentValidation): async naming, thin controllers, validation, nullability, repositories and queries, logging, security |
-| `gmf-packages` | C# in solutions referencing `Gmf.*` packages: unit of work, events, conflicts, Autofac |
+| `gmf-ecosystem` | C# in solutions referencing `Gmf.*` packages: unit of work, events, conflicts, entities, Autofac, email |
 | `typescript` | Any `.ts`: arrow-function members, no getters, typing, async/await instead of subscriptions, one abstraction per module |
 | `angular` | Angular projects: components, no lifecycle hooks, signals, templates, component styling, state, errors, i18n |
 | `html-scss` | `.html` / `.scss`, framework-free: styling only in SCSS, selectors, mobile-first layout, values, modules |
