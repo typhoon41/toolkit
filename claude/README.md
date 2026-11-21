@@ -55,7 +55,8 @@ Locally, without GitHub: `/plugin marketplace add <path to this repository>`, th
 | `scss-solutions` | Projects using `@typhoon41/scss-solutions`: utility classes and mixins |
 | `accessibility` | User-facing UI: WCAG 2.2 AA |
 | `browser-verification` | Finishing any UI change: lint, run, test with Claude in Chrome and measure |
-| `conventional-commits` | Commit messages, PR titles and descriptions, releases |
+| `conventional-commits` | Commit messages, PR titles and descriptions |
+| `toolkit-release` | Repositories releasing through the toolkit `release/` tooling: release-note sections, version bumps |
 
 Every rule has one owner. When a convention changes, edit the skill that owns it and nothing else. Framework
 skills build on the framework-free ones (`angular` on `typescript` and `html-scss`) and never the other way round.
