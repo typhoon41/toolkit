@@ -120,7 +120,7 @@ repository root:
 
 | Key | Effect |
 |---|---|
-| `hooks` | Switches a hook off (`false`); every hook is on by default, and a value that is not `true`/`false` keeps it on, with a warning |
+| `hooks` | Switches a hook off (`false`); every hook is on by default; `null` counts as not set, and any other value that is not `true`/`false` keeps the hook on, with a warning |
 | `disabledRules` | Drops rules by `Id`, as listed in `hooks/BannedPatterns.psd1` or in `rules` |
 | `rules` | Adds guard rules: `id`, `extensions`, `pattern` (.NET regex, per line) and `message` are required; `skill`, `target` (`Text`/`Path`), `whenProjectDependsOn` and `excludeWhenFileMatches` are optional. An invalid rule is skipped with a warning |
 | `requiredSkills` | Adds skills of this plugin to the gate for an extension; a name the plugin does not ship is skipped with a warning |

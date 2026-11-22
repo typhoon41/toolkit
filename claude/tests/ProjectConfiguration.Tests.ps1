@@ -154,11 +154,18 @@ Describe 'Invoke-SkillGate.ps1 with a project configuration' {
         (Invoke-Hook -Script $script:GateScript -Payload (New-EditPayload $root (Join-Path $root 'src/Service.cs')) -Argument @('-MarkerRoot', $script:Markers)).ExitCode | Should -Be 0
     }
 
-    It 'keeps gating, with a warning, when the gate switch is not a boolean' {
-        $root = New-ConfiguredProject '{ "hooks": { "skillGate": "false" } }'
+    It 'keeps gating, with a warning, when the gate switch is <Value>' -ForEach @(@{ Value = '"false"' }, @{ Value = '[]' }) {
+        $root = New-ConfiguredProject "{ `"hooks`": { `"skillGate`": $Value } }"
         $result = Invoke-Hook -Script $script:GateScript -Payload (New-EditPayload $root (Join-Path $root 'src/Service.cs')) -Argument @('-MarkerRoot', $script:Markers)
         $result.ExitCode | Should -Be 2
         $result.Output | Should -Match 'Ignoring skillGate in .*conventions\.json: expected true or false'
+    }
+
+    It 'keeps gating without a warning when the gate switch is null' {
+        $root = New-ConfiguredProject '{ "hooks": { "skillGate": null } }'
+        $result = Invoke-Hook -Script $script:GateScript -Payload (New-EditPayload $root (Join-Path $root 'src/Service.cs')) -Argument @('-MarkerRoot', $script:Markers)
+        $result.ExitCode | Should -Be 2
+        $result.Output | Should -Not -Match 'Ignoring skillGate'
     }
 
     It 'requires the skills the project maps to an extension' {
