@@ -78,6 +78,13 @@ Describe 'Read-ProjectConfiguration' {
         $project.SkillGate | Should -BeTrue
     }
 
+    It 'keeps only the skills the plugin ships in requiredSkills' {
+        $root = New-ConfiguredProject '{ "requiredSkills": { ".razor": ["code-design", "dotnt"], ".vue": ["vue"] } }'
+        $project = Read-ProjectConfiguration -Root $root 2>$null
+        $project.RequiredSkills['.razor'] | Should -Be @('code-design')
+        $project.RequiredSkills.ContainsKey('.vue') | Should -BeFalse
+    }
+
     It 'finds the file in a folder above the working folder, but not past the repository root' {
         $root = New-ConfiguredProject '{ "hooks": { "skillGate": false } }'
         $nested = Join-Path $root 'src/app'
@@ -86,6 +93,15 @@ Describe 'Read-ProjectConfiguration' {
         $inner = Join-Path $root 'packages/library'
         New-Item -ItemType Directory -Path (Join-Path $inner '.git') -Force | Out-Null
         (Read-ProjectConfiguration -Root $inner).SkillGate | Should -BeTrue
+    }
+}
+
+Describe 'Get-PluginSkill' {
+    It 'lists every skill folder of the plugin' {
+        $skills = @(Get-PluginSkill)
+        $skills | Should -Contain 'dotnet'
+        $skills | Should -Contain 'gmf-ecosystem'
+        $skills.Count | Should -Be @(Get-ChildItem (Join-Path $PSScriptRoot '../skills') -Directory).Count
     }
 }
 
@@ -150,6 +166,19 @@ Describe 'Invoke-SkillGate.ps1 with a project configuration' {
         $result = Invoke-Hook -Script $script:GateScript -Payload (New-EditPayload $root (Join-Path $root 'src/Page.razor')) -Argument @('-MarkerRoot', $script:Markers)
         $result.ExitCode | Should -Be 2
         $result.Output | Should -Match 'conventions:dotnet'
+    }
+
+    It 'asks only for known skills when a required skill is misspelled, then lets the edit through' {
+        $root = New-ConfiguredProject '{ "requiredSkills": { ".razor": ["code-design", "dotnt"] } }'
+        $payload = New-EditPayload $root (Join-Path $root 'src/Page.razor')
+        $result = Invoke-Hook -Script $script:GateScript -Payload $payload -Argument @('-MarkerRoot', $script:Markers)
+        $result.ExitCode | Should -Be 2
+        $result.Output | Should -Match "Ignoring unknown skill 'dotnt' for \.razor"
+        $result.Output | Should -Match 'conventions:code-design'
+        $result.Output | Should -Not -Match 'conventions:dotnt'
+        $skill = @{ hook_event_name = 'PostToolUse'; session_id = $payload.session_id; cwd = $root; tool_name = 'Skill'; tool_input = @{ skill = 'conventions:code-design' } }
+        Invoke-Hook -Script $script:GateScript -Payload $skill -Argument @('-MarkerRoot', $script:Markers) | Out-Null
+        (Invoke-Hook -Script $script:GateScript -Payload $payload -Argument @('-MarkerRoot', $script:Markers)).ExitCode | Should -Be 0
     }
 
     It 'gates a folder the project removes from the exclusions' {

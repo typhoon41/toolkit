@@ -23,8 +23,19 @@ function Read-ProjectConfiguration {
     $requiredSkills = @{}
     $extensions = Get-JsonProperty -Object $settings -Name 'requiredSkills'
     if ($extensions -is [pscustomobject]) {
+        # A skill the plugin does not ship could never be loaded, so the gate would block that extension for good.
+        $known = @(Get-PluginSkill)
         foreach ($extension in $extensions.PSObject.Properties) {
-            $requiredSkills[$extension.Name.ToLowerInvariant()] = @($extension.Value | ForEach-Object { [string]$_ })
+            $name = $extension.Name.ToLowerInvariant()
+            $skills = @($extension.Value | ForEach-Object { [string]$_ } | Where-Object {
+                    if ($known -notcontains $_) {
+                        [Console]::Error.WriteLine("Ignoring unknown skill '$_' for $name in ${file}.")
+                    }
+                    $known -contains $_
+                })
+            if ($skills.Count -gt 0) {
+                $requiredSkills[$name] = $skills
+            }
         }
     }
     [pscustomobject]@{
