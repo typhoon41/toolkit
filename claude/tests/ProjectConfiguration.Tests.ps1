@@ -71,6 +71,13 @@ Describe 'Read-ProjectConfiguration' {
         $project.ExcludedFolders | Should -Not -Contain 'Migrations'
     }
 
+    It 'keeps a hook on when its switch is <Value> instead of a boolean' -ForEach @(
+        @{ Value = '0' }, @{ Value = '"false"' }, @{ Value = '[]' }, @{ Value = '{}' }, @{ Value = 'null' }
+    ) {
+        $project = Read-ProjectConfiguration -Root (New-ConfiguredProject "{ `"hooks`": { `"skillGate`": $Value } }") 2>$null
+        $project.SkillGate | Should -BeTrue
+    }
+
     It 'finds the file in a folder above the working folder, but not past the repository root' {
         $root = New-ConfiguredProject '{ "hooks": { "skillGate": false } }'
         $nested = Join-Path $root 'src/app'
@@ -129,6 +136,13 @@ Describe 'Invoke-SkillGate.ps1 with a project configuration' {
     It 'lets every edit through when the project switches the gate off' {
         $root = New-ConfiguredProject '{ "hooks": { "skillGate": false } }'
         (Invoke-Hook -Script $script:GateScript -Payload (New-EditPayload $root (Join-Path $root 'src/Service.cs')) -Argument @('-MarkerRoot', $script:Markers)).ExitCode | Should -Be 0
+    }
+
+    It 'keeps gating, with a warning, when the gate switch is not a boolean' {
+        $root = New-ConfiguredProject '{ "hooks": { "skillGate": "false" } }'
+        $result = Invoke-Hook -Script $script:GateScript -Payload (New-EditPayload $root (Join-Path $root 'src/Service.cs')) -Argument @('-MarkerRoot', $script:Markers)
+        $result.ExitCode | Should -Be 2
+        $result.Output | Should -Match 'Ignoring skillGate in .*conventions\.json: expected true or false'
     }
 
     It 'requires the skills the project maps to an extension' {

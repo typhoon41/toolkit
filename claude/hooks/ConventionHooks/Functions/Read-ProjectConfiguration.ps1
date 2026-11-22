@@ -28,9 +28,9 @@ function Read-ProjectConfiguration {
         }
     }
     [pscustomobject]@{
-        SkillGate          = [bool](Get-JsonProperty -Object $hooks -Name 'skillGate' -Default $true)
-        BannedPatternGuard = [bool](Get-JsonProperty -Object $hooks -Name 'bannedPatternGuard' -Default $true)
-        DotnetFormat       = [bool](Get-JsonProperty -Object $hooks -Name 'dotnetFormat' -Default $true)
+        SkillGate          = Get-BooleanSetting -Object $hooks -Name 'skillGate' -Default $true -Source $file
+        BannedPatternGuard = Get-BooleanSetting -Object $hooks -Name 'bannedPatternGuard' -Default $true -Source $file
+        DotnetFormat       = Get-BooleanSetting -Object $hooks -Name 'dotnetFormat' -Default $true -Source $file
         DisabledRules      = @(Get-JsonProperty -Object $settings -Name 'disabledRules' -Default @() | ForEach-Object { [string]$_ })
         Rules              = @(Get-JsonProperty -Object $settings -Name 'rules' -Default @() | ForEach-Object { ConvertTo-BannedPatternDefinition -Rule $_ })
         RequiredSkills     = $requiredSkills
