@@ -17,6 +17,38 @@ BeforeAll {
     }
 }
 
+Describe 'Get-HighestMajorVersion' {
+    It 'reads <Range> as <Expected>' -ForEach @(
+        @{ Range = '^20.1.0'; Expected = 20 }
+        @{ Range = '~19.2'; Expected = 19 }
+        @{ Range = '19'; Expected = 19 }
+        @{ Range = '19.x'; Expected = 19 }
+        @{ Range = '=19.1'; Expected = 19 }
+        @{ Range = 'v20.0.0'; Expected = 20 }
+        @{ Range = '20.0.0-rc.1'; Expected = 20 }
+        @{ Range = '<20'; Expected = 19 }
+        @{ Range = '<20.0.0'; Expected = 19 }
+        @{ Range = '<20.x'; Expected = 19 }
+        @{ Range = '<20.1'; Expected = 20 }
+        @{ Range = '<=19.4'; Expected = 19 }
+        @{ Range = '>=18 <21'; Expected = 20 }
+        @{ Range = '18 - 19'; Expected = 19 }
+        @{ Range = '[20.0,21.0)'; Expected = 20 }
+        @{ Range = '(,20.0)'; Expected = 19 }
+        @{ Range = '[19.0,20.0]'; Expected = 20 }
+        @{ Range = '[2.1]'; Expected = 2 }
+    ) {
+        Get-HighestMajorVersion -Range $Range | Should -Be $Expected
+    }
+
+    It 'has no upper bound for <Range>' -ForEach @(
+        @{ Range = '>=19' }, @{ Range = '>19.1' }, @{ Range = '*' }, @{ Range = 'x' }, @{ Range = '' }, @{ Range = '[1.0,)' }
+        @{ Range = 'workspace:*' }, @{ Range = 'latest' }, @{ Range = '$(GmfVersion)' }, @{ Range = 'npm:@scope/core@^19' }
+    ) {
+        Get-HighestMajorVersion -Range $Range | Should -BeNullOrEmpty
+    }
+}
+
 Describe 'ConvertTo-DependencyRequirement' {
     It 'reads <Text>' -ForEach @(
         @{ Text = '@angular/core'; Package = '@angular/core'; Major = $null }
@@ -46,6 +78,21 @@ Describe 'ConvertTo-DependencyRequirement' {
         @{ Version = '^18.0.0 || ^19.0.0'; Expected = $false }
         @{ Version = '[20.0,21.0)'; Expected = $true }
         @{ Version = '[19.0,20.0)'; Expected = $false }
+        @{ Version = '<20'; Expected = $false }
+        @{ Version = '<=19'; Expected = $false }
+        @{ Version = '<20.0.0'; Expected = $false }
+        @{ Version = '<20.1'; Expected = $true }
+        @{ Version = '>=19'; Expected = $true }
+        @{ Version = '>=19 <20'; Expected = $false }
+        @{ Version = '>=18 <21'; Expected = $true }
+        @{ Version = '18 - 19'; Expected = $false }
+        @{ Version = '19 - 21'; Expected = $true }
+        @{ Version = '(,20.0)'; Expected = $false }
+        @{ Version = '[19.0,20.0]'; Expected = $true }
+        @{ Version = '[19.0,19.9]'; Expected = $false }
+        @{ Version = '[1.0,)'; Expected = $true }
+        @{ Version = '*'; Expected = $true }
+        @{ Version = 'latest'; Expected = $true }
         @{ Version = $null; Expected = $true }
     ) {
         (ConvertTo-DependencyRequirement -Text '@angular/core>=20').AcceptsVersion($Version) | Should -Be $Expected
