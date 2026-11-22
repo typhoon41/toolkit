@@ -1,9 +1,11 @@
 function Get-HighestMajorVersion {
     # The highest major version one range alternative allows; nothing when it has no upper bound (>=19, *) or cannot
     # be read (workspace:*, latest, $(Version)). Reads npm comparators (^ ~ = < <= > >=, 19.x, 18 - 19) and NuGet
-    # versions and intervals ([a,b), (,b], [a,), [a]); several comparators narrow to the smallest upper bound.
+    # versions (up to four parts, 1.0.0.0) and intervals ([a,b), (,b], [a,), [a]); several comparators narrow to the
+    # smallest upper bound.
     param([AllowEmptyString()] [string] $Range = '')
-    $version = '[vV]?(?<major>\d+)(?:\.(?<minor>\d+|[xX*]))?(?:\.(?<patch>\d+|[xX*]))?(?:[-+][\w.-]*)?'
+    $part = '(?:\.(?<{0}>\d+|[xX*]))?'
+    $version = '[vV]?(?<major>\d+)' + ($part -f 'minor') + ($part -f 'patch') + ($part -f 'revision') + '(?:[-+][\w.-]*)?'
     $text = $Range.Trim()
     if ($text -match '^[\[(][^,\])]*,\s*(?<upper>[^\])]*?)\s*(?<close>[\])])$') {
         if (-not $Matches.upper) {
@@ -25,10 +27,10 @@ function Get-HighestMajorVersion {
         $operator = if ($Matches.ContainsKey('operator')) { $Matches['operator'] } else { '' }
         $major = [int]$Matches['major']
         if ($operator -eq '<') {
-            $minor = if ($Matches.ContainsKey('minor')) { $Matches['minor'] } else { '0' }
-            $patch = if ($Matches.ContainsKey('patch')) { $Matches['patch'] } else { '0' }
-            $belowMajor = ($minor -notmatch '^\d+$' -or [int]$minor -eq 0) -and ($patch -notmatch '^\d+$' -or [int]$patch -eq 0)
-            $uppers += if ($belowMajor) { $major - 1 } else { $major }
+            # '<20', '<20.0.0', '<20.x' and '<20.0.0.0' all stop below major 20; '<20.1' or '<20.0.0.1' allow some of it.
+            $trailing = @('minor', 'patch', 'revision' | ForEach-Object { if ($Matches.ContainsKey($_)) { $Matches[$_] } })
+            $nonZero = @($trailing | Where-Object { $_ -match '^\d+$' -and [int]$_ -ne 0 })
+            $uppers += if ($nonZero.Count -eq 0) { $major - 1 } else { $major }
         }
         elseif ($operator -notin '>', '>=') {
             $uppers += $major

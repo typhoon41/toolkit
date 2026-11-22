@@ -37,12 +37,16 @@ Describe 'Get-HighestMajorVersion' {
         @{ Range = '(,20.0)'; Expected = 19 }
         @{ Range = '[19.0,20.0]'; Expected = 20 }
         @{ Range = '[2.1]'; Expected = 2 }
+        @{ Range = '[1.0.0.0,2.0.0.0)'; Expected = 1 }
+        @{ Range = '<2.0.0.0'; Expected = 1 }
+        @{ Range = '<2.0.0.1'; Expected = 2 }
+        @{ Range = '1.2.3.4'; Expected = 1 }
     ) {
         Get-HighestMajorVersion -Range $Range | Should -Be $Expected
     }
 
     It 'has no upper bound for <Range>' -ForEach @(
-        @{ Range = '>=19' }, @{ Range = '>19.1' }, @{ Range = '*' }, @{ Range = 'x' }, @{ Range = '' }, @{ Range = '[1.0,)' }
+        @{ Range = '>=19' }, @{ Range = '>19.1' }, @{ Range = '*' }, @{ Range = 'x' }, @{ Range = '' }, @{ Range = '[1.0,)' }, @{ Range = '[1.0.0.0,)' }
         @{ Range = 'workspace:*' }, @{ Range = 'latest' }, @{ Range = '$(GmfVersion)' }, @{ Range = 'npm:@scope/core@^19' }
     ) {
         Get-HighestMajorVersion -Range $Range | Should -BeNullOrEmpty
@@ -90,6 +94,8 @@ Describe 'ConvertTo-DependencyRequirement' {
         @{ Version = '(,20.0)'; Expected = $false }
         @{ Version = '[19.0,20.0]'; Expected = $true }
         @{ Version = '[19.0,19.9]'; Expected = $false }
+        @{ Version = '[1.0.0.0,2.0.0.0)'; Expected = $false }
+        @{ Version = '[20.0.0.0,21.0.0.0)'; Expected = $true }
         @{ Version = '[1.0,)'; Expected = $true }
         @{ Version = '*'; Expected = $true }
         @{ Version = 'latest'; Expected = $true }
@@ -157,6 +163,12 @@ Describe 'New-DependencyInventory with NuGet' {
         Set-Content -LiteralPath (Join-Path $script:Project 'Api.csproj') -Value '<Project><ItemGroup><PackageReference Include="Gmf.DDD.Common" Version="2.1.0" /></ItemGroup></Project>'
         Test-Dependency $script:File 'Gmf.DDD.Common' | Should -BeTrue
         Test-Dependency $script:File 'Gmf.DDD.Common>=3' | Should -BeFalse
+    }
+
+    It 'reads a four-part NuGet interval in a PackageReference' {
+        Set-Content -LiteralPath (Join-Path $script:Project 'Api.csproj') -Value '<Project><ItemGroup><PackageReference Include="Gmf.DDD.Common" Version="[1.0.0.0,2.0.0.0)" /></ItemGroup></Project>'
+        Test-Dependency $script:File 'Gmf.DDD.Common' | Should -BeTrue
+        Test-Dependency $script:File 'Gmf.DDD.Common>=20' | Should -BeFalse
     }
 
     It 'finds a ProjectReference to the library built from source' {
