@@ -196,6 +196,25 @@ Describe 'New-DependencyInventory with NuGet' {
         Test-Dependency $script:File 'Gmf.DDD.Common>=2' | Should -BeTrue
     }
 
+    It 'ignores a parent Directory.Build.props that the nearest one does not import' {
+        Set-Content -LiteralPath (Join-Path $script:Project 'Api.csproj') -Value '<Project />'
+        Set-Content -LiteralPath (Join-Path $script:Solution 'Directory.Build.props') -Value '<Project><ItemGroup><PackageReference Include="Gmf.DDD.Common" /></ItemGroup></Project>'
+        Set-Content -LiteralPath (Join-Path $script:Solution 'src/Directory.Build.props') -Value '<Project><PropertyGroup><Nullable>enable</Nullable></PropertyGroup></Project>'
+        Test-Dependency $script:File 'Gmf.DDD.Common' | Should -BeFalse
+    }
+
+    It 'follows a Directory.Build.props that imports its parent with GetPathOfFileAbove' {
+        Set-Content -LiteralPath (Join-Path $script:Project 'Api.csproj') -Value '<Project />'
+        Set-Content -LiteralPath (Join-Path $script:Solution 'Directory.Build.props') -Value '<Project><ItemGroup><PackageReference Include="Gmf.DDD.Common" /></ItemGroup></Project>'
+        Set-Content -LiteralPath (Join-Path $script:Solution 'src/Directory.Build.props') -Value '<Project><Import Project="$([MSBuild]::GetPathOfFileAbove(''Directory.Build.props'', ''$(MSBuildThisFileDirectory)../''))" /></Project>'
+        Test-Dependency $script:File 'Gmf.DDD.Common' | Should -BeTrue
+    }
+
+    It 'reads no Directory.Build.props outside a .NET project' {
+        Set-Content -LiteralPath (Join-Path $script:Solution 'Directory.Build.props') -Value '<Project><ItemGroup><PackageReference Include="Gmf.DDD.Common" /></ItemGroup></Project>'
+        Test-Dependency $script:File 'Gmf.DDD.Common' | Should -BeFalse
+    }
+
     It 'reads single-quoted attributes and ignores commented-out references' {
         Set-Content -LiteralPath (Join-Path $script:Project 'Api.csproj') -Value "<Project><ItemGroup><PackageReference Include='Gmf.DDD.Common' Version='2.0.0' /><!-- <PackageReference Include=`"Gmf.Mail.Common`" /> --></ItemGroup></Project>"
         Test-Dependency $script:File 'Gmf.DDD.Common' | Should -BeTrue
