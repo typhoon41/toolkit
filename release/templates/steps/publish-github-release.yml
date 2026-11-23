@@ -10,7 +10,7 @@ parameters:
   - name: githubToken
     type: string
     default: $(GitHubToken)
-  - name: useGitHubServiceConnection   # instead of githubToken; needs checkout.yml with persistCredentials: true
+  - name: useGitHubServiceConnection   # instead of githubToken: the toolkit resource's endpoint (checkout.yml persistToolkitCredentials)
     type: boolean
     default: false
   - name: feedWaitMinutes          # Publish: how long to wait for the feed to index the pushed packages

@@ -40,6 +40,8 @@ function New-UnitReleasePlan {
                           else { Get-ContinuousIntegrationVersion -Version $candidate -BuildId $Context.BuildId -Label $Context.Label -AlreadyReleased:$decision.AlreadyReleased }
     }
     $previousTag = Get-PreviousReleaseTag -Prefix $Unit.TagPrefix -Version $candidate
+    $previousCommit = if ($previousTag) { '' }
+                      else { Get-PreviousVersionCommit -Unit $Unit -Version $candidate.Text -SourceFiles $sourceFiles -RepositoryRoot $Context.Current.Root }
 
     [pscustomobject]@{
         name           = $Unit.Name
@@ -51,6 +53,7 @@ function New-UnitReleasePlan {
         tagPrefix      = $Unit.TagPrefix
         tag            = $tag
         previousTag    = if ($previousTag) { $previousTag.Tag } else { '' }
+        previousCommit = $previousCommit
         latestTag      = if ($decision.Highest) { $decision.Highest.Tag } else { '' }
         versionSource  = $source
         paths          = Get-UnitReleaseScope -Unit $Unit -VersionSourceFiles $sourceFiles

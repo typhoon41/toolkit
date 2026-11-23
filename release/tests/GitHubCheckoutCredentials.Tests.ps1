@@ -43,17 +43,19 @@ Describe 'Get-CheckoutGitHubToken' {
     }
 }
 
-Describe 'New-GitHubClient with checkout credentials' {
-    It 'authorizes with the persisted token instead of the passed one' {
-        $repository = New-TestRepository -Path (Join-Path $TestDrive 'client')
-        Set-TestExtraHeader $repository 'http.extraheader' 'AUTHORIZATION: bearer connection-token'
-        Push-Location -LiteralPath $repository
-        try {
-            $client = New-GitHubClient -Repository 'owner/demo' -Token 'variable-token' -UseCheckoutCredentials
+Describe 'Checkout credentials of the toolkit' {
+    It 'reads the toolkit checkout by default, the one made with the endpoint connection' {
+        Mock Invoke-Git -ModuleName ReleaseTooling { 'http.https://github.com/owner/toolkit.extraheader AUTHORIZATION: bearer endpoint-token' }
+        Get-CheckoutGitHubToken | Should -Be 'endpoint-token'
+        $toolkitRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
+        Should -Invoke Invoke-Git -ModuleName ReleaseTooling -Times 1 -ParameterFilter {
+            [IO.Path]::GetFullPath($Arguments[1]).TrimEnd('\', '/') -eq $toolkitRoot.TrimEnd('\', '/')
         }
-        finally {
-            Pop-Location
-        }
-        $client.Headers.Authorization | Should -Be 'Bearer connection-token'
+    }
+
+    It 'authorizes the client with the persisted token instead of the passed one' {
+        Mock Get-CheckoutGitHubToken -ModuleName ReleaseTooling { 'endpoint-token' }
+        $client = New-GitHubClient -Repository 'owner/demo' -Token 'variable-token' -UseCheckoutCredentials
+        $client.Headers.Authorization | Should -Be 'Bearer endpoint-token'
     }
 }

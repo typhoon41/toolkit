@@ -12,7 +12,7 @@ parameters:
   - name: githubToken              # Contents: write
     type: string
     default: $(GitHubToken)
-  - name: useGitHubServiceConnection   # instead of githubToken; with checkout: false the job's checkout must persist credentials
+  - name: useGitHubServiceConnection   # instead of githubToken; with checkout: false, run checkout.yml with persistToolkitCredentials
     type: boolean
     default: false
   - name: toolkitRepository
@@ -27,7 +27,7 @@ steps:
     - template: checkout.yml
       parameters:
         toolkitRepository: ${{ parameters.toolkitRepository }}
-        persistCredentials: ${{ parameters.useGitHubServiceConnection }}
+        persistToolkitCredentials: ${{ parameters.useGitHubServiceConnection }}
 
   - download: current
     artifact: release

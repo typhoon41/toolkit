@@ -48,7 +48,7 @@ parameters:
   - name: npmAccess
     type: string
     default: ''
-  - name: useGitHubServiceConnection   # the pipeline's own GitHub connection instead of GitHubToken (release job only)
+  - name: useGitHubServiceConnection   # the toolkit resource's endpoint connection instead of GitHubToken (release job only)
     type: boolean
     default: false
   - name: trustedFeedHosts         # comma-separated extra feed hosts that may get NuGetApiKey / NpmToken

@@ -10,7 +10,7 @@ parameters:
   - name: githubToken              # e.g. $(GitHubReadToken); an undefined variable means anonymous access
     type: string
     default: $(GitHubReadToken)
-  - name: useGitHubServiceConnection   # release jobs only: the Build stage runs PR code, never persist credentials there
+  - name: useGitHubServiceConnection   # release jobs only: the Build stage runs PR code, so it never persists credentials
     type: boolean
     default: false
   - name: toolkitPath

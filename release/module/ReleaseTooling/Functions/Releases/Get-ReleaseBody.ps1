@@ -6,8 +6,9 @@ function Get-ReleaseBody {
     }
     else {
         $body = "Release $($Context.Tag)`n"
-        if ($Context.Unit.previousTag) {
-            $body += "`n**Full Changelog**: $($Context.Client.RepositoryUrl)/compare/$($Context.Unit.previousTag)...$($Context.Tag)`n"
+        $previousRelease = Get-PreviousReleaseReference -UnitPlan $Context.Unit
+        if ($previousRelease) {
+            $body += "`n**Full Changelog**: $($Context.Client.RepositoryUrl)/compare/$previousRelease...$($Context.Tag)`n"
         }
     }
     if ($body.Length -le $MaximumLength) {

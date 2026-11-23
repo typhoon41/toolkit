@@ -8,6 +8,9 @@ parameters:
   - name: persistCredentials
     type: boolean
     default: false
+  - name: persistToolkitCredentials   # release jobs with useGitHubServiceConnection: keeps the endpoint's token for the scripts
+    type: boolean
+    default: false
 
 steps:
   - checkout: self
@@ -19,3 +22,4 @@ steps:
   - checkout: ${{ parameters.toolkitRepository }}
     path: toolkit
     fetchDepth: 1
+    persistCredentials: ${{ parameters.persistToolkitCredentials }}

@@ -5,12 +5,13 @@ function New-UnitReleaseNote {
         [string] $Ref = 'HEAD',
         [switch] $SkipPullRequests
     )
-    $range = if ($UnitPlan.previousTag) { "$($UnitPlan.previousTag)..$Ref" } else { $Ref }
+    $previousRelease = Get-PreviousReleaseReference -UnitPlan $UnitPlan
+    $range = if ($previousRelease) { "$previousRelease..$Ref" } else { $Ref }
     $scope = @($UnitPlan.paths)
     $commits = @(Get-FirstParentCommit -Range $range -Scope $scope)
     $entries = @(Get-ReleaseNoteEntry -Client $Client -Commits $commits -Scope $scope -SkipPullRequests:$SkipPullRequests)
 
-    $compareUrl = if ($UnitPlan.previousTag) { "$($Client.RepositoryUrl)/compare/$($UnitPlan.previousTag)...$($UnitPlan.tag)" } else { '' }
+    $compareUrl = if ($previousRelease) { "$($Client.RepositoryUrl)/compare/$previousRelease...$($UnitPlan.tag)" } else { '' }
     $releaseUrl = "$($Client.RepositoryUrl)/releases/tag/$($UnitPlan.tag)"
     [pscustomobject]@{
         Markdown   = ConvertTo-ReleaseNotesMarkdown -Entries $entries -CompareUrl $compareUrl

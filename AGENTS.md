@@ -8,8 +8,9 @@ Shared tooling consumed by other projects, one folder per tool:
 
 - `release/` — PowerShell 7 scripts + Azure Pipelines templates that version, write release notes for, and
   publish NuGet / npm packages and GitHub releases. Projects reference this repository from Azure Pipelines
-  at a **pinned tag** (`resources.repositories` with `ref: refs/tags/vX.Y.Z`); a change reaches a project
-  only when it moves its `ref`, so tag a new `vX.Y.Z` after changes.
+  at `main` (a `resources.repositories` entry without `ref`), so a merged change reaches every project on
+  its next run and nothing is tagged by hand. Keep template parameters and script contracts backward compatible:
+  add parameters with defaults that keep today's behaviour, never rename or remove one in place.
 - `claude/` — the `conventions` Claude Code plugin, published by the root `.claude-plugin/marketplace.json`
   (marketplace `toolkit`). See "Claude plugin (`claude/`)" below.
 
