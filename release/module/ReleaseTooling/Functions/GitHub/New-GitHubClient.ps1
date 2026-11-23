@@ -3,8 +3,12 @@ function New-GitHubClient {
         [Parameter(Mandatory)] [ValidatePattern('^[A-Za-z0-9._-]+/[A-Za-z0-9._-]+$')] [string] $Repository,
         [AllowEmptyString()] [string] $Token,
         [string] $ApiUrl = 'https://api.github.com',
-        [string] $WebUrl = 'https://github.com'
+        [string] $WebUrl = 'https://github.com',
+        [switch] $UseCheckoutCredentials
     )
+    if ($UseCheckoutCredentials) {
+        $Token = Get-CheckoutGitHubToken
+    }
     $headers = @{ Accept = 'application/vnd.github+json'; 'X-GitHub-Api-Version' = '2022-11-28' }
     # An unresolved Azure macro such as "$(GitHubReadToken)" (fork builds get no secrets) means "no token".
     if ($Token -and $Token -notmatch '^\$\(') {

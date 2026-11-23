@@ -14,12 +14,18 @@ parameters:
   - name: npmAuthenticate
     type: boolean
     default: false
+  - name: npmServiceConnection
+    type: string
+    default: ''
   - name: npmrcFile
     type: string
     default: $(Build.SourcesDirectory)/.npmrc
   - name: npmAccess
     type: string
     default: ''
+  - name: useGitHubServiceConnection
+    type: boolean
+    default: false
   - name: trustedFeedHosts
     type: string
     default: ''
@@ -38,6 +44,7 @@ jobs:
             - template: ../steps/checkout.yml       # same commit; tags are fetched after the approval
               parameters:
                 toolkitRepository: ${{ parameters.toolkitRepository }}
+                persistCredentials: ${{ parameters.useGitHubServiceConnection }}
 
             - download: current
               artifact: release
@@ -47,18 +54,20 @@ jobs:
               parameters:
                 nugetAuthenticate: ${{ parameters.nugetAuthenticate }}
                 npmAuthenticate: ${{ parameters.npmAuthenticate }}
+                npmServiceConnection: ${{ parameters.npmServiceConnection }}
                 npmrcFile: ${{ parameters.npmrcFile }}
 
             - template: ../steps/publish-github-release.yml
               parameters:
                 action: Prepare
+                useGitHubServiceConnection: ${{ parameters.useGitHubServiceConnection }}
                 trustedFeedHosts: ${{ parameters.trustedFeedHosts }}
-                npmAuthenticate: ${{ parameters.npmAuthenticate }}
+                npmAuthenticate: ${{ or(parameters.npmAuthenticate, ne(parameters.npmServiceConnection, '')) }}
                 npmrcFile: ${{ parameters.npmrcFile }}
 
             - template: ../steps/publish-packages.yml
               parameters:
-                npmAuthenticate: ${{ parameters.npmAuthenticate }}
+                npmAuthenticate: ${{ or(parameters.npmAuthenticate, ne(parameters.npmServiceConnection, '')) }}
                 npmrcFile: ${{ parameters.npmrcFile }}
                 npmAccess: ${{ parameters.npmAccess }}
                 trustedFeedHosts: ${{ parameters.trustedFeedHosts }}
@@ -66,7 +75,8 @@ jobs:
             - template: ../steps/publish-github-release.yml
               parameters:
                 action: Publish
+                useGitHubServiceConnection: ${{ parameters.useGitHubServiceConnection }}
                 trustedFeedHosts: ${{ parameters.trustedFeedHosts }}
                 feedWaitMinutes: ${{ parameters.feedWaitMinutes }}
-                npmAuthenticate: ${{ parameters.npmAuthenticate }}
+                npmAuthenticate: ${{ or(parameters.npmAuthenticate, ne(parameters.npmServiceConnection, '')) }}
                 npmrcFile: ${{ parameters.npmrcFile }}

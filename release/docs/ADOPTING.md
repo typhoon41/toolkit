@@ -36,6 +36,14 @@ Versions: NuGet units read `<Version>` from the `.csproj`, else from the nearest
 
 Existing tags keep working when their form matches: a single-unit repository uses `v1.2.3`.
 
+**First release.** A unit's notes cover the commits since its previous release tag, so a repository with
+no release tags gets its whole history in the first notes. To start clean, tag the last version published
+before adoption once by hand (`git tag -a v1.1.6 <its commit>`); every later tag comes from the pipeline.
+
+**Switching npm registry.** `package-lock.json` keeps each package's `resolved` URL. When those point at
+a private feed and its `.npmrc` goes away, `npm ci` fails in CI. Rewrite the host to the new registry
+(e.g. `https://registry.npmjs.org/`); the `integrity` hashes stay valid, and `npm ci` verifies them.
+
 ## 2. Pipeline YAML
 
 Reference this repository at a **tag**, so a change here never alters a project's pipeline until the
@@ -50,6 +58,10 @@ resources:
       endpoint: <GitHub service connection>
       ref: refs/tags/v1.0.0
 ```
+
+`endpoint` is the name of a GitHub service connection (**Project settings → Service connections → New →
+GitHub**). This repository is public, so any connection that can read it works; it is only used to fetch the
+templates.
 
 - Packages: copy [../examples/azure-pipelines.packages.yml](../examples/azure-pipelines.packages.yml).
   It uses `templates/stages/package-release.yml` and needs `lockBehavior: sequential` at the root
@@ -69,13 +81,15 @@ The templates check the project out at `$(Build.SourcesDirectory)` and this tool
 | `buildSteps` | `[]` | Your restore/build/test steps (install the SDKs and Node here) |
 | `releaseNotes` | `true` | Generate notes; `false` packs without notes and gives releases a minimal body |
 | `environment` | `package-release` | Approval environment of the Release stage |
-| `releaseVariableGroup` | `release-secrets` | `NuGetApiKey`, `NpmToken`, `GitHubToken` |
+| `releaseVariableGroup` | `release-secrets` | `NuGetApiKey`, `NpmToken`, `GitHubToken`; `''` when service connections replace every secret |
 | `buildVariableGroup` | `''` | Optional group with `GitHubReadToken` for the PR check and the notes |
 | `nugetAuthenticate` / `npmAuthenticate` | `false` | Azure Artifacts feeds instead of API keys; the release job authenticates first, before any feed check (`steps/authenticate-feeds.yml`) |
+| `npmServiceConnection` | `''` | npm service connection used instead of `NpmToken` (see §3) |
+| `useGitHubServiceConnection` | `false` | The pipeline's GitHub service connection instead of `GitHubToken` in the release job (see §3) |
 | `npmAccess` | `''` | `public` for scoped packages on npmjs.org |
 | `enforceCommitConvention` | `false` | Fail PRs whose title/commits don't follow the convention |
 
-## 3. GitHub tokens
+## 3. GitHub tokens and service connections
 
 Fine-grained personal access tokens limited to the repository (a service account if available), with an
 expiry and a rotation reminder:
@@ -89,6 +103,22 @@ Public repositories work without the read token (anonymous, rate-limited per IP;
 IPs, so a token is more reliable). Plus: a **NuGet API key** scoped to *Push* for the package ids, and/or
 an npm **automation token**, both in `release-secrets`.
 
+### Service connections instead of secrets
+
+Both are opt-in; the secret variables stay the default.
+
+- **GitHub** (`useGitHubServiceConnection: true`): the release job checks the repository out with
+  `persistCredentials: true` and uses the token of the GitHub service connection the pipeline itself was created
+  with (pipeline **Edit → ⋮ → Triggers → YAML → Get sources**), not the `endpoint` of the toolkit resource. That
+  connection needs Contents: **write** on the repository: a personal-access-token connection's token needs it, a
+  GitHub App connection gets it from the *Azure Pipelines* app's installation. The Build stage keeps
+  `GitHubReadToken` or anonymous access: it runs pull-request code, so it never persists credentials.
+- **npm** (`npmServiceConnection: <name>`): an *npm* service connection (**Service connections → New → npm**,
+  registry URL plus an automation token). `npmAuthenticate@0` writes its credentials into `npmrcFile`, so commit an
+  `.npmrc` that lists the registry, e.g. `registry=https://registry.npmjs.org/`.
+
+With both connections and no NuGet unit, set `releaseVariableGroup: ''`.
+
 ## 4. Azure DevOps
 
 **Pipelines → Library → `release-secrets`** (every value secret):
@@ -96,12 +126,19 @@ an npm **automation token**, both in `release-secrets`.
 - Approvals and checks → **Branch control**: `refs/heads/main`; tick *Verify branch protection*;
   untick *Allow resources from unknown/unverifiable branches*.
 
-**Pipelines → Environments → `package-release`** and, for applications, **`application-release`** (or your names; the
-application one needs only Branch control and the Exclusive lock, production was approved already), Approvals and checks:
-- **Approvals**: the reviewer; untick *Allow approvers to approve their own runs*.
+**Pipelines → Environments → New environment `package-release`** (resource: None) and, for applications,
+**`application-release`** (or your names; the application one needs only Branch control and the Exclusive lock,
+production was approved already). **Create it before merging the first version bump**: Azure DevOps creates a
+missing environment on its first deployment without any checks, so that release would publish unapproved.
+Approvals and checks:
+- **Approvals**: the reviewer. Untick *Allow approvers to approve their own runs* when a second person reviews;
+  a sole maintainer keeps it allowed, otherwise nobody can approve the run they started by merging.
 - **Branch control**: `refs/heads/main`.
 - **Exclusive lock** (the YAML's `lockBehavior: sequential` goes with it).
 - Pipeline permissions: this pipeline only.
+
+To approve a release, open the run: its Release stage shows *Waiting*; choose **Review → Approve**.
+Rejecting it skips the whole Release stage, so nothing is published.
 
 **Pipeline triggers**: CI on `main`, PR validation on PRs to `main`. Leave *Make secrets available to
 builds of forks* off, and require a team member's comment before building fork PRs.

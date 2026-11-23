@@ -5,7 +5,8 @@
 .DESCRIPTION
     Package units: Prepare (a frozen draft with assets) before the feed push, Publish (creates the tag) after it.
     Abandon and Restore are maintainer-only and need -Unit. Application units: Publish creates release and tag at once.
-    GITHUB_TOKEN needs Contents: write. docs/RELEASING.md lists every refusal.
+    GITHUB_TOKEN needs Contents: write; with -UseCheckoutCredentials the pipeline's GitHub service connection, persisted
+    by the checkout, is used instead. docs/RELEASING.md lists every refusal.
 #>
 [CmdletBinding()]
 param(
@@ -19,7 +20,8 @@ param(
     [int] $MinimumAgeMinutes = 60,
     [int] $FeedWaitMinutes = 15,
     [string] $ApiUrl = 'https://api.github.com',
-    [string] $WebUrl = 'https://github.com'
+    [string] $WebUrl = 'https://github.com',
+    [switch] $UseCheckoutCredentials
 )
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
@@ -33,7 +35,8 @@ try {
     if (-not $Repository) {
         $Repository = Get-GitHubRepositoryName
     }
-    $client = New-GitHubClient -Repository $Repository -Token $env:GITHUB_TOKEN -ApiUrl $ApiUrl -WebUrl $WebUrl
+    $client = New-GitHubClient -Repository $Repository -Token $env:GITHUB_TOKEN -ApiUrl $ApiUrl -WebUrl $WebUrl `
+        -UseCheckoutCredentials:$UseCheckoutCredentials
     if (-not $client.HasToken) {
         throw 'GITHUB_TOKEN is not set.'
     }

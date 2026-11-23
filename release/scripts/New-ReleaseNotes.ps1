@@ -4,7 +4,8 @@
 
 .DESCRIPTION
     In a pipeline: -PlanFile <plan.json> -OutDirectory <dir> -Repository owner/name, a read token in GITHUB_TOKEN.
-    Locally: -Unit <name> -Version 1.4.0 -Preview. Public repositories need no token.
+    Locally: -Unit <name> -Version 1.4.0 -Preview. Public repositories need no token. In a release job,
+    -UseCheckoutCredentials reads the pipeline's GitHub service connection persisted by the checkout instead.
 #>
 [CmdletBinding(DefaultParameterSetName = 'Plan')]
 param(
@@ -17,7 +18,8 @@ param(
     [string] $ApiUrl = 'https://api.github.com',
     [string] $WebUrl = 'https://github.com',
     [switch] $SkipPullRequests,
-    [switch] $Preview
+    [switch] $Preview,
+    [switch] $UseCheckoutCredentials
 )
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
@@ -28,7 +30,8 @@ try {
     if (-not $Repository) {
         $Repository = Get-GitHubRepositoryName
     }
-    $client = New-GitHubClient -Repository $Repository -Token $env:GITHUB_TOKEN -ApiUrl $ApiUrl -WebUrl $WebUrl
+    $client = New-GitHubClient -Repository $Repository -Token $env:GITHUB_TOKEN -ApiUrl $ApiUrl -WebUrl $WebUrl `
+        -UseCheckoutCredentials:$UseCheckoutCredentials
     $units = if ($PSCmdlet.ParameterSetName -eq 'Preview') {
         @(New-PreviewUnitPlan -RepositoryRoot '.' -UnitName $Unit -Version $Version)
     }

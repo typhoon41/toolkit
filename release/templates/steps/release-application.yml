@@ -12,6 +12,9 @@ parameters:
   - name: githubToken              # Contents: write
     type: string
     default: $(GitHubToken)
+  - name: useGitHubServiceConnection   # instead of githubToken; with checkout: false the job's checkout must persist credentials
+    type: boolean
+    default: false
   - name: toolkitRepository
     type: string
     default: toolkit
@@ -24,6 +27,7 @@ steps:
     - template: checkout.yml
       parameters:
         toolkitRepository: ${{ parameters.toolkitRepository }}
+        persistCredentials: ${{ parameters.useGitHubServiceConnection }}
 
   - download: current
     artifact: release
@@ -35,10 +39,12 @@ steps:
         planFile: $(Pipeline.Workspace)/release/release-plan.json
         notesDirectory: $(Pipeline.Workspace)/release/notes
         githubToken: ${{ parameters.githubToken }}
+        useGitHubServiceConnection: ${{ parameters.useGitHubServiceConnection }}
         toolkitPath: ${{ parameters.toolkitPath }}
 
   - template: publish-github-release.yml
     parameters:
       action: Publish
       githubToken: ${{ parameters.githubToken }}
+      useGitHubServiceConnection: ${{ parameters.useGitHubServiceConnection }}
       toolkitPath: ${{ parameters.toolkitPath }}
