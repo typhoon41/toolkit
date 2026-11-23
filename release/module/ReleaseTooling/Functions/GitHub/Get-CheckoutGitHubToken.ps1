@@ -1,8 +1,12 @@
 function Get-CheckoutGitHubToken {
     # Azure Pipelines exposes a GitHub service connection to scripts only through the authorization header that
-    # `checkout` with persistCredentials leaves in the repository's git config.
-    param([string] $RepositoryPath = (Get-Location).Path)
-    $missingMessage = "No GitHub credentials are persisted in $RepositoryPath. Check the repository out with persistCredentials: true."
+    # `checkout` with persistCredentials leaves in the repository's git config. By default that is this toolkit's own
+    # checkout, made with the `endpoint` connection of the consuming pipeline's toolkit resource.
+    param([string] $RepositoryPath)
+    if (-not $RepositoryPath) {
+        $RepositoryPath = [IO.Path]::GetFullPath((Join-Path $MyInvocation.MyCommand.Module.ModuleBase '../../..'))
+    }
+    $missingMessage = "No GitHub credentials are persisted in $RepositoryPath. Check it out with persistCredentials: true."
     try {
         $entries = @(Invoke-Git -C $RepositoryPath config --local --get-regexp '^http\..*extraheader$')
     }

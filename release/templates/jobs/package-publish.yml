@@ -44,7 +44,7 @@ jobs:
             - template: ../steps/checkout.yml       # same commit; tags are fetched after the approval
               parameters:
                 toolkitRepository: ${{ parameters.toolkitRepository }}
-                persistCredentials: ${{ parameters.useGitHubServiceConnection }}
+                persistToolkitCredentials: ${{ parameters.useGitHubServiceConnection }}
 
             - download: current
               artifact: release

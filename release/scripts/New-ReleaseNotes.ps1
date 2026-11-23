@@ -5,7 +5,7 @@
 .DESCRIPTION
     In a pipeline: -PlanFile <plan.json> -OutDirectory <dir> -Repository owner/name, a read token in GITHUB_TOKEN.
     Locally: -Unit <name> -Version 1.4.0 -Preview. Public repositories need no token. In a release job,
-    -UseCheckoutCredentials reads the pipeline's GitHub service connection persisted by the checkout instead.
+    -UseCheckoutCredentials reads the GitHub service connection the toolkit checkout persisted instead.
 #>
 [CmdletBinding(DefaultParameterSetName = 'Plan')]
 param(

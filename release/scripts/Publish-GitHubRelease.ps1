@@ -5,8 +5,8 @@
 .DESCRIPTION
     Package units: Prepare (a frozen draft with assets) before the feed push, Publish (creates the tag) after it.
     Abandon and Restore are maintainer-only and need -Unit. Application units: Publish creates release and tag at once.
-    GITHUB_TOKEN needs Contents: write; with -UseCheckoutCredentials the pipeline's GitHub service connection, persisted
-    by the checkout, is used instead. docs/RELEASING.md lists every refusal.
+    GITHUB_TOKEN needs Contents: write; with -UseCheckoutCredentials the GitHub service connection the toolkit checkout
+    persisted (its resource's endpoint) is used instead. docs/RELEASING.md lists every refusal.
 #>
 [CmdletBinding()]
 param(
