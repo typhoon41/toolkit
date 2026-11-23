@@ -1,5 +1,6 @@
 function ConvertTo-BannedPatternDefinition {
-    # A project rule from .claude/conventions.json (camelCase JSON) in the shape of a BannedPatterns.psd1 entry.
+    # A project rule from .claude/conventions.json (camelCase JSON) in the shape of a BannedPatterns.psd1 entry. An
+    # optional key set to null counts as not set, as for the hook switches.
     param([Parameter(Mandatory)] [AllowNull()] [object] $Rule)
     $definition = @{
         Id         = [string](Get-JsonProperty -Object $Rule -Name 'id' -Default '')
