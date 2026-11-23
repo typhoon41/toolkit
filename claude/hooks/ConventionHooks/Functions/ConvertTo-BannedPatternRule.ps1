@@ -6,6 +6,10 @@ function ConvertTo-BannedPatternRule {
             throw "the rule has no $required."
         }
     }
+    if ($Rule.ContainsKey('Target') -and $Rule.Target -notin 'Text', 'Path') {
+        # Any other value would silently match as Text.
+        throw "the rule's Target must be Text or Path."
+    }
     if ($Rule.ContainsKey('WhenProjectDependsOn')) {
         # Throws on a malformed requirement now, so the guard never fails on it later.
         ConvertTo-DependencyRequirement -Text $Rule.WhenProjectDependsOn | Out-Null

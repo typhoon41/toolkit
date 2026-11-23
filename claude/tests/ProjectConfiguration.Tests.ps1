@@ -128,12 +128,14 @@ Describe 'Invoke-BannedPatternGuard.ps1 with a project configuration' {
     }
 
     It 'skips an invalid project rule and keeps the bundled ones' {
-        $root = New-ConfiguredProject '{ "rules": [ { "id": "broken", "extensions": [".ts"], "pattern": "(", "message": "x" }, { "id": "empty", "extensions": [".ts"], "message": "x" }, { "id": "bad-dependency", "extensions": [".ts"], "pattern": "x", "message": "x", "whenProjectDependsOn": "package>20" } ] }'
+        $root = New-ConfiguredProject '{ "rules": [ { "id": "broken", "extensions": [".ts"], "pattern": "(", "message": "x" }, { "id": "empty", "extensions": [".ts"], "message": "x" }, { "id": "bad-dependency", "extensions": [".ts"], "pattern": "x", "message": "x", "whenProjectDependsOn": "package>20" }, { "id": "bad-target", "extensions": [".ts"], "pattern": "week", "message": "x", "target": "Pth" } ] }'
         $result = Invoke-Hook -Script $script:GuardScript -Payload (New-WritePayload -Root $root -Path (Join-Path $root 'src/week.ts') -Content 'get label() {')
         $result.ExitCode | Should -Be 2
         $result.Output | Should -Match "Ignoring project rule 'broken'"
         $result.Output | Should -Match "Ignoring project rule 'empty'"
         $result.Output | Should -Match "Ignoring project rule 'bad-dependency'"
+        $result.Output | Should -Match "Ignoring project rule 'bad-target': the rule's Target must be Text or Path"
+        $result.Output | Should -Not -Match '- bad-target:'
         $result.Output | Should -Match 'getter'
     }
 
