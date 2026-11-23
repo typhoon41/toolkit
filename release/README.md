@@ -57,7 +57,7 @@ and those parameters; the `NuGetApiKey` / `NpmToken` variables are used instead.
 
 Service connections instead of secrets ([docs/ADOPTING.md](docs/ADOPTING.md#service-connections-instead-of-secrets)):
 pass `npmServiceConnection` to `authenticate-feeds.yml` and `npmAuthenticate: true` to the later npm steps; for
-GitHub, give `checkout.yml` `persistCredentials: true` and both `publish-github-release.yml` steps
+GitHub, give `checkout.yml` `persistToolkitCredentials: true` and both `publish-github-release.yml` steps
 `useGitHubServiceConnection: true`.
 
 ## Layout
@@ -88,4 +88,4 @@ Invoke-Pester ./tests                       # Pester 5.6+
 './module', './scripts' | ForEach-Object { Invoke-ScriptAnalyzer -Path $_ -Recurse -Settings ./PSScriptAnalyzerSettings.psd1 }
 ```
 
-Tag a version of this repository (`vX.Y.Z`) after changes; projects move to it by changing their `ref`.
+Projects reference `main` (`ref: refs/heads/main`), so a merged change reaches them on their next run; nothing is tagged by hand.

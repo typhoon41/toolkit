@@ -36,9 +36,10 @@ Versions: NuGet units read `<Version>` from the `.csproj`, else from the nearest
 
 Existing tags keep working when their form matches: a single-unit repository uses `v1.2.3`.
 
-**First release.** A unit's notes cover the commits since its previous release tag, so a repository with
-no release tags gets its whole history in the first notes. To start clean, tag the last version published
-before adoption once by hand (`git tag -a v1.1.6 <its commit>`); every later tag comes from the pipeline.
+**No tags by hand.** The version in `package.json` / the `.csproj` is the only thing you change; the pipeline
+creates every release tag. A unit's notes cover the commits since its previous release tag, and before the first
+one (a repository adopting the tooling), since the commit that set the previous version: bumping 1.1.6 to 1.1.7
+lists only the commits after the one that set 1.1.6.
 
 **Switching npm registry.** `package-lock.json` keeps each package's `resolved` URL. When those point at
 a private feed and its `.npmrc` goes away, `npm ci` fails in CI. Rewrite the host to the new registry
@@ -46,8 +47,7 @@ a private feed and its `.npmrc` goes away, `npm ci` fails in CI. Rewrite the hos
 
 ## 2. Pipeline YAML
 
-Reference this repository at a **tag**, so a change here never alters a project's pipeline until the
-project moves its `ref`:
+Reference this repository's `main` branch:
 
 ```yaml
 resources:
@@ -56,12 +56,13 @@ resources:
       type: github
       name: typhoon41/toolkit
       endpoint: <GitHub service connection>
-      ref: refs/tags/v1.0.0
+      ref: refs/heads/main
 ```
 
-`endpoint` is the name of a GitHub service connection (**Project settings → Service connections → New →
-GitHub**). This repository is public, so any connection that can read it works; it is only used to fetch the
-templates.
+A change merged here reaches every project's next run; `main` takes changes only through reviewed PRs with
+passing CI. `endpoint` is the name of a GitHub service connection (**Project settings → Service connections →
+New → GitHub**). It fetches the templates, so any connection that can read this public repository works; with
+`useGitHubServiceConnection` it also creates the GitHub releases (§3).
 
 - Packages: copy [../examples/azure-pipelines.packages.yml](../examples/azure-pipelines.packages.yml).
   It uses `templates/stages/package-release.yml` and needs `lockBehavior: sequential` at the root
@@ -85,7 +86,7 @@ The templates check the project out at `$(Build.SourcesDirectory)` and this tool
 | `buildVariableGroup` | `''` | Optional group with `GitHubReadToken` for the PR check and the notes |
 | `nugetAuthenticate` / `npmAuthenticate` | `false` | Azure Artifacts feeds instead of API keys; the release job authenticates first, before any feed check (`steps/authenticate-feeds.yml`) |
 | `npmServiceConnection` | `''` | npm service connection used instead of `NpmToken` (see §3) |
-| `useGitHubServiceConnection` | `false` | The pipeline's GitHub service connection instead of `GitHubToken` in the release job (see §3) |
+| `useGitHubServiceConnection` | `false` | The toolkit resource's `endpoint` connection instead of `GitHubToken` in the release job (see §3) |
 | `npmAccess` | `''` | `public` for scoped packages on npmjs.org |
 | `enforceCommitConvention` | `false` | Fail PRs whose title/commits don't follow the convention |
 
@@ -107,12 +108,12 @@ an npm **automation token**, both in `release-secrets`.
 
 Both are opt-in; the secret variables stay the default.
 
-- **GitHub** (`useGitHubServiceConnection: true`): the release job checks the repository out with
-  `persistCredentials: true` and uses the token of the GitHub service connection the pipeline itself was created
-  with (pipeline **Edit → ⋮ → Triggers → YAML → Get sources**), not the `endpoint` of the toolkit resource. That
-  connection needs Contents: **write** on the repository: a personal-access-token connection's token needs it, a
-  GitHub App connection gets it from the *Azure Pipelines* app's installation. The Build stage keeps
-  `GitHubReadToken` or anonymous access: it runs pull-request code, so it never persists credentials.
+- **GitHub** (`useGitHubServiceConnection: true`): the release job checks the toolkit out with
+  `persistCredentials: true` and uses the token of its resource's `endpoint`, the connection named in your YAML.
+  That connection needs Contents: **write** on the project repository too: a personal-access-token connection's
+  token needs that scope, a GitHub App connection needs the *Azure Pipelines* app installed on the project
+  repository. The Build stage keeps `GitHubReadToken` or anonymous access: it runs pull-request code, so it never
+  persists credentials.
 - **npm** (`npmServiceConnection: <name>`): an *npm* service connection (**Service connections → New → npm**,
   registry URL plus an automation token). `npmAuthenticate@0` writes its credentials into `npmrcFile`, so commit an
   `.npmrc` that lists the registry, e.g. `registry=https://registry.npmjs.org/`.
