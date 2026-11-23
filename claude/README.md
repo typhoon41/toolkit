@@ -100,7 +100,8 @@ hook run as XML. For NuGet, a dependency is a `PackageReference Include` in that
 earlier in MSBuild's evaluation order (in `Directory.Build.props` before the project, or above it in the same file). A central `PackageVersion` in `Directory.Packages.props`
 only supplies the version of a reference; on its own it is not a dependency. A requirement written
 `package>=major` also checks the declared major version; an npm range passes when any of its `||` alternatives
-does.
+does. Sibling `.csproj` files in one folder are read as separate projects, and the requirement passes when any of
+them qualifies.
 
 ## Project configuration
 

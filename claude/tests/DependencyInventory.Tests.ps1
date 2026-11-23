@@ -221,6 +221,23 @@ Describe 'New-DependencyInventory with NuGet' {
         Test-Dependency $script:File 'Gmf.DDD.Common' | Should -BeTrue
     }
 
+    It 'keeps an Update in sibling <Updating> away from the Include in sibling <Including>' -ForEach @(
+        @{ Updating = 'A.csproj'; Including = 'B.csproj' }
+        @{ Updating = 'B.csproj'; Including = 'A.csproj' }
+    ) {
+        Set-Content -LiteralPath (Join-Path $script:Project $Updating) -Value '<Project><ItemGroup><PackageReference Update="Gmf.DDD.Common" Version="2.0.0" /></ItemGroup></Project>'
+        Set-Content -LiteralPath (Join-Path $script:Project $Including) -Value '<Project><ItemGroup><PackageReference Include="Gmf.DDD.Common" Version="1.0.0" /></ItemGroup></Project>'
+        Test-Dependency $script:File 'Gmf.DDD.Common>=1' | Should -BeTrue
+        Test-Dependency $script:File 'Gmf.DDD.Common>=2' | Should -BeFalse
+    }
+
+    It 'is satisfied when any sibling project declares a qualifying version' {
+        Set-Content -LiteralPath (Join-Path $script:Project 'Api.csproj') -Value '<Project><ItemGroup><PackageReference Include="Gmf.DDD.Common" Version="1.0.0" /></ItemGroup></Project>'
+        Set-Content -LiteralPath (Join-Path $script:Project 'Api.Tools.csproj') -Value '<Project><ItemGroup><PackageReference Include="Gmf.DDD.Common" Version="2.0.0" /></ItemGroup></Project>'
+        Test-Dependency $script:File 'Gmf.DDD.Common>=2' | Should -BeTrue
+        Test-Dependency $script:File 'Gmf.DDD.Common>=3' | Should -BeFalse
+    }
+
     It 'takes the version of the nearer Include when a package is included twice' {
         Set-Content -LiteralPath (Join-Path $script:Solution 'Directory.Build.props') -Value '<Project><ItemGroup><PackageReference Include="Gmf.DDD.Common" Version="1.0.0" /></ItemGroup></Project>'
         Set-Content -LiteralPath (Join-Path $script:Solution 'src/Directory.Build.props') -Value '<Project><Import Project="$([MSBuild]::GetPathOfFileAbove(''Directory.Build.props'', ''$(MSBuildThisFileDirectory)../''))" /></Project>'
