@@ -1,5 +1,6 @@
-# Run before any step that reads or writes an Azure Artifacts feed. With npmAuthenticate, pass the same
-# npmAuthenticate/npmrcFile to the later steps so npm uses that file.
+# Run before any step that reads or writes an Azure Artifacts feed or uses an npm service connection. With
+# npmAuthenticate or npmServiceConnection, pass npmAuthenticate: true and the same npmrcFile to the later steps so
+# npm uses that file. npmAuthenticate@0 adds credentials only for registries the file lists (registry=...).
 
 parameters:
   - name: nugetAuthenticate
@@ -8,6 +9,9 @@ parameters:
   - name: npmAuthenticate
     type: boolean
     default: false
+  - name: npmServiceConnection     # external npm service connection(s), comma-separated, e.g. for npmjs.org
+    type: string
+    default: ''
   - name: npmrcFile
     type: string
     default: $(Build.SourcesDirectory)/.npmrc
@@ -17,8 +21,10 @@ steps:
     - task: NuGetAuthenticate@1
       displayName: Authenticate to NuGet feeds
 
-  - ${{ if parameters.npmAuthenticate }}:
+  - ${{ if or(parameters.npmAuthenticate, ne(parameters.npmServiceConnection, '')) }}:
     - task: npmAuthenticate@0
       displayName: Authenticate to npm feeds
       inputs:
         workingFile: ${{ parameters.npmrcFile }}
+        ${{ if ne(parameters.npmServiceConnection, '') }}:
+          customEndpoint: ${{ parameters.npmServiceConnection }}

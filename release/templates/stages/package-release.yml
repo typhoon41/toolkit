@@ -39,12 +39,18 @@ parameters:
   - name: npmAuthenticate
     type: boolean
     default: false
+  - name: npmServiceConnection     # npm service connection used instead of NpmToken (needs a committed .npmrc)
+    type: string
+    default: ''
   - name: npmrcFile
     type: string
     default: $(Build.SourcesDirectory)/.npmrc
   - name: npmAccess
     type: string
     default: ''
+  - name: useGitHubServiceConnection   # the pipeline's own GitHub connection instead of GitHubToken (release job only)
+    type: boolean
+    default: false
   - name: trustedFeedHosts         # comma-separated extra feed hosts that may get NuGetApiKey / NpmToken
     type: string
     default: ''
@@ -72,8 +78,9 @@ stages:
     dependsOn: Build
     condition: and(succeeded(), eq(dependencies.Build.outputs['BuildJob.ReleasePlan.HasRelease'], 'true'))
     pool: ${{ parameters.pool }}
-    variables:
-      - group: ${{ parameters.releaseVariableGroup }}
+    ${{ if ne(parameters.releaseVariableGroup, '') }}:   # '' when service connections replace every secret
+      variables:
+        - group: ${{ parameters.releaseVariableGroup }}
     jobs:
       - template: ../jobs/package-publish.yml
         parameters:
@@ -81,7 +88,9 @@ stages:
           feedWaitMinutes: ${{ parameters.feedWaitMinutes }}
           nugetAuthenticate: ${{ parameters.nugetAuthenticate }}
           npmAuthenticate: ${{ parameters.npmAuthenticate }}
+          npmServiceConnection: ${{ parameters.npmServiceConnection }}
           npmrcFile: ${{ parameters.npmrcFile }}
           npmAccess: ${{ parameters.npmAccess }}
+          useGitHubServiceConnection: ${{ parameters.useGitHubServiceConnection }}
           trustedFeedHosts: ${{ parameters.trustedFeedHosts }}
           toolkitRepository: ${{ parameters.toolkitRepository }}

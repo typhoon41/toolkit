@@ -55,6 +55,11 @@ Pass `nugetAuthenticate` only to `authenticate-feeds.yml`. Give `npmAuthenticate
 step that reads or writes the npm feed. With nuget.org and npmjs.org, leave out `authenticate-feeds.yml`
 and those parameters; the `NuGetApiKey` / `NpmToken` variables are used instead.
 
+Service connections instead of secrets ([docs/ADOPTING.md](docs/ADOPTING.md#service-connections-instead-of-secrets)):
+pass `npmServiceConnection` to `authenticate-feeds.yml` and `npmAuthenticate: true` to the later npm steps; for
+GitHub, give `checkout.yml` `persistCredentials: true` and both `publish-github-release.yml` steps
+`useGitHubServiceConnection: true`.
+
 ## Layout
 
 | Path | Contents |

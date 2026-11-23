@@ -81,13 +81,15 @@ The templates check the project out at `$(Build.SourcesDirectory)` and this tool
 | `buildSteps` | `[]` | Your restore/build/test steps (install the SDKs and Node here) |
 | `releaseNotes` | `true` | Generate notes; `false` packs without notes and gives releases a minimal body |
 | `environment` | `package-release` | Approval environment of the Release stage |
-| `releaseVariableGroup` | `release-secrets` | `NuGetApiKey`, `NpmToken`, `GitHubToken` |
+| `releaseVariableGroup` | `release-secrets` | `NuGetApiKey`, `NpmToken`, `GitHubToken`; `''` when service connections replace every secret |
 | `buildVariableGroup` | `''` | Optional group with `GitHubReadToken` for the PR check and the notes |
 | `nugetAuthenticate` / `npmAuthenticate` | `false` | Azure Artifacts feeds instead of API keys; the release job authenticates first, before any feed check (`steps/authenticate-feeds.yml`) |
+| `npmServiceConnection` | `''` | npm service connection used instead of `NpmToken` (see §3) |
+| `useGitHubServiceConnection` | `false` | The pipeline's GitHub service connection instead of `GitHubToken` in the release job (see §3) |
 | `npmAccess` | `''` | `public` for scoped packages on npmjs.org |
 | `enforceCommitConvention` | `false` | Fail PRs whose title/commits don't follow the convention |
 
-## 3. GitHub tokens
+## 3. GitHub tokens and service connections
 
 Fine-grained personal access tokens limited to the repository (a service account if available), with an
 expiry and a rotation reminder:
@@ -100,6 +102,22 @@ expiry and a rotation reminder:
 Public repositories work without the read token (anonymous, rate-limited per IP; hosted agents share
 IPs, so a token is more reliable). Plus: a **NuGet API key** scoped to *Push* for the package ids, and/or
 an npm **automation token**, both in `release-secrets`.
+
+### Service connections instead of secrets
+
+Both are opt-in; the secret variables stay the default.
+
+- **GitHub** (`useGitHubServiceConnection: true`): the release job checks the repository out with
+  `persistCredentials: true` and uses the token of the GitHub service connection the pipeline itself was created
+  with (pipeline **Edit → ⋮ → Triggers → YAML → Get sources**), not the `endpoint` of the toolkit resource. That
+  connection needs Contents: **write** on the repository: a personal-access-token connection's token needs it, a
+  GitHub App connection gets it from the *Azure Pipelines* app's installation. The Build stage keeps
+  `GitHubReadToken` or anonymous access: it runs pull-request code, so it never persists credentials.
+- **npm** (`npmServiceConnection: <name>`): an *npm* service connection (**Service connections → New → npm**,
+  registry URL plus an automation token). `npmAuthenticate@0` writes its credentials into `npmrcFile`, so commit an
+  `.npmrc` that lists the registry, e.g. `registry=https://registry.npmjs.org/`.
+
+With both connections and no NuGet unit, set `releaseVariableGroup: ''`.
 
 ## 4. Azure DevOps
 

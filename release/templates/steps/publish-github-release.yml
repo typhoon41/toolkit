@@ -10,6 +10,9 @@ parameters:
   - name: githubToken
     type: string
     default: $(GitHubToken)
+  - name: useGitHubServiceConnection   # instead of githubToken; needs checkout.yml with persistCredentials: true
+    type: boolean
+    default: false
   - name: feedWaitMinutes          # Publish: how long to wait for the feed to index the pushed packages
     type: number
     default: 15
@@ -38,7 +41,8 @@ steps:
         -NotesDirectory (Join-Path $env:RELEASE_DIRECTORY 'notes') `
         -Repository $env:BUILD_REPOSITORY_NAME `
         -FeedWaitMinutes ([int]$env:FEED_WAIT_MINUTES) `
-        -TrustedFeedHost $env:TRUSTED_FEED_HOSTS
+        -TrustedFeedHost $env:TRUSTED_FEED_HOSTS `
+        -UseCheckoutCredentials:([bool]::Parse($env:USE_CHECKOUT_CREDENTIALS))
     displayName: ${{ parameters.action }} GitHub release
     workingDirectory: $(Build.SourcesDirectory)
     target:
@@ -48,7 +52,9 @@ steps:
       TOOLKIT_PATH: ${{ parameters.toolkitPath }}
       RELEASE_ACTION: ${{ parameters.action }}
       RELEASE_DIRECTORY: ${{ parameters.releaseDirectory }}
-      GITHUB_TOKEN: ${{ parameters.githubToken }}
+      USE_CHECKOUT_CREDENTIALS: ${{ parameters.useGitHubServiceConnection }}
+      ${{ if not(parameters.useGitHubServiceConnection) }}:
+        GITHUB_TOKEN: ${{ parameters.githubToken }}
       FEED_WAIT_MINUTES: ${{ parameters.feedWaitMinutes }}
       TRUSTED_FEED_HOSTS: ${{ parameters.trustedFeedHosts }}
       NUGET_FEED_READ_TOKEN: $(System.AccessToken)     # sent only to Azure Artifacts hosts
