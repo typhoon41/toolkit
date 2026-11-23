@@ -1,6 +1,6 @@
 function Read-NpmManifest {
-    # Package → declared version from the nearest package.json above the file (dependencies, devDependencies and
-    # peerDependencies, which Angular libraries use). Empty without a readable manifest.
+    # Package → declared version from the nearest package.json above the file (dependencies, devDependencies,
+    # optionalDependencies and peerDependencies, which Angular libraries use). Empty without a readable manifest.
     param([Parameter(Mandatory)] [string] $Path)
     $packages = @{}
     $folder = Split-Path -Parent ([IO.Path]::GetFullPath($Path))
@@ -13,7 +13,7 @@ function Read-NpmManifest {
             catch {
                 return $packages
             }
-            foreach ($section in 'dependencies', 'devDependencies', 'peerDependencies') {
+            foreach ($section in 'dependencies', 'devDependencies', 'optionalDependencies', 'peerDependencies') {
                 if ($project[$section] -is [Collections.IDictionary]) {
                     foreach ($package in $project[$section].Keys) {
                         $packages[$package] = [string]$project[$section][$package]

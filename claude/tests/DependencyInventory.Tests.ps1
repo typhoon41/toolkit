@@ -125,6 +125,11 @@ Describe 'New-DependencyInventory with npm' {
         Test-Dependency (Join-Path $root 'src/app/card.ts') '@angular/core' | Should -BeTrue
     }
 
+    It 'finds an optional dependency' {
+        $root = New-ProjectFolder '{ "optionalDependencies": { "@angular/core": "^20.0.0" } }'
+        Test-Dependency (Join-Path $root 'src/app/card.ts') '@angular/core>=20' | Should -BeTrue
+    }
+
     It 'is false when the project does not depend on the package' {
         $root = New-ProjectFolder '{ "dependencies": { "express": "^5.0.0" } }'
         Test-Dependency (Join-Path $root 'src/app/server.ts') '@angular/core' | Should -BeFalse
