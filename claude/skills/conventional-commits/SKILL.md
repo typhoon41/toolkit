@@ -6,7 +6,7 @@ description: Commit message and pull request title format (Conventional Commits)
 # Commits and PR titles
 
 What a commit says is what a release note or a reviewer reads, so each one describes a single change in the format
-below. A repository releasing through the toolkit `release/` tooling also follows `toolkit-release`.
+below.
 
 ## Format
 

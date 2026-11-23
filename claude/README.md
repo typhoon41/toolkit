@@ -75,6 +75,9 @@ it:
 | `scss-solutions` | `package.json` depends on `@typhoon41/scss-solutions` | Its utility classes and mixins |
 | `toolkit-release` | (by description) the repository has a root `release.json` for the toolkit `release/` tooling | Release-note sections, version bumps |
 
+`toolkit-release` is the one integration the hook does not gate: there is no package dependency to detect, so its
+description decides when Claude loads it.
+
 Every rule has one owner. When a convention changes, edit the skill that owns it and nothing else. Integration
 skills build on core ones, framework skills on framework-free ones (`angular` on `typescript` and `html-scss`), and
 never the other way round. Repository facts (component names, locale files, folder paths) belong in the project's
