@@ -164,6 +164,13 @@ Describe 'New-DependencyInventory with NuGet' {
         $script:File = Join-Path $script:Project 'Controllers/EntryController.cs'
     }
 
+    It 'judges a package that package.json also declares by its npm range alone' {
+        Set-Content -LiteralPath (Join-Path $script:Project 'Api.csproj') -Value '<Project><ItemGroup><PackageReference Include="shared-package" /></ItemGroup></Project>'
+        Set-Content -LiteralPath (Join-Path $script:Project 'package.json') -Value '{ "dependencies": { "shared-package": "^19.0.0" } }'
+        Test-Dependency $script:File 'shared-package' | Should -BeTrue
+        Test-Dependency $script:File 'shared-package>=20' | Should -BeFalse
+    }
+
     It 'finds a PackageReference in the nearest .csproj' {
         Set-Content -LiteralPath (Join-Path $script:Project 'Api.csproj') -Value '<Project><ItemGroup><PackageReference Include="Gmf.DDD.Common" Version="2.1.0" /></ItemGroup></Project>'
         Test-Dependency $script:File 'Gmf.DDD.Common' | Should -BeTrue
