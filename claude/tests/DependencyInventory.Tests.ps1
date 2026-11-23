@@ -240,6 +240,25 @@ Describe 'New-DependencyInventory with NuGet' {
         Test-Dependency $script:File 'Gmf.DDD.Common>=3' | Should -BeFalse
     }
 
+    It 'ignores a Directory.Build.props Update that MSBuild evaluates before the project Include' {
+        Set-Content -LiteralPath (Join-Path $script:Solution 'src/Directory.Build.props') -Value '<Project><ItemGroup><PackageReference Update="Gmf.DDD.Common" Version="2.0.0" /></ItemGroup></Project>'
+        Set-Content -LiteralPath (Join-Path $script:Project 'Api.csproj') -Value '<Project><ItemGroup><PackageReference Include="Gmf.DDD.Common" Version="1.0.0" /></ItemGroup></Project>'
+        Test-Dependency $script:File 'Gmf.DDD.Common>=1' | Should -BeTrue
+        Test-Dependency $script:File 'Gmf.DDD.Common>=2' | Should -BeFalse
+    }
+
+    It 'applies an Update below its Include in the same file' {
+        Set-Content -LiteralPath (Join-Path $script:Project 'Api.csproj') -Value ('<Project><ItemGroup><PackageReference Include="Gmf.DDD.Common" Version="1.0.0" />' +
+            '<PackageReference Update="Gmf.DDD.Common" Version="2.0.0" /></ItemGroup></Project>')
+        Test-Dependency $script:File 'Gmf.DDD.Common>=2' | Should -BeTrue
+    }
+
+    It 'ignores an Update above its Include in the same file' {
+        Set-Content -LiteralPath (Join-Path $script:Project 'Api.csproj') -Value ('<Project><ItemGroup><PackageReference Update="Gmf.DDD.Common" Version="2.0.0" />' +
+            '<PackageReference Include="Gmf.DDD.Common" Version="1.0.0" /></ItemGroup></Project>')
+        Test-Dependency $script:File 'Gmf.DDD.Common>=2' | Should -BeFalse
+    }
+
     It 'reads no Directory.Build.props outside a .NET project' {
         Set-Content -LiteralPath (Join-Path $script:Solution 'Directory.Build.props') -Value '<Project><ItemGroup><PackageReference Include="Gmf.DDD.Common" /></ItemGroup></Project>'
         Test-Dependency $script:File 'Gmf.DDD.Common' | Should -BeFalse

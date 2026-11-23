@@ -96,8 +96,8 @@ All hooks are PowerShell 7 scripts in `hooks/` sharing the `ConventionHooks` mod
 A dependency is detected from the file's nearest `package.json` (npm) or nearest `.csproj` (NuGet), read once per
 hook run as XML. For NuGet, a dependency is a `PackageReference Include` in that `.csproj` or in the
 `Directory.Build.props` MSBuild imports for it (the nearest one, and any it imports with `GetPathOfFileAbove`), or a
-`ProjectReference` to `<Package>.csproj`. A `PackageReference Update` only changes the version of a package already
-included. A central `PackageVersion` in `Directory.Packages.props`
+`ProjectReference` to `<Package>.csproj`. A `PackageReference Update` only changes the version of a package included
+earlier in MSBuild's evaluation order (in `Directory.Build.props` before the project, or above it in the same file). A central `PackageVersion` in `Directory.Packages.props`
 only supplies the version of a reference; on its own it is not a dependency. A requirement written
 `package>=major` also checks the declared major version; an npm range passes when any of its `||` alternatives
 does.
