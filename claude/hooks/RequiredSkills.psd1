@@ -3,9 +3,10 @@
     with the extension is edited. WhenProjectDependsOn adds skills when the file's project depends on the package:
     the nearest package.json for npm; for NuGet a PackageReference in the nearest .csproj or in the
     Directory.Build.props chain MSBuild imports for it, or a ProjectReference to <Package>.csproj
-    (New-DependencyInventory). 'package>=major' also requires that
-    major version, so a framework or library skill is required only where it applies. Skills that apply only
-    conditionally otherwise (accessibility, toolkit-release) are not gated: their descriptions decide.
+    (New-DependencyInventory). For npm, 'package>=major' also requires that major version, so a framework skill is
+    required only where it applies; NuGet packages are detected by presence only, so their minimum is not checked.
+    Skills that apply only conditionally otherwise (accessibility, toolkit-release) are not gated: their
+    descriptions decide.
 #>
 @{
     Extensions           = @{

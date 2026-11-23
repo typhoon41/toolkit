@@ -167,13 +167,11 @@ Describe 'New-DependencyInventory with NuGet' {
     It 'finds a PackageReference in the nearest .csproj' {
         Set-Content -LiteralPath (Join-Path $script:Project 'Api.csproj') -Value '<Project><ItemGroup><PackageReference Include="Gmf.DDD.Common" Version="2.1.0" /></ItemGroup></Project>'
         Test-Dependency $script:File 'Gmf.DDD.Common' | Should -BeTrue
-        Test-Dependency $script:File 'Gmf.DDD.Common>=3' | Should -BeFalse
     }
 
-    It 'reads a four-part NuGet interval in a PackageReference' {
-        Set-Content -LiteralPath (Join-Path $script:Project 'Api.csproj') -Value '<Project><ItemGroup><PackageReference Include="Gmf.DDD.Common" Version="[1.0.0.0,2.0.0.0)" /></ItemGroup></Project>'
-        Test-Dependency $script:File 'Gmf.DDD.Common' | Should -BeTrue
-        Test-Dependency $script:File 'Gmf.DDD.Common>=20' | Should -BeFalse
+    It 'detects NuGet packages by presence only: any major passes' {
+        Set-Content -LiteralPath (Join-Path $script:Project 'Api.csproj') -Value '<Project><ItemGroup><PackageReference Include="Gmf.DDD.Common" Version="1.0.0" /></ItemGroup></Project>'
+        Test-Dependency $script:File 'Gmf.DDD.Common>=20' | Should -BeTrue
     }
 
     It 'finds a ProjectReference to the library built from source' {
@@ -188,17 +186,10 @@ Describe 'New-DependencyInventory with NuGet' {
         Test-Dependency $script:File 'Gmf.Mail.Common' | Should -BeFalse
     }
 
-    It 'takes the version of a reference without one from Directory.Packages.props' {
-        Set-Content -LiteralPath (Join-Path $script:Project 'Api.csproj') -Value '<Project><ItemGroup><PackageReference Include="Gmf.Mail.Common" /></ItemGroup></Project>'
-        Set-Content -LiteralPath (Join-Path $script:Solution 'Directory.Packages.props') -Value '<Project><ItemGroup><PackageVersion Include="Gmf.Mail.Common" Version="1.4.0" /></ItemGroup></Project>'
-        Test-Dependency $script:File 'Gmf.Mail.Common' | Should -BeTrue
-        Test-Dependency $script:File 'Gmf.Mail.Common>=2' | Should -BeFalse
-    }
-
     It 'finds a PackageReference in Directory.Build.props above the project' {
         Set-Content -LiteralPath (Join-Path $script:Project 'Api.csproj') -Value '<Project />'
         Set-Content -LiteralPath (Join-Path $script:Solution 'Directory.Build.props') -Value '<Project><ItemGroup><PackageReference Include="Gmf.DDD.Common"><Version>2.0.0</Version></PackageReference></ItemGroup></Project>'
-        Test-Dependency $script:File 'Gmf.DDD.Common>=2' | Should -BeTrue
+        Test-Dependency $script:File 'Gmf.DDD.Common' | Should -BeTrue
     }
 
     It 'ignores a parent Directory.Build.props that the nearest one does not import' {
@@ -221,59 +212,9 @@ Describe 'New-DependencyInventory with NuGet' {
         Test-Dependency $script:File 'Gmf.DDD.Common' | Should -BeTrue
     }
 
-    It 'keeps an Update in sibling <Updating> away from the Include in sibling <Including>' -ForEach @(
-        @{ Updating = 'A.csproj'; Including = 'B.csproj' }
-        @{ Updating = 'B.csproj'; Including = 'A.csproj' }
-    ) {
-        Set-Content -LiteralPath (Join-Path $script:Project $Updating) -Value '<Project><ItemGroup><PackageReference Update="Gmf.DDD.Common" Version="2.0.0" /></ItemGroup></Project>'
-        Set-Content -LiteralPath (Join-Path $script:Project $Including) -Value '<Project><ItemGroup><PackageReference Include="Gmf.DDD.Common" Version="1.0.0" /></ItemGroup></Project>'
-        Test-Dependency $script:File 'Gmf.DDD.Common>=1' | Should -BeTrue
-        Test-Dependency $script:File 'Gmf.DDD.Common>=2' | Should -BeFalse
-    }
-
-    It 'is satisfied when any sibling project declares a qualifying version' {
-        Set-Content -LiteralPath (Join-Path $script:Project 'Api.csproj') -Value '<Project><ItemGroup><PackageReference Include="Gmf.DDD.Common" Version="1.0.0" /></ItemGroup></Project>'
-        Set-Content -LiteralPath (Join-Path $script:Project 'Api.Tools.csproj') -Value '<Project><ItemGroup><PackageReference Include="Gmf.DDD.Common" Version="2.0.0" /></ItemGroup></Project>'
-        Test-Dependency $script:File 'Gmf.DDD.Common>=2' | Should -BeTrue
-        Test-Dependency $script:File 'Gmf.DDD.Common>=3' | Should -BeFalse
-    }
-
-    It 'takes the version of the nearer Include when a package is included twice' {
-        Set-Content -LiteralPath (Join-Path $script:Solution 'Directory.Build.props') -Value '<Project><ItemGroup><PackageReference Include="Gmf.DDD.Common" Version="1.0.0" /></ItemGroup></Project>'
-        Set-Content -LiteralPath (Join-Path $script:Solution 'src/Directory.Build.props') -Value '<Project><Import Project="$([MSBuild]::GetPathOfFileAbove(''Directory.Build.props'', ''$(MSBuildThisFileDirectory)../''))" /></Project>'
-        Set-Content -LiteralPath (Join-Path $script:Project 'Api.csproj') -Value '<Project><ItemGroup><PackageReference Include="Gmf.DDD.Common" Version="2.0.0" /></ItemGroup></Project>'
-        Test-Dependency $script:File 'Gmf.DDD.Common>=2' | Should -BeTrue
-    }
-
     It 'does not count a PackageReference Update without an Include' {
         Set-Content -LiteralPath (Join-Path $script:Project 'Api.csproj') -Value '<Project><ItemGroup><PackageReference Update="Gmf.DDD.Common" Version="2.0.0" /></ItemGroup></Project>'
         Test-Dependency $script:File 'Gmf.DDD.Common' | Should -BeFalse
-    }
-
-    It 'takes the version of an included package from a PackageReference Update' {
-        Set-Content -LiteralPath (Join-Path $script:Solution 'src/Directory.Build.props') -Value '<Project><ItemGroup><PackageReference Include="Gmf.DDD.Common" /></ItemGroup></Project>'
-        Set-Content -LiteralPath (Join-Path $script:Project 'Api.csproj') -Value '<Project><ItemGroup><PackageReference Update="Gmf.DDD.Common" Version="2.0.0" /></ItemGroup></Project>'
-        Test-Dependency $script:File 'Gmf.DDD.Common>=2' | Should -BeTrue
-        Test-Dependency $script:File 'Gmf.DDD.Common>=3' | Should -BeFalse
-    }
-
-    It 'ignores a Directory.Build.props Update that MSBuild evaluates before the project Include' {
-        Set-Content -LiteralPath (Join-Path $script:Solution 'src/Directory.Build.props') -Value '<Project><ItemGroup><PackageReference Update="Gmf.DDD.Common" Version="2.0.0" /></ItemGroup></Project>'
-        Set-Content -LiteralPath (Join-Path $script:Project 'Api.csproj') -Value '<Project><ItemGroup><PackageReference Include="Gmf.DDD.Common" Version="1.0.0" /></ItemGroup></Project>'
-        Test-Dependency $script:File 'Gmf.DDD.Common>=1' | Should -BeTrue
-        Test-Dependency $script:File 'Gmf.DDD.Common>=2' | Should -BeFalse
-    }
-
-    It 'applies an Update below its Include in the same file' {
-        Set-Content -LiteralPath (Join-Path $script:Project 'Api.csproj') -Value ('<Project><ItemGroup><PackageReference Include="Gmf.DDD.Common" Version="1.0.0" />' +
-            '<PackageReference Update="Gmf.DDD.Common" Version="2.0.0" /></ItemGroup></Project>')
-        Test-Dependency $script:File 'Gmf.DDD.Common>=2' | Should -BeTrue
-    }
-
-    It 'ignores an Update above its Include in the same file' {
-        Set-Content -LiteralPath (Join-Path $script:Project 'Api.csproj') -Value ('<Project><ItemGroup><PackageReference Update="Gmf.DDD.Common" Version="2.0.0" />' +
-            '<PackageReference Include="Gmf.DDD.Common" Version="1.0.0" /></ItemGroup></Project>')
-        Test-Dependency $script:File 'Gmf.DDD.Common>=2' | Should -BeFalse
     }
 
     It 'reads no Directory.Build.props outside a .NET project' {

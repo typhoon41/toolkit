@@ -15,7 +15,8 @@ or optional style profiles: a project that needs an exception declares it in its
 
 - Every rule has exactly one owning skill. Other skills refer to it by name and never restate it.
 - A new integration skill is gated in `hooks/RequiredSkills.psd1` under `WhenProjectDependsOn`, as
-  `'package'` or `'package>=major'`. Add a gate test in `tests/SkillGate.Tests.ps1`.
+  `'package'` or `'package>=major'` (the minimum is checked for npm packages only; NuGet packages are detected by
+  presence). Add a gate test in `tests/SkillGate.Tests.ps1`.
 - Integration skills may build on core skills; core skills never name an integration.
 
 ## Guard rules
