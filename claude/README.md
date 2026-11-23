@@ -47,8 +47,10 @@ To use it locally, without GitHub: `/plugin marketplace add <path to this reposi
 | `browser-verification` (optional) | A browser Claude can drive, e.g. the **Claude in Chrome** extension connected to Claude Code; `chrome-devtools-mcp@chrome-devtools-plugins` adds media emulation |
 | Code navigation (optional) | `csharp-lsp@claude-plugins-official` / `typescript-lsp@claude-plugins-official`, with `csharp-ls` / `typescript-language-server` on `PATH` |
 
-The plugin also registers the [Context7](https://context7.com) MCP server (`.mcp.json`) for up-to-date library
-documentation.
+The plugin also registers the [Context7](https://context7.com) MCP server (`.mcp.json`) in every project that
+enables it. Claude uses it to look up current documentation for the libraries and frameworks it is coding
+against, instead of relying on what it remembers. The skills don't depend on it. To opt out, turn the server off
+in Claude Code with `/mcp`, or delete `claude/.mcp.json` in a fork.
 
 ## Skills
 
@@ -154,6 +156,21 @@ positive.
 
 To release: bump `version` in `.claude-plugin/plugin.json` and in the plugin's entry in the root
 `.claude-plugin/marketplace.json`. Installed copies update when the version changes.
+
+## Forking
+
+To publish your own copy instead of installing this one:
+
+1. **Marketplace** (`.claude-plugin/marketplace.json` at the repository root): set your own `name` (it is the
+   `@<marketplace>` in `conventions@<marketplace>`) and `owner`.
+2. **Plugin** (`claude/.claude-plugin/plugin.json`): set `author`, `repository` and `homepage`.
+   - The plugin `name` is the `<plugin>:<skill>` prefix of every skill. The hooks read it from this file, so a
+     rename needs no hook change.
+   - If you rename it, also rename the plugin's entry in `marketplace.json`, and the
+     `Where-Object name -eq 'conventions'` version check in `azure-pipelines.yml`.
+3. **Projects**: point the `.claude/settings.json` snippet above at your repository and marketplace name.
+4. **Versions**: keep `version` equal in `plugin.json` and the marketplace entry; CI fails when they differ.
+5. **Context7**: delete `claude/.mcp.json` if you don't want the server.
 
 ## License
 
