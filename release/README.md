@@ -88,4 +88,4 @@ Invoke-Pester ./tests                       # Pester 5.6+
 './module', './scripts' | ForEach-Object { Invoke-ScriptAnalyzer -Path $_ -Recurse -Settings ./PSScriptAnalyzerSettings.psd1 }
 ```
 
-Projects reference `main` (`ref: refs/heads/main`), so a merged change reaches them on their next run; nothing is tagged by hand.
+Projects use `main`, the resource's default without a `ref`, so a merged change reaches them on their next run; nothing is tagged by hand.

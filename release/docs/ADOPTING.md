@@ -47,7 +47,7 @@ a private feed and its `.npmrc` goes away, `npm ci` fails in CI. Rewrite the hos
 
 ## 2. Pipeline YAML
 
-Reference this repository's `main` branch:
+Reference this repository; without a `ref`, Azure Pipelines uses its default branch, `main`:
 
 ```yaml
 resources:
@@ -56,11 +56,11 @@ resources:
       type: github
       name: typhoon41/toolkit
       endpoint: <GitHub service connection>
-      ref: refs/heads/main
 ```
 
 A change merged here reaches every project's next run; `main` takes changes only through reviewed PRs with
-passing CI. `endpoint` is the name of a GitHub service connection (**Project settings → Service connections →
+passing CI. To stay on an older version, add a `ref` to a branch or tag, e.g. `ref: refs/tags/v1.0.0`.
+`endpoint` is the name of a GitHub service connection (**Project settings → Service connections →
 New → GitHub**). It fetches the templates, so any connection that can read this public repository works; with
 `useGitHubServiceConnection` it also creates the GitHub releases (§3).
 
