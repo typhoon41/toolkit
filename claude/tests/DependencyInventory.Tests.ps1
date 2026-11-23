@@ -210,6 +210,19 @@ Describe 'New-DependencyInventory with NuGet' {
         Test-Dependency $script:File 'Gmf.DDD.Common' | Should -BeTrue
     }
 
+    It 'reads every .csproj in the project folder' {
+        Set-Content -LiteralPath (Join-Path $script:Project 'Api.csproj') -Value '<Project />'
+        Set-Content -LiteralPath (Join-Path $script:Project 'Api.Tools.csproj') -Value '<Project><ItemGroup><PackageReference Include="Gmf.DDD.Common" /></ItemGroup></Project>'
+        Test-Dependency $script:File 'Gmf.DDD.Common' | Should -BeTrue
+    }
+
+    It 'takes the version of the nearer Include when a package is included twice' {
+        Set-Content -LiteralPath (Join-Path $script:Solution 'Directory.Build.props') -Value '<Project><ItemGroup><PackageReference Include="Gmf.DDD.Common" Version="1.0.0" /></ItemGroup></Project>'
+        Set-Content -LiteralPath (Join-Path $script:Solution 'src/Directory.Build.props') -Value '<Project><Import Project="$([MSBuild]::GetPathOfFileAbove(''Directory.Build.props'', ''$(MSBuildThisFileDirectory)../''))" /></Project>'
+        Set-Content -LiteralPath (Join-Path $script:Project 'Api.csproj') -Value '<Project><ItemGroup><PackageReference Include="Gmf.DDD.Common" Version="2.0.0" /></ItemGroup></Project>'
+        Test-Dependency $script:File 'Gmf.DDD.Common>=2' | Should -BeTrue
+    }
+
     It 'does not count a PackageReference Update without an Include' {
         Set-Content -LiteralPath (Join-Path $script:Project 'Api.csproj') -Value '<Project><ItemGroup><PackageReference Update="Gmf.DDD.Common" Version="2.0.0" /></ItemGroup></Project>'
         Test-Dependency $script:File 'Gmf.DDD.Common' | Should -BeFalse
