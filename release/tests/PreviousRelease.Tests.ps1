@@ -77,6 +77,26 @@ Describe 'Previous release without release tags' {
         $unit.previousCommit | Should -Be ''
     }
 
+    It 'follows a NuGet version that moved from Directory.Build.props into the project' {
+        $repository = New-TestRepository (Join-Path $TestDrive 'moved-version')
+        Set-TestFile $repository 'release.json' '{ "units": [ { "name": "Lib", "type": "nuget", "projects": ["src/Lib/Lib.csproj"] } ] }'
+        Set-TestFile $repository 'Directory.Build.props' (New-PropsContent '1.0.0')
+        Set-TestFile $repository 'src/Lib/Lib.csproj' (New-ProjectContent)
+        Save-TestCommit $repository 'Initial commit.'
+        Set-TestFile $repository 'Directory.Build.props' (New-PropsContent '1.1.0')
+        Save-TestCommit $repository 'Bumped version.'
+        $setPrevious = Get-TestHead $repository
+        Set-TestFile $repository 'src/Lib/A.cs' 'class A {}'
+        Save-TestCommit $repository 'feat: add A'
+        Set-TestFile $repository 'Directory.Build.props' "<Project>`n</Project>`n"
+        Set-TestFile $repository 'src/Lib/Lib.csproj' (New-ProjectContent '1.1.0')
+        Save-TestCommit $repository 'refactor: move the version into the project'
+        Set-TestFile $repository 'src/Lib/Lib.csproj' (New-ProjectContent '1.2.0')
+        Save-TestCommit $repository 'chore: release 1.2.0'
+        $plan = Invoke-InRepository $repository { New-ReleasePlan -RepositoryRoot '.' -SourceBranch 'refs/heads/main' -BuildId '42' }
+        ($plan.units | Where-Object name -eq 'Lib').previousCommit | Should -Be $setPrevious
+    }
+
     It 'returns no commit when the version never changed' {
         $repository = New-TestRepository (Join-Path $TestDrive 'single-version')
         Save-PackageCommit $repository '1.0.0' '9.0.0' 'Initial commit.' | Out-Null

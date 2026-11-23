@@ -11,9 +11,13 @@ function Get-PreviousVersionCommit {
     if ($SourceFiles.Count -eq 0) {
         return ''
     }
+    # A NuGet version may have moved between a project and a Directory.Build.props over time: walk every place
+    # it can live, and let Read-UnitVersion resolve the one each commit used.
+    $paths = @(if ($Unit.Type -eq 'nuget') { @($SourceFiles) + @($Unit.Projects) + @(':(glob)**/Directory.Build.props') | Select-Object -Unique }
+             else { $SourceFiles })
     Push-Location -LiteralPath $RepositoryRoot
     try {
-        $commits = @(Invoke-Git log --first-parent --format=%H $Ref -- @SourceFiles)
+        $commits = @(Invoke-Git log --first-parent --format=%H $Ref -- @paths)
     }
     finally {
         Pop-Location
