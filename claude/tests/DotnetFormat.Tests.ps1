@@ -36,6 +36,16 @@ Describe 'Invoke-DotnetFormat.ps1' {
         [IO.File]::ReadAllText($project.File) | Should -Match '(?m)^    public int Value'
     }
 
+    It 'leaves the file alone when the project switches the hook off' -Skip:(-not $script:HasDotnet) {
+        $project = New-Project -WithEditorConfig
+        New-Item -ItemType Directory -Path (Join-Path $project.Root '.claude') | Out-Null
+        Set-Content -LiteralPath (Join-Path $project.Root '.claude/conventions.json') -Value '{ "hooks": { "dotnetFormat": false } }'
+        $result = Invoke-Format $project.Root $project.File
+        $result.ExitCode | Should -Be 0
+        $result.Output.Trim() | Should -BeNullOrEmpty
+        [IO.File]::ReadAllText($project.File) | Should -Be $script:Misindented
+    }
+
     It 'stays silent when the file already matches' -Skip:(-not $script:HasDotnet) {
         $project = New-Project -WithEditorConfig
         Invoke-Format $project.Root $project.File | Out-Null

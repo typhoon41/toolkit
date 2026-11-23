@@ -1,17 +1,28 @@
 function Read-BannedPatternRule {
-    param([Parameter(Mandatory)] [string] $Path)
-    $timeout = [TimeSpan]::FromSeconds(1)
-    $options = [Text.RegularExpressions.RegexOptions]::None
+    # Bundled rules name a skill of this plugin, reported as <plugin>:<skill>; project rules (.claude/conventions.json)
+    # name any skill or none. A disabled id drops either kind. An incomplete or invalid project rule is skipped with a
+    # warning on stderr, so a project's typo never breaks the hook.
+    param(
+        [Parameter(Mandatory)] [string] $Path,
+        [AllowEmptyCollection()] [hashtable[]] $ProjectRule = @(),
+        [AllowEmptyCollection()] [string[]] $DisabledRuleId = @(),
+        [string] $Plugin = (Get-PluginName)
+    )
     foreach ($rule in (Import-PowerShellDataFile -LiteralPath $Path).Rules) {
-        [pscustomobject]@{
-            Id                     = $rule.Id
-            Extensions             = @($rule.Extensions)
-            Target                 = if ($rule.ContainsKey('Target')) { $rule.Target } else { 'Text' }
-            Pattern                = [regex]::new($rule.Pattern, $options, $timeout)
-            ExcludeWhenFileMatches = if ($rule.ContainsKey('ExcludeWhenFileMatches')) { [regex]::new($rule.ExcludeWhenFileMatches, $options, $timeout) } else { $null }
-            WhenProjectDependsOn   = if ($rule.ContainsKey('WhenProjectDependsOn')) { $rule.WhenProjectDependsOn } else { $null }
-            Message                = $rule.Message
-            Skill                  = $rule.Skill
+        if ($DisabledRuleId -notcontains $rule.Id) {
+            $bundled = $rule.Clone()
+            $bundled.Skill = "${Plugin}:$($rule.Skill)"
+            ConvertTo-BannedPatternRule -Rule $bundled
+        }
+    }
+    foreach ($rule in $ProjectRule) {
+        if ($DisabledRuleId -notcontains $rule.Id) {
+            try {
+                ConvertTo-BannedPatternRule -Rule $rule
+            }
+            catch {
+                [Console]::Error.WriteLine("Ignoring project rule '$($rule.Id)': $($_.Exception.Message)")
+            }
         }
     }
 }

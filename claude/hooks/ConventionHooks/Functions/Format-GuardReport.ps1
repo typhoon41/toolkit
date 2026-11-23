@@ -4,9 +4,10 @@ function Format-GuardReport {
         [Parameter(Mandatory)] [object[]] $Hit
     )
     $entries = foreach ($item in $Hit) {
-        "- $($item.RuleId): $($item.Message) (skill conventions:$($item.Skill))`n    $($item.Line)"
+        $owner = if ($item.Skill) { " (skill $($item.Skill))" } else { '' }
+        "- $($item.RuleId): $($item.Message)$owner`n    $($item.Line)"
     }
     $lines = @("Banned patterns in what was just written to $($Path):") + @($entries) +
-        @('Fix them now unless the user explicitly asked for this.')
+        @('Fix them now, unless the user asked for this or the project disables the rule in .claude/conventions.json.')
     $lines -join "`n"
 }
