@@ -36,6 +36,14 @@ Versions: NuGet units read `<Version>` from the `.csproj`, else from the nearest
 
 Existing tags keep working when their form matches: a single-unit repository uses `v1.2.3`.
 
+**First release.** A unit's notes cover the commits since its previous release tag, so a repository with
+no release tags gets its whole history in the first notes. To start clean, tag the last version published
+before adoption once by hand (`git tag -a v1.1.6 <its commit>`); every later tag comes from the pipeline.
+
+**Switching npm registry.** `package-lock.json` keeps each package's `resolved` URL. When those point at
+a private feed and its `.npmrc` goes away, `npm ci` fails in CI. Rewrite the host to the new registry
+(e.g. `https://registry.npmjs.org/`); the `integrity` hashes stay valid, and `npm ci` verifies them.
+
 ## 2. Pipeline YAML
 
 Reference this repository at a **tag**, so a change here never alters a project's pipeline until the
@@ -50,6 +58,10 @@ resources:
       endpoint: <GitHub service connection>
       ref: refs/tags/v1.0.0
 ```
+
+`endpoint` is the name of a GitHub service connection (**Project settings → Service connections → New →
+GitHub**). This repository is public, so any connection that can read it works; it is only used to fetch the
+templates.
 
 - Packages: copy [../examples/azure-pipelines.packages.yml](../examples/azure-pipelines.packages.yml).
   It uses `templates/stages/package-release.yml` and needs `lockBehavior: sequential` at the root
@@ -96,12 +108,19 @@ an npm **automation token**, both in `release-secrets`.
 - Approvals and checks → **Branch control**: `refs/heads/main`; tick *Verify branch protection*;
   untick *Allow resources from unknown/unverifiable branches*.
 
-**Pipelines → Environments → `package-release`** and, for applications, **`application-release`** (or your names; the
-application one needs only Branch control and the Exclusive lock, production was approved already), Approvals and checks:
-- **Approvals**: the reviewer; untick *Allow approvers to approve their own runs*.
+**Pipelines → Environments → New environment `package-release`** (resource: None) and, for applications,
+**`application-release`** (or your names; the application one needs only Branch control and the Exclusive lock,
+production was approved already). **Create it before merging the first version bump**: Azure DevOps creates a
+missing environment on its first deployment without any checks, so that release would publish unapproved.
+Approvals and checks:
+- **Approvals**: the reviewer. Untick *Allow approvers to approve their own runs* when a second person reviews;
+  a sole maintainer keeps it allowed, otherwise nobody can approve the run they started by merging.
 - **Branch control**: `refs/heads/main`.
 - **Exclusive lock** (the YAML's `lockBehavior: sequential` goes with it).
 - Pipeline permissions: this pipeline only.
+
+To approve a release, open the run: its Release stage shows *Waiting*; choose **Review → Approve**.
+Rejecting it skips the whole Release stage, so nothing is published.
 
 **Pipeline triggers**: CI on `main`, PR validation on PRs to `main`. Leave *Make secrets available to
 builds of forks* off, and require a team member's comment before building fork PRs.
