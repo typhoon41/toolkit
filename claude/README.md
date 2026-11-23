@@ -106,7 +106,9 @@ A dependency is detected once per hook run from the file's nearest `package.json
   folder, or in the `Directory.Build.props` MSBuild imports for it (the nearest one, and any it imports with
   `GetPathOfFileAbove`), or a `ProjectReference` to `<Package>.csproj`. A `PackageReference Update` or a central
   `PackageVersion` alone is not a dependency. Versions are not read, so a NuGet `package>=major` requirement passes
-  whenever the package is present.
+  whenever the package is present. A package referenced by any `.csproj` in the folder counts for every file
+  there: SDK-style projects compile all `.cs` files under their folder by default, so each sibling project builds
+  the file.
 
 ## Project configuration
 
