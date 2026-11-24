@@ -21,7 +21,6 @@ steps:
     condition: and(succeeded(), eq(variables['Build.Reason'], 'PullRequest'))
     target:
       commands: restricted
-      settableVariables: none
     env:
       TOOLKIT_PATH: ${{ parameters.toolkitPath }}
       ENFORCE: ${{ parameters.enforce }}
