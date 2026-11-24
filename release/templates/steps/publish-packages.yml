@@ -36,7 +36,7 @@ steps:
     displayName: Push NuGet packages
     target:
       commands: restricted
-      settableVariables: []
+      settableVariables: none
     env:
       TOOLKIT_PATH: ${{ parameters.toolkitPath }}
       RELEASE_DIRECTORY: ${{ parameters.releaseDirectory }}
@@ -53,7 +53,7 @@ steps:
     displayName: Publish npm packages
     target:
       commands: restricted
-      settableVariables: []
+      settableVariables: none
     env:
       TOOLKIT_PATH: ${{ parameters.toolkitPath }}
       RELEASE_DIRECTORY: ${{ parameters.releaseDirectory }}
