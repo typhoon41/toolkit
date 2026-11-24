@@ -47,7 +47,7 @@ steps:
     workingDirectory: $(Build.SourcesDirectory)
     target:
       commands: restricted
-      settableVariables: []
+      settableVariables: none
     env:
       TOOLKIT_PATH: ${{ parameters.toolkitPath }}
       RELEASE_ACTION: ${{ parameters.action }}
