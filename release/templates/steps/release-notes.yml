@@ -28,7 +28,6 @@ steps:
     workingDirectory: $(Build.SourcesDirectory)
     target:
       commands: restricted
-      settableVariables: none
     env:
       TOOLKIT_PATH: ${{ parameters.toolkitPath }}
       PLAN_FILE: ${{ parameters.planFile }}
