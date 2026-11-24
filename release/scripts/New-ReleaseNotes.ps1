@@ -32,13 +32,13 @@ try {
     }
     $client = New-GitHubClient -Repository $Repository -Token $env:GITHUB_TOKEN -ApiUrl $ApiUrl -WebUrl $WebUrl `
         -UseCheckoutCredentials:$UseCheckoutCredentials
-    $units = if ($PSCmdlet.ParameterSetName -eq 'Preview') {
-        @(New-PreviewUnitPlan -RepositoryRoot '.' -UnitName $Unit -Version $Version)
+    $units = @(if ($PSCmdlet.ParameterSetName -eq 'Preview') {
+        New-PreviewUnitPlan -RepositoryRoot '.' -UnitName $Unit -Version $Version
     }
     else {
         $plan = Get-Content -LiteralPath $PlanFile -Raw | ConvertFrom-Json
-        @($plan.units | Where-Object { $_.canRelease -and (-not $Unit -or $_.name -eq $Unit) })
-    }
+        $plan.units | Where-Object { $_.canRelease -and (-not $Unit -or $_.name -eq $Unit) }
+    })
     if ($units.Count -eq 0) {
         Write-ReleaseLog 'No unit releases in this build; no release notes written.'
         exit 0
