@@ -34,8 +34,6 @@ steps:
     name: ReleasePlan
     displayName: Resolve release plan
     workingDirectory: $(Build.SourcesDirectory)
-    target:
-      settableVariables: [ HasRelease, RunName ]
     env:
       TOOLKIT_PATH: ${{ parameters.toolkitPath }}
       RELEASE_BRANCH: ${{ parameters.releaseBranch }}
