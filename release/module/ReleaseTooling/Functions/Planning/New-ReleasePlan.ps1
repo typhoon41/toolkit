@@ -35,6 +35,7 @@ function New-ReleasePlan {
         @($units | Where-Object { $_.canRelease })
         $units[0]
     ) | Select-Object -First 1
+    $runName = Get-RunName -UnitPlan $runNameUnit -IsReleaseBranch $isReleaseBranch -Label $label
     [pscustomobject]@{
         schemaVersion   = 1
         commit          = $context.Commit
@@ -43,7 +44,8 @@ function New-ReleasePlan {
         isReleaseBranch = $isReleaseBranch
         buildId         = $BuildId
         label           = $label
-        runName         = Get-RunName -UnitPlan $runNameUnit -BuildId $BuildId -IsReleaseBranch $isReleaseBranch -Label $label
+        runName         = $runName.Text
+        runNameCounted  = $runName.CountsRuns
         hasRelease      = [bool](@($units | Where-Object { $_.canRelease }).Count)
         units           = $units
     }

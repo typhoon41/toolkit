@@ -1,0 +1,26 @@
+# Appends a run counter to a releasing build's name (1.3.0 -> 1.3.0.1, 1.3.0.2, ...). counter() is keyed on the
+# version, so it restarts at 1 after every bump; it is a runtime expression, so it needs a job after the plan's job.
+
+parameters:
+  - name: planJob                  # the job that ran steps/resolve-release-plan.yml
+    type: string
+    default: BuildJob
+  - name: planStep
+    type: string
+    default: ReleasePlan
+
+jobs:
+  - job: RunCounter
+    displayName: Count the run
+    dependsOn: ${{ parameters.planJob }}
+    condition: and(succeeded(), eq(dependencies.${{ parameters.planJob }}.outputs['${{ parameters.planStep }}.RunNameCounted'], 'true'))
+    variables:
+      runName: $[ dependencies.${{ parameters.planJob }}.outputs['${{ parameters.planStep }}.RunName'] ]
+      runCounter: $[ counter(dependencies.${{ parameters.planJob }}.outputs['${{ parameters.planStep }}.RunName'], 1) ]
+    steps:
+      - checkout: none
+      - pwsh: Write-Host "##vso[build.updatebuildnumber]$env:RUN_NAME.$env:RUN_COUNTER"
+        displayName: Name the run
+        env:
+          RUN_NAME: $(runName)
+          RUN_COUNTER: $(runCounter)

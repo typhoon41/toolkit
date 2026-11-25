@@ -38,7 +38,8 @@ Describe 'New-ReleasePlan' {
         $lib.previousTag | Should -Be 'Lib/v1.0.0'
         $lib.paths | Should -Be @('src/Lib', 'Directory.Build.props')
         ($plan.units | Where-Object name -eq 'web').canRelease | Should -BeFalse
-        $plan.runName | Should -Be '1.1.0+42'
+        $plan.runName | Should -Be '1.1.0'
+        $plan.runNameCounted | Should -BeTrue
         $plan.hasRelease | Should -BeTrue
     }
 
@@ -56,7 +57,7 @@ Describe 'New-ReleasePlan' {
         Set-TestFile $repository 'web/package.json' '{ "name": "@x/web", "version": "2.1.0-beta.1" }'
         Save-TestCommit $repository 'chore: web beta'
         $plan = Get-TestPlan $repository
-        $plan.runName | Should -Be '2.1.0-beta.1+42'
+        $plan.runName | Should -Be '2.1.0-beta.1'
         $web = $plan.units | Where-Object name -eq 'web'
         $web.canRelease | Should -BeTrue
         $web.isPrerelease | Should -BeTrue
@@ -71,6 +72,7 @@ Describe 'New-ReleasePlan' {
         ($plan.units | Where-Object name -eq 'Lib').packageVersion | Should -Be '1.0.1-calendar-fixes.42'
         $plan.hasRelease | Should -BeFalse
         $plan.runName | Should -Be '1.0.1-calendar-fixes.42'
+        $plan.runNameCounted | Should -BeFalse
     }
 
     It 'takes an application version from the pipeline' {
@@ -82,6 +84,7 @@ Describe 'New-ReleasePlan' {
         $plan.units[0].canRelease | Should -BeTrue
         $plan.units[0].tag | Should -Be 'v0.9.12'
         $plan.runName | Should -Be '0.9.12'
+        $plan.runNameCounted | Should -BeFalse
         (Get-TestPlan $repository -Branch 'refs/heads/features/new-login' -PipelineVersion '0.9.13').runName | Should -Be '0.9.13-new-login'
         (Get-TestPlan $repository -PipelineVersion '0.9.10').units[0].problem | Should -Match 'higher than the latest'
     }
@@ -90,6 +93,6 @@ Describe 'New-ReleasePlan' {
 Describe 'Get-RunName' {
     It 'does not repeat the branch words when a job is re-run' {
         $unitPlan = [pscustomobject]@{ type = 'pipeline'; version = '0.9.12-calendar-fixes'; isPrerelease = $true }
-        Get-RunName -UnitPlan $unitPlan -BuildId '1' -IsReleaseBranch $false -Label 'calendar-fixes' | Should -Be '0.9.12-calendar-fixes'
+        (Get-RunName -UnitPlan $unitPlan -IsReleaseBranch $false -Label 'calendar-fixes').Text | Should -Be '0.9.12-calendar-fixes'
     }
 }

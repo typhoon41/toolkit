@@ -11,8 +11,9 @@ from one place:
   [ESLint's releases](https://github.com/eslint/eslint/releases): Breaking Changes, Features, Bug Fixes,
   Documentation, Chores. A commit that doesn't follow the [convention](docs/CONTRIBUTING.md) is a chore.
   The notes are optional and, when on, ship inside the NuGet/npm package and form the GitHub release.
-- **Run names** show the version and build id (`1.3.0+4711`, `1.3.1-ci.4711`), with up to three words
-  of the branch name on feature branches (`1.3.1-calendar-fixes.4711`).
+- **Run names** show the version and a counter that restarts with every version bump on releases
+  (`1.3.0.1`, `1.3.0.2`), and the build id on CI builds (`1.3.1-ci.4711`), with up to three words of the
+  branch name on feature branches (`1.3.1-calendar-fixes.4711`).
 - **Mono- and multi-repos**: a `release.json` lists the release units; each has its own version, tags
   (`<unit>/v1.2.3` when there are several) and notes limited to its own paths.
 
@@ -54,6 +55,10 @@ steps:   # inside a deployment job, after the Build stage published the 'release
 Pass `nugetAuthenticate` only to `authenticate-feeds.yml`. Give `npmAuthenticate`/`npmrcFile` to every
 step that reads or writes the npm feed. With nuget.org and npmjs.org, leave out `authenticate-feeds.yml`
 and those parameters; the `NuGetApiKey` / `NpmToken` variables are used instead.
+
+A build job of your own that runs `steps/resolve-release-plan.yml` names a releasing run after the bare
+version (`1.3.0`). Add `jobs/run-counter.yml` next to it (`planJob`: that job's name) to append the
+per-version counter (`1.3.0.1`).
 
 Service connections instead of secrets ([docs/ADOPTING.md](docs/ADOPTING.md#service-connections-instead-of-secrets)):
 pass `npmServiceConnection` to `authenticate-feeds.yml` and `npmAuthenticate: true` to the later npm steps; for

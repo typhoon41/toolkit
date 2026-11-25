@@ -1,4 +1,4 @@
-# Output variables: <stepName>.HasRelease and <stepName>.RunName, e.g.
+# Output variables: <stepName>.HasRelease, <stepName>.RunName and <stepName>.RunNameCounted, e.g.
 # dependencies.<Stage>.outputs['<Job>.ReleasePlan.HasRelease'].
 
 parameters:

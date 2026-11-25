@@ -74,6 +74,8 @@ stages:
           configuration: ${{ parameters.configuration }}
           toolkitRepository: ${{ parameters.toolkitRepository }}
 
+      - template: ../jobs/run-counter.yml
+
   - stage: Release
     dependsOn: Build
     condition: and(succeeded(), eq(dependencies.Build.outputs['BuildJob.ReleasePlan.HasRelease'], 'true'))
