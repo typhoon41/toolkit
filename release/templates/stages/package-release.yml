@@ -51,7 +51,7 @@ parameters:
     default: ''
   - name: npmrcFile
     type: string
-    default: $(Build.SourcesDirectory)/.npmrc
+    default: $(System.DefaultWorkingDirectory)/.npmrc
   - name: npmAccess
     type: string
     default: ''

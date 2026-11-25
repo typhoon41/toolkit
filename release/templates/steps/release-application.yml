@@ -20,7 +20,7 @@ parameters:
     default: toolkit
   - name: toolkitPath
     type: string
-    default: $(Pipeline.Workspace)/toolkit
+    default: $(Build.SourcesDirectory)/toolkit
 
 steps:
   - ${{ if parameters.checkout }}:

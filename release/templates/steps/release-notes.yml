@@ -15,7 +15,7 @@ parameters:
     default: false
   - name: toolkitPath
     type: string
-    default: $(Pipeline.Workspace)/toolkit
+    default: $(Build.SourcesDirectory)/toolkit
 
 steps:
   - pwsh: |
@@ -25,7 +25,6 @@ steps:
         -Repository $env:BUILD_REPOSITORY_NAME `
         -UseCheckoutCredentials:([bool]::Parse($env:USE_CHECKOUT_CREDENTIALS))
     displayName: Generate release notes
-    workingDirectory: $(Build.SourcesDirectory)
     target:
       commands: restricted
     env:

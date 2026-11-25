@@ -73,9 +73,10 @@ New → GitHub**). It fetches the templates, so any connection that can read thi
   and `publishPlan: true`) to the build job, and `steps/release-application.yml` after the production
   deployment.
 
-The templates check the project out at `$(Build.SourcesDirectory)` and this toolkit at
-`$(Pipeline.Workspace)/toolkit`. Agents need PowerShell 7 (`pwsh`) and git; `ubuntu-latest` and
-`windows-latest` have both.
+The templates check the project out at `$(System.DefaultWorkingDirectory)` (the default working directory,
+`$(Build.SourcesDirectory)/<repository>`) and this toolkit at `$(Build.SourcesDirectory)/toolkit`, so refer to
+the project as `$(System.DefaultWorkingDirectory)`, never `$(Build.SourcesDirectory)`. Agents need PowerShell 7
+(`pwsh`) and git; `ubuntu-latest` and `windows-latest` have both.
 
 | Template parameter (package-release.yml) | Default | Meaning |
 |---|---|---|

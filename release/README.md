@@ -42,18 +42,18 @@ steps:   # inside a deployment job, after the Build stage published the 'release
   - download: current
     artifact: release
   - template: release/templates/steps/authenticate-feeds.yml@toolkit     # Azure Artifacts only
-    parameters: { nugetAuthenticate: true, npmAuthenticate: true, npmrcFile: $(Build.SourcesDirectory)/.npmrc }
+    parameters: { nugetAuthenticate: true, npmAuthenticate: true }
   - template: release/templates/steps/publish-github-release.yml@toolkit
-    parameters: { action: Prepare, npmAuthenticate: true, npmrcFile: $(Build.SourcesDirectory)/.npmrc }
+    parameters: { action: Prepare, npmAuthenticate: true }
   - template: release/templates/steps/publish-packages.yml@toolkit
-    parameters: { npmAuthenticate: true, npmrcFile: $(Build.SourcesDirectory)/.npmrc }
+    parameters: { npmAuthenticate: true }
   - template: release/templates/steps/publish-github-release.yml@toolkit
-    parameters: { action: Publish, npmAuthenticate: true, npmrcFile: $(Build.SourcesDirectory)/.npmrc }
+    parameters: { action: Publish, npmAuthenticate: true }
 ```
 
-Pass `nugetAuthenticate` only to `authenticate-feeds.yml`. Give `npmAuthenticate`/`npmrcFile` to every
-step that reads or writes the npm feed. With nuget.org and npmjs.org, leave out `authenticate-feeds.yml`
-and those parameters; the `NuGetApiKey` / `NpmToken` variables are used instead.
+Pass `nugetAuthenticate` only to `authenticate-feeds.yml`. Give `npmAuthenticate` to every step that
+reads or writes the npm feed (`npmrcFile` defaults to the project's `.npmrc`). With nuget.org and
+npmjs.org, leave out `authenticate-feeds.yml` and those parameters; the `NuGetApiKey` / `NpmToken` variables are used instead.
 
 Service connections instead of secrets ([docs/ADOPTING.md](docs/ADOPTING.md#service-connections-instead-of-secrets)):
 pass `npmServiceConnection` to `authenticate-feeds.yml` and `npmAuthenticate: true` to the later npm steps; for
