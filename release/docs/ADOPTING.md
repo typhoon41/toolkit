@@ -65,7 +65,7 @@ New → GitHub**). It fetches the templates, so any connection that can read thi
 `useGitHubServiceConnection` it also creates the GitHub releases (§3).
 
 - Packages: copy [../examples/azure-pipelines.packages.yml](../examples/azure-pipelines.packages.yml).
-  It uses `templates/stages/package-release.yml` and needs `lockBehavior: sequential` at the root
+  It uses `templates/stages/package-release.yml`, whose Release stage already sets `lockBehavior: sequential`
   (assembling the steps yourself: [README](../README.md#using-the-step-templates-on-their-own)).
 - Applications: copy the relevant parts of
   [../examples/azure-pipelines.application.yml](../examples/azure-pipelines.application.yml): add
@@ -79,16 +79,17 @@ The templates check the project out at `$(Build.SourcesDirectory)` and this tool
 
 | Template parameter (package-release.yml) | Default | Meaning |
 |---|---|---|
-| `buildSteps` | `[]` | Your restore/build/test steps (install the SDKs and Node here) |
+| `buildSteps` | `[]` | Your restore/build/test steps |
+| `nodeVersion` / `dotnetVersion` | `''` | Installs Node (`UseNode@1`) / the .NET SDK (`UseDotNet@2`) before `buildSteps`, e.g. `22.x` / `10.x` |
 | `releaseNotes` | `true` | Generate notes; `false` packs without notes and gives releases a minimal body |
 | `environment` | `package-release` | Approval environment of the Release stage |
-| `releaseVariableGroup` | `release-secrets` | `NuGetApiKey`, `NpmToken`, `GitHubToken`; `''` when service connections replace every secret |
+| `releaseVariableGroup` | `''` | Group with `NuGetApiKey`, `NpmToken` and/or `GitHubToken` (e.g. `release-secrets`), for whatever service connections don't replace |
 | `buildVariableGroup` | `''` | Optional group with `GitHubReadToken` for the PR check and the notes |
 | `nugetAuthenticate` / `npmAuthenticate` | `false` | Azure Artifacts feeds instead of API keys; the release job authenticates first, before any feed check (`steps/authenticate-feeds.yml`) |
 | `npmServiceConnection` | `''` | npm service connection used instead of `NpmToken` (see §3) |
-| `useGitHubServiceConnection` | `false` | The toolkit resource's `endpoint` connection instead of `GitHubToken` in the release job (see §3) |
+| `useGitHubServiceConnection` | `true` | The toolkit resource's `endpoint` connection instead of `GitHubToken` in the release job; `false` uses `GitHubToken` (see §3) |
 | `npmAccess` | `''` | `public` for scoped packages on npmjs.org |
-| `enforceCommitConvention` | `false` | Fail PRs whose title/commits don't follow the convention |
+| `enforceCommitConvention` | `true` | Fail PRs whose title/commits don't follow the convention; `false` only warns |
 
 ## 3. GitHub tokens and service connections
 
@@ -106,9 +107,9 @@ an npm **automation token**, both in `release-secrets`.
 
 ### Service connections instead of secrets
 
-Both are opt-in; the secret variables stay the default.
+The GitHub connection is the default in `package-release.yml`; npm and NuGet use secrets unless configured.
 
-- **GitHub** (`useGitHubServiceConnection: true`): the release job checks the toolkit out with
+- **GitHub** (`useGitHubServiceConnection`, on by default in `package-release.yml`): the release job checks the toolkit out with
   `persistCredentials: true` and uses the token of its resource's `endpoint`, the connection named in your YAML.
   That connection needs Contents: **write** on the project repository too: a personal-access-token connection's
   token needs that scope, a GitHub App connection needs the *Azure Pipelines* app installed on the project
@@ -118,7 +119,8 @@ Both are opt-in; the secret variables stay the default.
   registry URL plus an automation token). `npmAuthenticate@0` writes its credentials into `npmrcFile`, so commit an
   `.npmrc` that lists the registry, e.g. `registry=https://registry.npmjs.org/`.
 
-With both connections and no NuGet unit, set `releaseVariableGroup: ''`.
+Any secret still needed (`NuGetApiKey`, `NpmToken`, or `GitHubToken` with `useGitHubServiceConnection: false`) comes
+from the group named in `releaseVariableGroup`; with both connections and no NuGet unit, no group is needed.
 
 ## 4. Azure DevOps
 
@@ -135,7 +137,7 @@ Approvals and checks:
 - **Approvals**: the reviewer. Untick *Allow approvers to approve their own runs* when a second person reviews;
   a sole maintainer keeps it allowed, otherwise nobody can approve the run they started by merging.
 - **Branch control**: `refs/heads/main`.
-- **Exclusive lock** (the YAML's `lockBehavior: sequential` goes with it).
+- **Exclusive lock** (`package-release.yml`'s Release stage sets `lockBehavior: sequential` to go with it).
 - Pipeline permissions: this pipeline only.
 
 To approve a release, open the run: its Release stage shows *Waiting*; choose **Review → Approve**.

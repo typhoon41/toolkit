@@ -1,5 +1,6 @@
 # Package repository (NuGet and/or npm). Builds every push and PR; releases a unit when a merge to main
-# bumps its version, after approval in the 'package-release' environment.
+# bumps its version, after approval in the 'package-release' environment. GitHub releases use the toolkit
+# resource's endpoint connection (useGitHubServiceConnection, on by default).
 
 trigger:
   branches:
@@ -8,8 +9,6 @@ trigger:
 pr:
   branches:
     include: [ main ]
-
-lockBehavior: sequential           # with the environment's exclusive lock: releases never overlap
 
 resources:
   repositories:
@@ -21,19 +20,11 @@ resources:
 stages:
   - template: release/templates/stages/package-release.yml@toolkit
     parameters:
-      releaseNotes: true
-      environment: package-release
-      releaseVariableGroup: release-secrets
-      buildVariableGroup: build-read     # holds GitHubReadToken; remove for public repositories
+      releaseVariableGroup: release-secrets   # NuGetApiKey and NpmToken
+      buildVariableGroup: build-read          # holds GitHubReadToken; remove for public repositories
+      dotnetVersion: 10.x
+      nodeVersion: 22.x
       buildSteps:
-        - task: UseDotNet@2
-          displayName: Install .NET SDK
-          inputs:
-            version: 10.x
-        - task: NodeTool@0
-          displayName: Install Node
-          inputs:
-            versionSpec: 22.x
         - pwsh: dotnet build -c Release
           displayName: Build
         - pwsh: dotnet test -c Release --no-build
