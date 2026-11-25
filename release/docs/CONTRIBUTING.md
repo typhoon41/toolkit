@@ -34,8 +34,8 @@ type(optional scope)!: description
 | `style`    | Formatting, whitespace                                   | Chores                |
 | `revert`   | Reverting an earlier change                              | Chores                |
 
-**A commit that doesn't follow the format is not rejected: it is listed under Chores.** The PR check
-warns about it (projects can make it strict with `enforceCommitConvention: true`).
+**A commit that doesn't follow the format is listed under Chores.** The PR check of `package-release.yml`
+fails on it (`enforceCommitConvention: false` makes it only warn).
 
 | Good                                    | Not recognised (→ Chores)   | Why                           |
 |-----------------------------------------|-----------------------------|-------------------------------|

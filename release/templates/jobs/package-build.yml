@@ -5,6 +5,12 @@ parameters:
   - name: buildSteps
     type: stepList
     default: []
+  - name: nodeVersion
+    type: string
+    default: ''
+  - name: dotnetVersion
+    type: string
+    default: ''
   - name: releaseNotes
     type: boolean
     default: true
@@ -13,7 +19,7 @@ parameters:
     default: refs/heads/main
   - name: enforceCommitConvention
     type: boolean
-    default: false
+    default: true
   - name: configuration
     type: string
     default: Release
@@ -27,6 +33,18 @@ jobs:
       - template: ../steps/checkout.yml
         parameters:
           toolkitRepository: ${{ parameters.toolkitRepository }}
+
+      - ${{ if ne(parameters.nodeVersion, '') }}:
+        - task: UseNode@1
+          displayName: Install Node
+          inputs:
+            version: ${{ parameters.nodeVersion }}
+
+      - ${{ if ne(parameters.dotnetVersion, '') }}:
+        - task: UseDotNet@2
+          displayName: Install .NET SDK
+          inputs:
+            version: ${{ parameters.dotnetVersion }}
 
       - template: ../steps/validate-pull-request.yml
         parameters:

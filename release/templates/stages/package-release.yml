@@ -1,19 +1,26 @@
 # NuGet/npm pipeline: Build on every branch and PR; Release only when a version bump reaches the release branch.
-# Only Release references releaseVariableGroup: protect it and the environment (docs/ADOPTING.md).
+# Only Release references releaseVariableGroup: protect it and the environment (docs/ADOPTING.md). The Release
+# stage takes the environment's exclusive lock in order (lockBehavior), so releases never overlap.
 
 parameters:
-  - name: buildSteps               # restore/build/test of your projects (install SDKs and Node here)
+  - name: buildSteps               # restore/build/test of your projects
     type: stepList
     default: []
+  - name: nodeVersion              # e.g. 22.x: installed with UseNode@1 before buildSteps
+    type: string
+    default: ''
+  - name: dotnetVersion            # e.g. 10.x: the .NET SDK installed with UseDotNet@2 before buildSteps
+    type: string
+    default: ''
   - name: releaseNotes
     type: boolean
     default: true
   - name: environment
     type: string
     default: package-release
-  - name: releaseVariableGroup
+  - name: releaseVariableGroup     # NuGetApiKey / NpmToken / GitHubToken, when service connections don't replace them
     type: string
-    default: release-secrets
+    default: ''
   - name: buildVariableGroup       # optional; only a read-only GitHubReadToken (the Build stage runs PR code)
     type: string
     default: ''
@@ -26,7 +33,7 @@ parameters:
       vmImage: ubuntu-latest
   - name: enforceCommitConvention
     type: boolean
-    default: false
+    default: true
   - name: configuration
     type: string
     default: Release
@@ -50,7 +57,7 @@ parameters:
     default: ''
   - name: useGitHubServiceConnection   # the toolkit resource's endpoint connection instead of GitHubToken (release job only)
     type: boolean
-    default: false
+    default: true
   - name: trustedFeedHosts         # comma-separated extra feed hosts that may get NuGetApiKey / NpmToken
     type: string
     default: ''
@@ -68,6 +75,8 @@ stages:
       - template: ../jobs/package-build.yml
         parameters:
           buildSteps: ${{ parameters.buildSteps }}
+          nodeVersion: ${{ parameters.nodeVersion }}
+          dotnetVersion: ${{ parameters.dotnetVersion }}
           releaseNotes: ${{ parameters.releaseNotes }}
           releaseBranch: ${{ parameters.releaseBranch }}
           enforceCommitConvention: ${{ parameters.enforceCommitConvention }}
@@ -76,6 +85,7 @@ stages:
 
   - stage: Release
     dependsOn: Build
+    lockBehavior: sequential
     condition: and(succeeded(), eq(dependencies.Build.outputs['BuildJob.ReleasePlan.HasRelease'], 'true'))
     pool: ${{ parameters.pool }}
     ${{ if ne(parameters.releaseVariableGroup, '') }}:   # '' when service connections replace every secret
@@ -87,7 +97,7 @@ stages:
           environment: ${{ parameters.environment }}
           feedWaitMinutes: ${{ parameters.feedWaitMinutes }}
           nugetAuthenticate: ${{ parameters.nugetAuthenticate }}
-          npmAuthenticate: ${{ parameters.npmAuthenticate }}
+          npmAuthenticate: ${{ or(parameters.npmAuthenticate, ne(parameters.npmServiceConnection, '')) }}
           npmServiceConnection: ${{ parameters.npmServiceConnection }}
           npmrcFile: ${{ parameters.npmrcFile }}
           npmAccess: ${{ parameters.npmAccess }}
