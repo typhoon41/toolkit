@@ -15,7 +15,7 @@ parameters:
     default: Release
   - name: toolkitPath
     type: string
-    default: $(Pipeline.Workspace)/toolkit
+    default: $(Build.SourcesDirectory)/toolkit
 
 steps:
   - pwsh: |
@@ -26,7 +26,6 @@ steps:
         -RepositoryUrl "https://github.com/$env:BUILD_REPOSITORY_NAME" `
         -Configuration $env:BUILD_CONFIGURATION
     displayName: Pack
-    workingDirectory: $(Build.SourcesDirectory)
     target:
       commands: restricted
     env:

@@ -1,5 +1,6 @@
-# Full history and tags: versions are compared with release tags. Pinning 'self' to 's' keeps the project in
-# $(Build.SourcesDirectory) despite the second checkout; the toolkit lands in $(Pipeline.Workspace)/toolkit.
+# Full history and tags: versions are compared with release tags. Both repositories stay at the agent's own
+# multi-checkout paths: with a custom path the agent first moves a clone that isn't there and warns about it.
+# The project lands in $(System.DefaultWorkingDirectory) (workspaceRepo), this toolkit in $(Build.SourcesDirectory)/toolkit.
 
 parameters:
   - name: toolkitRepository        # the alias under resources.repositories in the consuming pipeline
@@ -14,12 +15,11 @@ parameters:
 
 steps:
   - checkout: self
-    path: s
+    workspaceRepo: true
     fetchDepth: 0
     fetchTags: true
     persistCredentials: ${{ parameters.persistCredentials }}
 
   - checkout: ${{ parameters.toolkitRepository }}
-    path: toolkit
     fetchDepth: 1
     persistCredentials: ${{ parameters.persistToolkitCredentials }}

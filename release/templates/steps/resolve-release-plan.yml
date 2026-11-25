@@ -19,7 +19,7 @@ parameters:
     default: false
   - name: toolkitPath
     type: string
-    default: $(Pipeline.Workspace)/toolkit
+    default: $(Build.SourcesDirectory)/toolkit
 
 steps:
   - pwsh: |
@@ -33,7 +33,6 @@ steps:
         -KeepRunName:([bool]::Parse($env:KEEP_RUN_NAME))
     name: ReleasePlan
     displayName: Resolve release plan
-    workingDirectory: $(Build.SourcesDirectory)
     env:
       TOOLKIT_PATH: ${{ parameters.toolkitPath }}
       RELEASE_BRANCH: ${{ parameters.releaseBranch }}

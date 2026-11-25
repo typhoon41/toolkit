@@ -31,7 +31,7 @@ stages:
               pipelineVersion: $(Build.BuildNumber)
               publishPlan: true
 
-          # ... your build steps (they run in $(Build.SourcesDirectory) as before)
+          # ... your build steps (they run in the project, $(System.DefaultWorkingDirectory))
 
   # ... your test deployment stage
 

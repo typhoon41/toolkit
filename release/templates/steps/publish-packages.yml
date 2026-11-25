@@ -16,7 +16,7 @@ parameters:
     default: false
   - name: npmrcFile
     type: string
-    default: $(Build.SourcesDirectory)/.npmrc
+    default: $(System.DefaultWorkingDirectory)/.npmrc
   - name: npmAccess                # '', public or restricted (scoped packages on npmjs.org default to restricted)
     type: string
     default: ''
@@ -25,7 +25,7 @@ parameters:
     default: ''
   - name: toolkitPath
     type: string
-    default: $(Pipeline.Workspace)/toolkit
+    default: $(Build.SourcesDirectory)/toolkit
 
 steps:
   - pwsh: |

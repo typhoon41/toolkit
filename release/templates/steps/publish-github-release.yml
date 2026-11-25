@@ -24,13 +24,13 @@ parameters:
     default: false
   - name: npmrcFile
     type: string
-    default: $(Build.SourcesDirectory)/.npmrc
+    default: $(System.DefaultWorkingDirectory)/.npmrc
   - name: trustedFeedHosts         # comma-separated npm hosts besides npmjs.org/Azure Artifacts that may get NpmToken
     type: string
     default: ''
   - name: toolkitPath
     type: string
-    default: $(Pipeline.Workspace)/toolkit
+    default: $(Build.SourcesDirectory)/toolkit
 
 steps:
   - pwsh: |
@@ -44,7 +44,6 @@ steps:
         -TrustedFeedHost $env:TRUSTED_FEED_HOSTS `
         -UseCheckoutCredentials:([bool]::Parse($env:USE_CHECKOUT_CREDENTIALS))
     displayName: ${{ parameters.action }} GitHub release
-    workingDirectory: $(Build.SourcesDirectory)
     target:
       commands: restricted
     env:
