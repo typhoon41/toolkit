@@ -4,7 +4,8 @@
 
 .DESCRIPTION
     A package unit releases only from the release-branch commit that changes its version.
-    Output variables: HasRelease ('true' when a unit releases) and RunName.
+    Output variables: HasRelease ('true' when a unit releases), RunName and RunNameCounted ('true' when
+    jobs/run-counter.yml appends the per-version run counter).
 #>
 [CmdletBinding()]
 param(
@@ -56,6 +57,7 @@ try {
 
     Set-PipelineVariable -Name HasRelease -Value $plan.hasRelease.ToString().ToLowerInvariant() -Output
     Set-PipelineVariable -Name RunName -Value $plan.runName -Output
+    Set-PipelineVariable -Name RunNameCounted -Value $plan.runNameCounted.ToString().ToLowerInvariant() -Output
     if (-not $KeepRunName) {
         Set-PipelineBuildNumber -BuildNumber $plan.runName
     }

@@ -83,6 +83,8 @@ stages:
           configuration: ${{ parameters.configuration }}
           toolkitRepository: ${{ parameters.toolkitRepository }}
 
+      - template: ../jobs/run-counter.yml
+
   - stage: Release
     dependsOn: Build
     lockBehavior: sequential
