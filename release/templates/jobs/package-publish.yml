@@ -11,7 +11,7 @@ parameters:
   - name: nugetAuthenticate
     type: boolean
     default: false
-  - name: npmAuthenticate          # true with npmServiceConnection too: every npm step then uses npmrcFile
+  - name: npmAuthenticate
     type: boolean
     default: false
   - name: npmServiceConnection
@@ -62,12 +62,12 @@ jobs:
                 action: Prepare
                 useGitHubServiceConnection: ${{ parameters.useGitHubServiceConnection }}
                 trustedFeedHosts: ${{ parameters.trustedFeedHosts }}
-                npmAuthenticate: ${{ parameters.npmAuthenticate }}
+                npmAuthenticate: ${{ or(parameters.npmAuthenticate, ne(parameters.npmServiceConnection, '')) }}
                 npmrcFile: ${{ parameters.npmrcFile }}
 
             - template: ../steps/publish-packages.yml
               parameters:
-                npmAuthenticate: ${{ parameters.npmAuthenticate }}
+                npmAuthenticate: ${{ or(parameters.npmAuthenticate, ne(parameters.npmServiceConnection, '')) }}
                 npmrcFile: ${{ parameters.npmrcFile }}
                 npmAccess: ${{ parameters.npmAccess }}
                 trustedFeedHosts: ${{ parameters.trustedFeedHosts }}
@@ -78,5 +78,5 @@ jobs:
                 useGitHubServiceConnection: ${{ parameters.useGitHubServiceConnection }}
                 trustedFeedHosts: ${{ parameters.trustedFeedHosts }}
                 feedWaitMinutes: ${{ parameters.feedWaitMinutes }}
-                npmAuthenticate: ${{ parameters.npmAuthenticate }}
+                npmAuthenticate: ${{ or(parameters.npmAuthenticate, ne(parameters.npmServiceConnection, '')) }}
                 npmrcFile: ${{ parameters.npmrcFile }}

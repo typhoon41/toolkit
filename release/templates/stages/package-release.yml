@@ -99,7 +99,7 @@ stages:
           environment: ${{ parameters.environment }}
           feedWaitMinutes: ${{ parameters.feedWaitMinutes }}
           nugetAuthenticate: ${{ parameters.nugetAuthenticate }}
-          npmAuthenticate: ${{ or(parameters.npmAuthenticate, ne(parameters.npmServiceConnection, '')) }}
+          npmAuthenticate: ${{ parameters.npmAuthenticate }}
           npmServiceConnection: ${{ parameters.npmServiceConnection }}
           npmrcFile: ${{ parameters.npmrcFile }}
           npmAccess: ${{ parameters.npmAccess }}
