@@ -18,6 +18,8 @@ Describe 'Read-ReleaseConfiguration' {
         @{ Case = 'a nuget unit without projects'; Json = '{ "units": [ { "name": "A", "type": "nuget" } ] }' }
         @{ Case = 'duplicate names'; Json = '{ "units": [ { "name": "A", "type": "pipeline" }, { "name": "A", "type": "pipeline" } ] }' }
         @{ Case = 'a path outside the repository'; Json = '{ "units": [ { "name": "A", "type": "npm", "package": "../x/package.json" } ] }' }
+        @{ Case = 'equal tag prefixes'; Json = '{ "units": [ { "name": "A", "type": "pipeline", "tagPrefix": "v" }, { "name": "B", "type": "pipeline", "tagPrefix": "v" } ] }' }
+        @{ Case = 'a tag prefix that starts with another'; Json = '{ "units": [ { "name": "A", "type": "pipeline", "tagPrefix": "a" }, { "name": "B", "type": "pipeline", "tagPrefix": "a1.0.0-foo" } ] }' }
     ) {
         $root = Join-Path $TestDrive ([Guid]::NewGuid().ToString('n'))
         Set-TestFile $root 'release.json' $Json

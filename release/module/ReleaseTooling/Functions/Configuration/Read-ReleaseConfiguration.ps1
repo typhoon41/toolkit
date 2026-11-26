@@ -21,9 +21,16 @@ function Read-ReleaseConfiguration {
     if ($duplicate) {
         throw "$Path lists unit '$($duplicate.Name)' more than once."
     }
-    $prefixes = @($units.TagPrefix)
-    if (@($prefixes | Select-Object -Unique).Count -ne $prefixes.Count) {
-        throw "$Path gives two units the same tag prefix; set a distinct 'tagPrefix' on each."
+    for ($index = 0; $index -lt $units.Count; $index++) {
+        foreach ($other in @($units | Select-Object -Skip ($index + 1))) {
+            $prefix = $units[$index].TagPrefix
+            if ($prefix.StartsWith($other.TagPrefix, [StringComparison]::Ordinal) -or
+                $other.TagPrefix.StartsWith($prefix, [StringComparison]::Ordinal)) {
+                throw ("$Path gives units '$($units[$index].Name)' and '$($other.Name)' overlapping tag prefixes " +
+                       "('$prefix', '$($other.TagPrefix)'), so one unit's tags could be read as the other's; " +
+                       "set a 'tagPrefix' on each that doesn't start with the other.")
+            }
+        }
     }
 
     $runNameUnit = if ($document['runNameUnit']) { [string]$document['runNameUnit'] } else { '' }     # '' = decided per build
