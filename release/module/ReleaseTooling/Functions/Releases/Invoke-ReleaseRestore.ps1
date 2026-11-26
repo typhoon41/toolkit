@@ -7,7 +7,7 @@ function Invoke-ReleaseRestore {
         [AllowEmptyCollection()] [object[]] $Releases = @(),
         [string] $NotesFile
     )
-    if ($Release -and (Get-ReleaseAsset -Context $Context -Release $Release -Name (Get-ReleaseStateName).Marker)) {
+    if ($Release -and (Get-ReleaseAsset -Context $Context -Release $Release -Marker)) {
         throw "A frozen draft for $($Context.Tag) already exists; use Prepare."
     }
     if ($Release -and $Release.target_commitish -ne $Context.Commit) {
@@ -23,7 +23,7 @@ function Invoke-ReleaseRestore {
         throw "None of this build's packages is on the feed; nothing to restore. Run the normal pipeline instead."
     }
 
-    $payload = New-ReleasePayload -Context $Context -Body (Get-ReleaseBody -Context $Context -NotesFile $NotesFile)
+    $payload = New-ReleasePayload -Context $Context -NotesFile $NotesFile
     $Release = if ($Release) {
         Write-ReleaseLog "Resuming interrupted restore of $($Context.Tag)"
         Invoke-GitHubApi -Client $Context.Client -Method Patch -Path "releases/$($Release.id)" -Body $payload

@@ -6,7 +6,7 @@ function Invoke-ReleasePublish {
     if ($Release.target_commitish -ne $Context.Commit) {
         throw "Draft $($Context.Tag) targets $($Release.target_commitish), not $($Context.Commit)."
     }
-    if (-not (Get-ReleaseAsset -Context $Context -Release $Release -Name (Get-ReleaseStateName).Marker)) {
+    if (-not (Get-ReleaseAsset -Context $Context -Release $Release -Marker)) {
         throw "Prepare did not complete for $($Context.Tag); run Prepare, then the feed push, then Publish."
     }
     Assert-ReleasePublishable -Context $Context                        # fail fast, before any waiting
@@ -18,10 +18,7 @@ function Invoke-ReleasePublish {
         draft       = $false
         make_latest = if ($Context.Candidate.IsPrerelease) { 'false' } else { 'true' }
     }
-    $commit = Assert-TagTarget -Context $Context
-    if (-not $commit) {
-        throw "Release $($Context.Tag) was published but GitHub reports no tag; check the release manually."
-    }
+    $commit = Assert-TagTarget -Context $Context -MissingReason "Release $($Context.Tag) was published but GitHub reports no tag; check the release manually."
     Remove-ReleaseMarker -Context $Context -Release $published
     Write-ReleaseLog "Published $($Context.Tag) at $commit`: $($published.html_url)"
 }

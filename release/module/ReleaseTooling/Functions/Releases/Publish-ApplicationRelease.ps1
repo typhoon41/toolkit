@@ -5,25 +5,18 @@ function Publish-ApplicationRelease {
     $releases = Get-GitHubRelease -Client $Context.Client
     $release = Find-UnitRelease -Context $Context -Releases $releases
     if ($release -and -not $release.draft) {
-        $commit = Assert-TagTarget -Context $Context
-        if (-not $commit) {
-            throw "Release $($Context.Tag) is published but its tag is missing."
-        }
+        [void](Assert-TagTarget -Context $Context -MissingReason "Release $($Context.Tag) is published but its tag is missing.")
         Write-ReleaseLog "Release $($Context.Tag) is already published and verified: $($release.html_url)"
         return
     }
     Assert-ReleasePublishable -Context $Context       # fresh: no higher version was released before this run got the lock
-    $payload = New-ReleasePayload -Context $Context -Body (Get-ReleaseBody -Context $Context -NotesFile $NotesFile) -Draft $false
-    $payload.make_latest = if ($Context.Candidate.IsPrerelease) { 'false' } else { 'true' }
+    $payload = New-ReleasePayload -Context $Context -NotesFile $NotesFile -Draft $false
     $published = if ($release) {
         Invoke-GitHubApi -Client $Context.Client -Method Patch -Path "releases/$($release.id)" -Body $payload
     }
     else {
         Invoke-GitHubApi -Client $Context.Client -Method Post -Path 'releases' -Body $payload
     }
-    $commit = Assert-TagTarget -Context $Context
-    if (-not $commit) {
-        throw "Release $($Context.Tag) was published but GitHub reports no tag; check the release manually."
-    }
+    $commit = Assert-TagTarget -Context $Context -MissingReason "Release $($Context.Tag) was published but GitHub reports no tag; check the release manually."
     Write-ReleaseLog "Published $($Context.Tag) at $commit`: $($published.html_url)"
 }

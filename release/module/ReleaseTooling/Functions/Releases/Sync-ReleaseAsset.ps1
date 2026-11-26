@@ -26,7 +26,7 @@ function Sync-ReleaseAsset {
     }
 
     $names = @($Context.Files.Name)
-    foreach ($extra in @($assets | Where-Object { $_.name -notin $names -and -not (Test-ReleaseStateAsset $_.name) })) {
+    foreach ($extra in @($assets | Where-Object { $_.name -notin $names -and -not [ReleaseStateName]::Includes($_.name) })) {
         if ($VerifyOnly) {
             throw "Release $($Context.Tag) has an asset this build didn't produce: $($extra.name). $FrozenReason"
         }

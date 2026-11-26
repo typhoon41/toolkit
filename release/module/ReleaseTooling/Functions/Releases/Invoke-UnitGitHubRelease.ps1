@@ -4,7 +4,7 @@ function Invoke-UnitGitHubRelease {
         [Parameter(Mandatory)] $Client,
         [Parameter(Mandatory)] $UnitPlan,
         [Parameter(Mandatory)] [string] $Commit,
-        [Parameter(Mandatory)] [string] $PackagesPath,
+        [Parameter(Mandatory)] [AllowEmptyString()] [string] $PackagesPath,       # empty: the guard below names it
         [string] $NotesFile,
         [int] $MinimumAgeMinutes = 60,
         [int] $FeedWaitMinutes = 15
@@ -34,7 +34,7 @@ function Invoke-UnitGitHubRelease {
         Confirm-PublishedRelease -Context $context -Release $release
         return
     }
-    if ($release -and $Action -ne 'Abandon' -and (Test-ReleaseSuperseded -Context $context -Release $release)) {
+    if ($release -and $Action -ne 'Abandon' -and (Get-ReleaseAsset -Context $context -Release $release -Superseded)) {
         throw "Release $($context.Tag) was superseded by a maintainer and must not be published. Bump the version."
     }
     switch ($Action) {

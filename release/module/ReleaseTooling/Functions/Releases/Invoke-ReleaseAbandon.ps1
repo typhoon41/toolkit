@@ -5,12 +5,11 @@ function Invoke-ReleaseAbandon {
     if (-not $Release) {
         throw "No draft release for $($Context.Tag)."
     }
-    if (Test-ReleaseSuperseded -Context $Context -Release $Release) {
+    if (Get-ReleaseAsset -Context $Context -Release $Release -Superseded) {
         Write-ReleaseLog "Release $($Context.Tag) is already superseded."
         return
     }
-    $names = Get-ReleaseStateName
-    $marker = Get-ReleaseAsset -Context $Context -Release $Release -Name $names.Marker
+    $marker = Get-ReleaseAsset -Context $Context -Release $Release -Marker
     if (-not $marker) {
         throw "Draft $($Context.Tag) never started publication; nothing to abandon. Delete it on GitHub if you don't want it."
     }
@@ -33,7 +32,7 @@ function Invoke-ReleaseAbandon {
     if (@(Get-ReleaseAsset -Context $Context -Release $Release -Attempts).Count -ne $attemptCount) {
         throw "A pipeline run attempted to publish $($Context.Tag) while Abandon was evaluating. Disable the release pipeline and retry."
     }
-    Add-ReleaseStateAsset -Context $Context -Release $Release -Name $names.Superseded -Content @{      # BEFORE the marker goes
+    Add-ReleaseStateAsset -Context $Context -Release $Release -Name ([ReleaseStateName]::Superseded) -Content @{      # BEFORE the marker goes
         version = $Context.Candidate.Text; commit = $Context.Commit; state = 'superseded'; at = [DateTimeOffset]::UtcNow.ToString('o')
         publishedOnFeed = $published; foreignOnFeed = $foreign
     }

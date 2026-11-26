@@ -25,7 +25,7 @@ function Invoke-ReleasePrepare {
         return
     }
 
-    $payload = New-ReleasePayload -Context $Context -Body (Get-ReleaseBody -Context $Context -NotesFile $NotesFile)
+    $payload = New-ReleasePayload -Context $Context -NotesFile $NotesFile
     if ($Release -and $Release.target_commitish -ne $Context.Commit) {
         Write-ReleaseLog "Deleting abandoned draft for $($Context.Tag) (it targets $($Release.target_commitish), nothing was pushed)"
         Invoke-GitHubApi -Client $Context.Client -Method Delete -Path "releases/$($Release.id)" | Out-Null
