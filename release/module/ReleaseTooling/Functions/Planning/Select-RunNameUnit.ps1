@@ -1,6 +1,7 @@
 function Select-RunNameUnit {
     # Without a configured or releasing unit, a release-branch build follows the unit released last, so its counter
-    # continues that version (2.0.0.1, 2.0.0.2, ...). Commit height orders the tags: timestamps can tie or lie.
+    # continues that version (2.0.0.1, 2.0.0.2, ...). It looks at every release tag reachable from HEAD, not the
+    # current version's tag: a bump whose release failed has none. Commit height orders tags; timestamps can tie.
     param(
         [Parameter(Mandatory)] [object[]] $Units,
         [AllowEmptyString()] [string] $ConfiguredName,
@@ -16,9 +17,11 @@ function Select-RunNameUnit {
     }
     if ($IsReleaseBranch) {
         $released = @(foreach ($unit in $Units) {
-            $commit = Get-TagTargetCommit $unit.tag
-            if ($commit) {
-                [pscustomobject]@{ Unit = $unit; Height = [int](Invoke-Git rev-list --count $commit) }
+            $heights = @(Get-ReleaseTag -Prefix $unit.tagPrefix -MergedInto HEAD | ForEach-Object {
+                [int](Invoke-Git rev-list --count "refs/tags/$($_.Tag)")
+            })
+            if ($heights.Count -gt 0) {
+                [pscustomobject]@{ Unit = $unit; Height = ($heights | Measure-Object -Maximum).Maximum }
             }
         })
         if ($released.Count -gt 0) {

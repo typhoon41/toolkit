@@ -87,6 +87,20 @@ Describe 'New-ReleasePlan' {
         $plan.runNameCounted | Should -BeTrue
     }
 
+    It 'follows the unit released last even when its newer bump has no release yet' {
+        $repository = New-TwoUnitRepository 'main-after-failed-release'
+        Set-TestFile $repository 'web/package.json' '{ "name": "@x/web", "version": "2.1.0" }'
+        Save-TestCommit $repository 'feat: web 2.1.0' -Tag 'web/v2.1.0'
+        Set-TestFile $repository 'web/package.json' '{ "name": "@x/web", "version": "2.2.0" }'
+        Save-TestCommit $repository 'feat: web 2.2.0'
+        Set-TestFile $repository 'src/Lib/a.cs' 'x'
+        Save-TestCommit $repository 'fix: something'
+        $plan = Get-TestPlan $repository
+        $plan.hasRelease | Should -BeFalse
+        $plan.runName | Should -Be '2.2.0'
+        $plan.runNameCounted | Should -BeTrue
+    }
+
     It 'packs CI versions with branch words on a feature branch' {
         $repository = New-TwoUnitRepository 'feature'
         Set-TestFile $repository 'src/Lib/a.cs' 'x'
