@@ -4,7 +4,7 @@ function Invoke-UnitGitHubRelease {
         [Parameter(Mandatory)] $Client,
         [Parameter(Mandatory)] $UnitPlan,
         [Parameter(Mandatory)] [string] $Commit,
-        [Parameter(Mandatory)] [string] $PackagesPath,
+        [Parameter(Mandatory)] [AllowEmptyString()] [string] $PackagesPath,       # empty: the guard below names it
         [string] $NotesFile,
         [int] $MinimumAgeMinutes = 60,
         [int] $FeedWaitMinutes = 15

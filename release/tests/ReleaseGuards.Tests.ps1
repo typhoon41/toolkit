@@ -81,3 +81,11 @@ Describe 'Sync-ReleaseAsset' {
             Should -Throw '*asset this build didn''t produce: Lib.1.0.9.nupkg*'
     }
 }
+
+Describe 'Invoke-UnitGitHubRelease' {
+    It 'names a missing -PackagesPath instead of failing parameter binding' {
+        $unitPlan = (New-TestContext).Unit
+        { Invoke-UnitGitHubRelease -Action Prepare -Client (New-GitHubClient -Repository 'owner/demo' -Token 'token') -UnitPlan $unitPlan `
+            -Commit $script:TestCommit -PackagesPath '' } | Should -Throw "-PackagesPath is required for unit 'Lib'."
+    }
+}
