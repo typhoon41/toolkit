@@ -18,10 +18,7 @@ function Invoke-ReleasePublish {
         draft       = $false
         make_latest = if ($Context.Candidate.IsPrerelease) { 'false' } else { 'true' }
     }
-    $commit = Assert-TagTarget -Context $Context
-    if (-not $commit) {
-        throw "Release $($Context.Tag) was published but GitHub reports no tag; check the release manually."
-    }
+    $commit = Assert-TagTarget -Context $Context -MissingReason "Release $($Context.Tag) was published but GitHub reports no tag; check the release manually."
     Remove-ReleaseMarker -Context $Context -Release $published
     Write-ReleaseLog "Published $($Context.Tag) at $commit`: $($published.html_url)"
 }
