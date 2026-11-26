@@ -5,7 +5,7 @@ function Assert-NoUnfinishedRelease {
         if (-not $tag -or $tag.Version.Text -eq $Context.Candidate.Text) {
             continue
         }
-        if (Test-ReleaseSuperseded -Context $Context -Release $draft) {
+        if (Get-ReleaseAsset -Context $Context -Release $draft -Superseded) {
             Write-ReleaseLog "Draft $($draft.tag_name) was superseded by a maintainer; ignoring it."
             continue
         }

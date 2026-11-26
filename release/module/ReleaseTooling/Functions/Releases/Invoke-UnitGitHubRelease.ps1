@@ -34,7 +34,7 @@ function Invoke-UnitGitHubRelease {
         Confirm-PublishedRelease -Context $context -Release $release
         return
     }
-    if ($release -and $Action -ne 'Abandon' -and (Test-ReleaseSuperseded -Context $context -Release $release)) {
+    if ($release -and $Action -ne 'Abandon' -and (Get-ReleaseAsset -Context $context -Release $release -Superseded)) {
         throw "Release $($context.Tag) was superseded by a maintainer and must not be published. Bump the version."
     }
     switch ($Action) {

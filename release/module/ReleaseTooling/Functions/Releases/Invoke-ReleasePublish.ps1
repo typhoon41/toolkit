@@ -6,7 +6,7 @@ function Invoke-ReleasePublish {
     if ($Release.target_commitish -ne $Context.Commit) {
         throw "Draft $($Context.Tag) targets $($Release.target_commitish), not $($Context.Commit)."
     }
-    if (-not (Get-ReleaseAsset -Context $Context -Release $Release -Name (Get-ReleaseStateName).Marker)) {
+    if (-not (Get-ReleaseAsset -Context $Context -Release $Release -Marker)) {
         throw "Prepare did not complete for $($Context.Tag); run Prepare, then the feed push, then Publish."
     }
     Assert-ReleasePublishable -Context $Context                        # fail fast, before any waiting

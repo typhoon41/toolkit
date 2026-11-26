@@ -7,7 +7,7 @@ function Invoke-ReleaseRestore {
         [AllowEmptyCollection()] [object[]] $Releases = @(),
         [string] $NotesFile
     )
-    if ($Release -and (Get-ReleaseAsset -Context $Context -Release $Release -Name (Get-ReleaseStateName).Marker)) {
+    if ($Release -and (Get-ReleaseAsset -Context $Context -Release $Release -Marker)) {
         throw "A frozen draft for $($Context.Tag) already exists; use Prepare."
     }
     if ($Release -and $Release.target_commitish -ne $Context.Commit) {

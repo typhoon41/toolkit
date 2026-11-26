@@ -41,13 +41,14 @@ Three layers, each calling the one below:
 1. **`templates/`** — Azure Pipelines YAML. `stages/package-release.yml` is the complete Build + Release
    flow for package repos (via `jobs/package-build.yml`, `jobs/package-publish.yml`); `steps/*.yml` are
    individually usable and must keep the order documented in `release/README.md`. Templates check out the
-   project at `$(Build.SourcesDirectory)` and the toolkit at `$(Pipeline.Workspace)/toolkit`.
+   project at `$(System.DefaultWorkingDirectory)` and the toolkit at `$(Build.SourcesDirectory)/toolkit`.
 2. **`scripts/`** — one entry-point script per pipeline step. Each sets `$ErrorActionPreference='Stop'`,
    `Set-StrictMode -Version Latest`, imports the module, and keeps logic thin.
 3. **`module/ReleaseTooling/`** — all logic. `ReleaseTooling.psm1` dot-sources every
-   `Functions/**/*.ps1` and exports everything: **one public function per file, named after the
-   function**, grouped by folder (Planning, Versioning, Notes, Releases, NuGet, Npm, GitHub, Git, Feeds…).
-   Adding a function = adding a file; nothing to register.
+   `Classes/*.ps1`, then every `Functions/**/*.ps1`, and exports the functions: **one public function per
+   file, named after the function**, grouped by folder (Planning, Versioning, Notes, Releases, NuGet, Npm,
+   GitHub, Git, Feeds…); a class (one per file, module-internal) holds values that belong together, such as
+   `ReleaseStateName`. Adding a function = adding a file; nothing to register.
 
 Data flow: `Resolve-ReleasePlan.ps1` reads the consuming repo's `release.json` (units of type `nuget`,
 `npm`, `pipeline`) and git history/tags, and writes `release-plan.json` (schemaVersion 1). Every later

@@ -12,13 +12,13 @@ Describe 'Invoke-ReleasePublish' {
         Mock -ModuleName ReleaseTooling Sync-ReleaseAsset { }
         Mock -ModuleName ReleaseTooling Remove-ReleaseMarker { }
         Mock -ModuleName ReleaseTooling Start-Sleep { }
-        Mock -ModuleName ReleaseTooling Get-ReleaseAsset { [pscustomobject]@{ name = 'release-state.json' } } -ParameterFilter { $Name -eq 'release-state.json' }
+        Mock -ModuleName ReleaseTooling Get-ReleaseAsset { [pscustomobject]@{ name = 'release-state.json' } } -ParameterFilter { $Marker }
         Mock -ModuleName ReleaseTooling Get-ReleaseAsset { }
         Mock -ModuleName ReleaseTooling Invoke-GitHubApi { New-TestDraft }
     }
 
     It 'refuses a draft that Prepare never marked' {
-        Mock -ModuleName ReleaseTooling Get-ReleaseAsset { } -ParameterFilter { $Name -eq 'release-state.json' }
+        Mock -ModuleName ReleaseTooling Get-ReleaseAsset { } -ParameterFilter { $Marker }
         { Invoke-ReleasePublish -Context (New-TestContext -Files @($package)) -Release (New-TestDraft) } | Should -Throw '*Prepare did not complete*'
         Should -Invoke -ModuleName ReleaseTooling Invoke-GitHubApi -Times 0 -Exactly -ParameterFilter { $Method -eq 'Patch' }
     }
