@@ -150,7 +150,14 @@ builds of forks* off, and require a team member's comment before building fork P
 ## 5. GitHub
 
 - **Branch ruleset for `main`**: require a PR with 1 approval (dismiss stale approvals), require the
-  pipeline's status check, no bypass, block force pushes and deletions. Allow **squash merging only**.
+  pipeline's status check, no bypass, block force pushes and deletions.
+- **Merging** (*Settings → General → Pull Requests*): allow **squash merging only**, with *Pull request title*
+  as the commit title and *Commit messages* as its body, and *Automatically delete head branches*. Each PR then
+  lands on `main` as one commit titled like `fix(scope): description (#12)`, which also names the pipeline run;
+  the release notes still list the PR's own commits, grouped by type. From a shell:
+  `gh api -X PATCH repos/<owner>/<repository> -F allow_squash_merge=true -F allow_merge_commit=false
+  -F allow_rebase_merge=false -f squash_merge_commit_title=PR_TITLE -f squash_merge_commit_message=COMMIT_MESSAGES
+  -F delete_branch_on_merge=true`.
 - **Tag ruleset** for the release tags (`v*`, or `*/v*` with several units): restrict updates and
   deletions; optionally restrict creations with the release token's account on the bypass list.
 

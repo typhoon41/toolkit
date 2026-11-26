@@ -1,12 +1,13 @@
 function Get-RunName {
-    # CountsRuns: jobs/run-counter.yml appends a counter that restarts with every version (1.3.0.1, 1.3.0.2, ...).
+    # CountsRuns: jobs/run-counter.yml appends a counter that restarts with every version, so a package's release
+    # run is 1.3.0.1 and later release-branch builds without a bump are 1.3.0.2, 1.3.0.3, ...
     param(
         [Parameter(Mandatory)] $UnitPlan,
         [Parameter(Mandatory)] [bool] $IsReleaseBranch,
         [Parameter(Mandatory)] [string] $Label
     )
     if ($UnitPlan.type -ne 'pipeline') {
-        if ($UnitPlan.canRelease) {
+        if ($IsReleaseBranch) {
             return [pscustomobject]@{ Text = $UnitPlan.version; CountsRuns = $true }
         }
         return [pscustomobject]@{ Text = $UnitPlan.packageVersion; CountsRuns = $false }

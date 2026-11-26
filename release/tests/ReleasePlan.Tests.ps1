@@ -64,6 +64,17 @@ Describe 'New-ReleasePlan' {
         $web.tag | Should -Be 'web/v2.1.0-beta.1'
     }
 
+    It 'counts a release-branch build without a bump under the released version' {
+        $repository = New-TwoUnitRepository 'main-without-bump'
+        Set-TestFile $repository 'src/Lib/a.cs' 'x'
+        Save-TestCommit $repository 'fix: something'
+        $plan = Get-TestPlan $repository
+        ($plan.units | Where-Object name -eq 'Lib').packageVersion | Should -Be '1.0.1-ci.42'
+        $plan.hasRelease | Should -BeFalse
+        $plan.runName | Should -Be '1.0.0'
+        $plan.runNameCounted | Should -BeTrue
+    }
+
     It 'packs CI versions with branch words on a feature branch' {
         $repository = New-TwoUnitRepository 'feature'
         Set-TestFile $repository 'src/Lib/a.cs' 'x'
