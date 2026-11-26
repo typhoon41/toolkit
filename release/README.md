@@ -11,9 +11,10 @@ from one place:
   [ESLint's releases](https://github.com/eslint/eslint/releases): Breaking Changes, Features, Bug Fixes,
   Documentation, Chores. A commit that doesn't follow the [convention](docs/CONTRIBUTING.md) is a chore.
   The notes are optional and, when on, ship inside the NuGet/npm package and form the GitHub release.
-- **Run names** show the version and a counter that restarts with every version bump on releases
-  (`1.3.0.1`, `1.3.0.2`), and the build id on CI builds (`1.3.1-ci.4711`), with up to three words of the
-  branch name on feature branches (`1.3.1-calendar-fixes.4711`).
+- **Run names** on the release branch show the version and a counter that restarts with every version
+  bump: the release is `1.3.0.1`, later builds without a bump `1.3.0.2`, `1.3.0.3`. Feature branches and
+  PRs show the next version, up to three words of the branch name and the build id
+  (`1.3.1-calendar-fixes.4711`).
 - **Mono- and multi-repos**: a `release.json` lists the release units; each has its own version, tags
   (`<unit>/v1.2.3` when there are several) and notes limited to its own paths.
 

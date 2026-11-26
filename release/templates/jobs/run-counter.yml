@@ -1,5 +1,6 @@
-# Appends a run counter to a releasing build's name (1.3.0 -> 1.3.0.1, 1.3.0.2, ...). counter() is keyed on the
-# version, so it restarts at 1 after every bump; it is a runtime expression, so it needs a job after the plan's job.
+# Appends a run counter to every release-branch package build's name (1.3.0 -> 1.3.0.1, 1.3.0.2, ...). counter() is
+# keyed on the version, so it restarts at 1 after every bump; it is a runtime expression, so it needs a job after the
+# plan's job.
 
 parameters:
   - name: planJob                  # the job that ran steps/resolve-release-plan.yml

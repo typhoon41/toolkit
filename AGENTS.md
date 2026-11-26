@@ -12,8 +12,9 @@ Shared tooling consumed by other projects, one folder per tool:
   its next run and nothing is tagged by hand. Keep template parameters and script contracts backward compatible
   by default: add parameters with defaults that keep today's behaviour, never rename or remove one in place.
   A deliberate breaking change (a new default, a moved path, a removed parameter) is allowed only when the
-  maintainer asks for it, the commit is marked `!` with a `BREAKING CHANGE:` footer saying what consumers must
-  change, and a PR updating every known consumer is opened alongside, merging after the toolkit PR.
+  maintainer asks for it and the commit is marked `!` with a `BREAKING CHANGE:` footer saying what consumers must
+  change. When a known consumer's files must change, a PR updating it is opened alongside and merges after the
+  toolkit PR; when none must, the toolkit PR says so instead.
 - `claude/` — the `conventions` Claude Code plugin, published by the root `.claude-plugin/marketplace.json`
   (marketplace `toolkit`). See "Claude plugin (`claude/`)" below.
 
