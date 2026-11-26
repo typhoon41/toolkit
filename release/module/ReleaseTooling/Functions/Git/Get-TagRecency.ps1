@@ -7,8 +7,9 @@ function Get-TagRecency {
         $position[$commit] = $index
         $index++
     }
-    $recency = @{}
-    foreach ($line in @(Invoke-Git for-each-ref refs/tags '--format=%(refname:short)%09%(*objectname)%09%(objectname)')) {
+    # Ordinal keys: tags may differ only in case. lstrip=2 keeps the bare tag name even when a branch shares it.
+    $recency = [Collections.Generic.Dictionary[string, int]]::new([StringComparer]::Ordinal)
+    foreach ($line in @(Invoke-Git for-each-ref refs/tags '--format=%(refname:lstrip=2)%09%(*objectname)%09%(objectname)')) {
         $name, $peeled, $object = $line -split "`t"
         $commit = if ($peeled) { $peeled } else { $object }      # annotated tags point at a tag object first
         if ($position.ContainsKey($commit)) {

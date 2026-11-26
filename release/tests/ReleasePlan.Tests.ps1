@@ -142,6 +142,7 @@ Describe 'Get-TagRecency' {
         Push-Location $repository
         try {
             git tag -a 'annotated' -m 'annotated tag'
+            git branch 'old'          # a branch named like a tag must not hide the tag
             git checkout -q -b side
             git commit -q --allow-empty -m 'feat: elsewhere'
             git tag 'unreachable'
