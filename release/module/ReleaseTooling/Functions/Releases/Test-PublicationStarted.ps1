@@ -4,8 +4,17 @@ function Test-PublicationStarted {
     if (Get-ReleaseAsset -Context $Context -Release $Release -Name (Get-ReleaseStateName).Marker) {
         return $true
     }
+    $unit = $Context.Unit
     foreach ($packageId in $Context.PackageIds) {
-        if (Test-FeedVersion -UnitPlan $Context.Unit -Id $packageId -Version $VersionText) {
+        if ($unit.type -eq 'npm') {
+            $published = [bool](Get-NpmPublishedIntegrity -Name $packageId -Version $VersionText -Registry $unit.npmRegistry)
+        }
+        else {
+            $headers = Get-NuGetFeedHeader -Source $unit.nugetSource
+            $flatContainer = Get-NuGetFlatContainer -Source $unit.nugetSource -Headers $headers
+            $published = Test-NuGetVersion -FlatContainer $flatContainer -Id $packageId -Version $VersionText -Headers $headers
+        }
+        if ($published) {
             return $true
         }
     }

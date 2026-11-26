@@ -36,3 +36,21 @@ Describe 'Assert-AbandonAllowed' {
         { Assert-AbandonAllowed -Context (New-TestContext) -Release $release -Marker $marker -Published @() -Foreign @() -MinimumAgeMinutes 1 } | Should -Not -Throw
     }
 }
+
+Describe 'Test-PublicationStarted' {
+    BeforeAll {
+        Mock -ModuleName ReleaseTooling Get-ReleaseAsset { }
+        Mock -ModuleName ReleaseTooling Get-NuGetFeedHeader { @{} }
+        Mock -ModuleName ReleaseTooling Get-NuGetFlatContainer { 'https://api.nuget.org/v3-flatcontainer/' }
+    }
+
+    It 'reads the <Type> feed when the draft has no marker' -ForEach @(
+        @{ Type = 'nuget'; OnFeed = $true }, @{ Type = 'nuget'; OnFeed = $false }
+        @{ Type = 'npm'; OnFeed = $true }, @{ Type = 'npm'; OnFeed = $false }
+    ) {
+        Mock -ModuleName ReleaseTooling Test-NuGetVersion { $OnFeed }
+        Mock -ModuleName ReleaseTooling Get-NpmPublishedIntegrity { if ($OnFeed) { 'sha512-x' } }
+        Test-PublicationStarted -Context (New-TestContext -Type $Type) -VersionText '1.1.0' -Release ([pscustomobject]@{ id = 1 }) |
+            Should -Be $OnFeed
+    }
+}
