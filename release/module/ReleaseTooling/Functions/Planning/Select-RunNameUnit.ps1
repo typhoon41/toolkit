@@ -1,7 +1,7 @@
 function Select-RunNameUnit {
     # Without a configured or releasing unit, a release-branch build follows the unit released last, so its counter
     # continues that version (2.0.0.1, 2.0.0.2, ...). It looks at every release tag reachable from HEAD, not the
-    # current version's tag: a bump whose release failed has none. Commit height orders tags; timestamps can tie.
+    # current version's tag: a bump whose release failed has none. History order ranks tags; timestamps can tie.
     param(
         [Parameter(Mandatory)] [object[]] $Units,
         [AllowEmptyString()] [string] $ConfiguredName,
@@ -16,16 +16,16 @@ function Select-RunNameUnit {
         return $releasing[0]
     }
     if ($IsReleaseBranch) {
+        $recency = Get-TagRecency
         $released = @(foreach ($unit in $Units) {
-            $heights = @(Get-ReleaseTag -Prefix $unit.tagPrefix -MergedInto HEAD | ForEach-Object {
-                [int](Invoke-Git rev-list --count "refs/tags/$($_.Tag)")
-            })
-            if ($heights.Count -gt 0) {
-                [pscustomobject]@{ Unit = $unit; Height = ($heights | Measure-Object -Maximum).Maximum }
+            $positions = @(Get-ReleaseTag -Prefix $unit.tagPrefix | Where-Object { $recency.ContainsKey($_.Tag) } |
+                ForEach-Object { $recency[$_.Tag] })
+            if ($positions.Count -gt 0) {
+                [pscustomobject]@{ Unit = $unit; Position = ($positions | Measure-Object -Minimum).Minimum }
             }
         })
         if ($released.Count -gt 0) {
-            return ($released | Sort-Object -Property Height -Descending -Stable | Select-Object -First 1).Unit
+            return ($released | Sort-Object -Property Position -Stable | Select-Object -First 1).Unit
         }
     }
     $Units[0]

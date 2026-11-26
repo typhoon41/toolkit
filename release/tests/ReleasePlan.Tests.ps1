@@ -133,3 +133,26 @@ Describe 'Get-RunName' {
         (Get-RunName -UnitPlan $unitPlan -IsReleaseBranch $false -Label 'calendar-fixes').Text | Should -Be '0.9.12-calendar-fixes'
     }
 }
+
+Describe 'Get-TagRecency' {
+    It 'ranks lightweight and annotated tags by history position and skips unreachable ones' {
+        $repository = New-TestRepository (Join-Path $TestDrive 'recency')
+        Save-TestCommit $repository 'feat: first' -Tag 'old'
+        Save-TestCommit $repository 'feat: second'
+        Push-Location $repository
+        try {
+            git tag -a 'annotated' -m 'annotated tag'
+            git checkout -q -b side
+            git commit -q --allow-empty -m 'feat: elsewhere'
+            git tag 'unreachable'
+            git checkout -q main
+            $recency = Get-TagRecency
+        }
+        finally {
+            Pop-Location
+        }
+        $recency['annotated'] | Should -Be 0
+        $recency['old'] | Should -Be 1
+        $recency.ContainsKey('unreachable') | Should -BeFalse
+    }
+}
