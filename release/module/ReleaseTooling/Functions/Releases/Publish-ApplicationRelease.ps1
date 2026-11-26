@@ -10,8 +10,7 @@ function Publish-ApplicationRelease {
         return
     }
     Assert-ReleasePublishable -Context $Context       # fresh: no higher version was released before this run got the lock
-    $payload = New-ReleasePayload -Context $Context -Body (Get-ReleaseBody -Context $Context -NotesFile $NotesFile) -Draft $false
-    $payload.make_latest = if ($Context.Candidate.IsPrerelease) { 'false' } else { 'true' }
+    $payload = New-ReleasePayload -Context $Context -NotesFile $NotesFile -Draft $false
     $published = if ($release) {
         Invoke-GitHubApi -Client $Context.Client -Method Patch -Path "releases/$($release.id)" -Body $payload
     }
