@@ -75,6 +75,18 @@ Describe 'New-ReleasePlan' {
         $plan.runNameCounted | Should -BeTrue
     }
 
+    It 'keeps counting under the unit released last when it is not the first unit' {
+        $repository = New-TwoUnitRepository 'main-after-second-unit-release'
+        Set-TestFile $repository 'web/package.json' '{ "name": "@x/web", "version": "2.1.0" }'
+        Save-TestCommit $repository 'feat: web 2.1.0' -Tag 'web/v2.1.0'
+        Set-TestFile $repository 'src/Lib/a.cs' 'x'
+        Save-TestCommit $repository 'fix: something'
+        $plan = Get-TestPlan $repository
+        $plan.hasRelease | Should -BeFalse
+        $plan.runName | Should -Be '2.1.0'
+        $plan.runNameCounted | Should -BeTrue
+    }
+
     It 'packs CI versions with branch words on a feature branch' {
         $repository = New-TwoUnitRepository 'feature'
         Set-TestFile $repository 'src/Lib/a.cs' 'x'

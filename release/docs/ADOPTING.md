@@ -27,7 +27,7 @@ are what keep publishing credentials away from untrusted code.
 | `tagPrefix` | Optional. Default `v` for a single unit, `<name>/v` for several |
 | `nugetSource` | Optional, `https://` only. Default `https://api.nuget.org/v3/index.json`; Azure Artifacts: the feed's `index.json`. Credentials go only to nuget.org, Azure Artifacts or hosts in the pipeline's `trustedFeedHosts` |
 | `npmRegistry` | Optional, `https://` only. Default `https://registry.npmjs.org/`. `NpmToken` goes only to npmjs.org, Azure Artifacts or `trustedFeedHosts` |
-| `runNameUnit` | Optional. Which unit names the run when there are several (default: the first unit that releases in the build, otherwise the first unit) |
+| `runNameUnit` | Optional. Which unit names the run when there are several (default: the first unit that releases in the build; on the release branch otherwise the unit released last, so its counter continues; otherwise the first unit) |
 
 Versions: NuGet units read `<Version>` from the `.csproj`, else from the nearest
 `Directory.Build.props` above it (a props file that imports its parent through

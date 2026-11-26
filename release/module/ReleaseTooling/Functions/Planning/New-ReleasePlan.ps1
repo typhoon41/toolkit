@@ -30,11 +30,7 @@ function New-ReleasePlan {
     $units = @(foreach ($unit in $configuration.Units) {
         New-UnitReleasePlan -Unit $unit -Context $context
     })
-    $runNameUnit = @(
-        @($units | Where-Object { $_.name -eq $configuration.RunNameUnit })
-        @($units | Where-Object { $_.canRelease })
-        $units[0]
-    ) | Select-Object -First 1
+    $runNameUnit = Select-RunNameUnit -Units $units -ConfiguredName $configuration.RunNameUnit -IsReleaseBranch $isReleaseBranch
     $runName = Get-RunName -UnitPlan $runNameUnit -IsReleaseBranch $isReleaseBranch -Label $label
     [pscustomobject]@{
         schemaVersion   = 1
