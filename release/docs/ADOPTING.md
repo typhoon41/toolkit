@@ -117,8 +117,9 @@ The GitHub connection is the default in `package-release.yml`; npm and NuGet use
   repository. The Build stage keeps `GitHubReadToken` or anonymous access: it runs pull-request code, so it never
   persists credentials.
 - **npm** (`npmServiceConnection: <name>`): an *npm* service connection (**Service connections → New → npm**,
-  registry URL plus an automation token). `npmAuthenticate@0` writes its credentials into `npmrcFile`, so commit an
-  `.npmrc` that lists the registry, e.g. `registry=https://registry.npmjs.org/`.
+  registry URL plus an automation token). `npmAuthenticate@0` writes its credentials into `npmrcFile`; when the
+  project commits no `.npmrc`, the release job writes one naming `https://registry.npmjs.org/` first. Commit an
+  `.npmrc` only for another registry.
 
 Any secret still needed (`NuGetApiKey`, `NpmToken`, or `GitHubToken` with `useGitHubServiceConnection: false`) comes
 from the group named in `releaseVariableGroup`; with both connections and no NuGet unit, no group is needed.

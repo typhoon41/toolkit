@@ -1,6 +1,7 @@
 # Run before any step that reads or writes an Azure Artifacts feed or uses an npm service connection. With
 # npmAuthenticate or npmServiceConnection, pass npmAuthenticate: true and the same npmrcFile to the later steps so
-# npm uses that file. npmAuthenticate@0 adds credentials only for registries the file lists (registry=...).
+# npm uses that file. npmAuthenticate@0 adds credentials only for registries the file lists (registry=...); with
+# npmServiceConnection and no file at npmrcFile, one naming registry.npmjs.org is written first.
 
 parameters:
   - name: nugetAuthenticate
@@ -15,11 +16,23 @@ parameters:
   - name: npmrcFile
     type: string
     default: $(System.DefaultWorkingDirectory)/.npmrc
+  - name: toolkitPath
+    type: string
+    default: $(Build.SourcesDirectory)/toolkit
 
 steps:
   - ${{ if parameters.nugetAuthenticate }}:
     - task: NuGetAuthenticate@1
       displayName: Authenticate to NuGet feeds
+
+  - ${{ if ne(parameters.npmServiceConnection, '') }}:
+    - pwsh: '& "$env:TOOLKIT_PATH/release/scripts/Initialize-NpmUserConfiguration.ps1" -Path $env:NPMRC_FILE'
+      displayName: Prepare .npmrc
+      target:
+        commands: restricted
+      env:
+        TOOLKIT_PATH: ${{ parameters.toolkitPath }}
+        NPMRC_FILE: ${{ parameters.npmrcFile }}
 
   - ${{ if or(parameters.npmAuthenticate, ne(parameters.npmServiceConnection, '')) }}:
     - task: npmAuthenticate@0
